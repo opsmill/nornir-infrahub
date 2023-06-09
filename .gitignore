@@ -1,0 +1,19 @@
+.coverage
+coverage.xml
+*.pyc
+*.env
+script.py
+.vscode/settings.json
+.retype/*
+node_modules/*
+development/docker-compose.override.yml
+.DS_Store
+.python-version
+.venv
+
+# Direnv files (https://direnv.net/)
+.direnv/
+.envrc
+
+.dir-locals.el
+

@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "nornir-infrahub"
+version = "0.1.0"
+description = "Nornir plugin for Infrahub"
+authors = ["OpsMill <info@opsmill.com>"]
+readme = "README.md"
+packages = [{include = "nornir_infrahub"}]
+
+[tool.poetry.dependencies]
+python = "^3.8, <3.12"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
