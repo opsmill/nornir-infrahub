@@ -8,6 +8,127 @@ packages = [{include = "nornir_infrahub"}]
 
 [tool.poetry.dependencies]
 python = "^3.8, <3.12"
+infrahub-sdk = "^0.2.0"
+ruamel-yaml = "^0.18.5"
+nornir = "^3.4.1"
+nornir-utils = "^0.2.0"
+python-slugify = "^8.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+ruff = "^0.1.4"
+black = "^23.10.1"
+mypy = "^1.6.1"
+pytest-asyncio = "^0.21.1"
+types-python-slugify = "^8.0.0.3"
+isort = "^5.12.0"
+
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
+exclude = '''
+        /(
+          \.git
+        | \.tox
+        | \.venv
+        | env/
+        | _build
+        | build
+        | dist
+        | examples
+        )/
+    '''
+
+[tool.isort]
+profile = "black"
+# known_first_party = [ "nornir_infrahub" ]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError()"
+]
+
+[tool.pylint.format]
+disable = "logging-fstring-interpolation"
+
+[tool.pylint.basic]
+# No docstrings required for private methods (Pylint default), or for test_ functions.
+no-docstring-rgx="^(_|test_)"
+
+[tool.pylint.messages_control]
+# Line length is enforced by Black, so pylint doesn't need to check it.
+# Pylint and Black disagree about how to format multi-line arrays; Black wins.
+disable = """,
+    line-too-long,
+    missing-module-docstring,
+    missing-function-docstring,
+    missing-class-docstring,
+    consider-using-from-import,
+    invalid-name,
+    too-many-arguments,
+    too-many-locals,
+    keyword-arg-before-vararg,
+    too-few-public-methods,
+    too-many-instance-attributes,
+    fixme,
+    consider-using-f-string,
+    protected-access,
+    import-self,
+    wrong-import-order,
+    """
+
+[tool.pylint.miscellaneous]
+notes = """,
+    FIXME,
+    XXX,
+    """
+
+[tool.pylint.similarities]
+min-similarity-lines = 20
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = [
+    "tests"
+]
+filterwarnings = [
+    "ignore:Module already imported so cannot be rewritten",
+    "ignore:the imp module is deprecated",
+    "ignore:Deprecated call to",
+]
+addopts = "-vs"
+
+
+[tool.mypy]
+pretty = true
+ignore_missing_imports = true
+
+[tool.ruff]
+
+select = [
+    "C90",
+    "DTZ",
+    "E",
+    "F",
+    "ICN",
+    "TCH",
+    "T10",
+    "Q",
+    "W",
+    "YTT",
+]
+
+line-length = 170
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.ruff.per-file-ignores]
 
 
 [build-system]
