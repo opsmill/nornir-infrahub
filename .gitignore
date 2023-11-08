@@ -17,3 +17,4 @@ development/docker-compose.override.yml
 
 .dir-locals.el
 
+dist/*
