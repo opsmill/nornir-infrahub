@@ -1,10 +1,26 @@
 [tool.poetry]
 name = "nornir-infrahub"
-version = "0.1.0"
+version = "0.2.1"
 description = "Nornir plugin for Infrahub"
 authors = ["OpsMill <info@opsmill.com>"]
 readme = "README.md"
 packages = [{include = "nornir_infrahub"}]
+license = "Apache-2.0"
+homepage = "https://opsmill.io"
+repository = "https://opsmill.io"
+documentation = "https://opsmill.io"
+
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+[tool.poetry.plugins."nornir.plugins.inventory"]
+"InfrahubInventory" = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 
 [tool.poetry.dependencies]
 python = "^3.8, <3.12"
