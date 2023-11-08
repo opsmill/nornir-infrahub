@@ -1,0 +1,73 @@
+---
+# yamllint disable rule:truthy rule:truthy rule:line-length
+name: "CI"
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - stable
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# env:
+#   XXX
+
+jobs:
+  yaml-lint:
+    if: needs.files-changed.outputs.yaml == 'true'
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v3"
+      - name: "Setup environment"
+        run: "pip install yamllint==1.29.0"
+      - name: "Linting: yamllint"
+        run: "yamllint ."
+
+  python-lint:
+    if: needs.files-changed.outputs.python == 'true'
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v3"
+      - name: "Setup environment"
+        run: "pip install black==23.1.0 ruff==0.0.265"
+      - name: "Linting: BLACK"
+        run: "black --check ."
+      - name: "Linting: ruff"
+        run: "ruff check ."
+
+  python-tests:
+    if: |
+      always() && !cancelled() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+    needs: ["yaml-lint", "python-lint"]
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v3"
+      - name: "Install Poetry"
+        run: "pipx install poetry"
+      - name: "Pytest Tests"
+        run: "pytest -v tests/"
+
+  coverall-report:
+    needs: ["python-tests"]
+    if: |
+      always() && !cancelled()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: coverallsapp/github-action@v2
+        env:
+          COVERALLS_SERVICE_NUMBER: ${{ github.sha }}
+        with:
+          carryforward: "nornir-unit"
+          parallel-finished: true
