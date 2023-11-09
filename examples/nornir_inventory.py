@@ -12,9 +12,7 @@ def main():
                 "address": "http://localhost:8000",
                 "token": "06438eb2-8019-4776-878c-0941b1f1d1ec",
                 # defines the Infrahub Node kind that will mapped to Nornir Hosts
-                "host_node": {
-                    "kind": "InfraDevice"
-                },
+                "host_node": {"kind": "InfraDevice"},
                 # maps a Nornir Host property to an InfraNode attributes or relation
                 # name is the name of the Nornir Host property we want to map
                 # mapping is the attribute or relation of the Node from which we have to extract the value
@@ -30,10 +28,8 @@ def main():
                 ],
                 # create Nornir groups from InfraNode attributesor relations
                 # groups is created as attribute__value `site__jfk1`
-                "group_mappings": [
-                    "site.name"
-                ],
-                "group_file": "dummy.yml"
+                "group_mappings": ["site.name"],
+                "group_file": "dummy.yml",
             },
         }
     )

@@ -33,12 +33,11 @@ python-slugify = "^8.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
-ruff = "^0.1.4"
-black = "^23.10.1"
+ruff = "^0.1"
 mypy = "^1.6.1"
 pytest-asyncio = "^0.21.1"
-types-python-slugify = "^8.0.0.3"
-isort = "^5.12.0"
+types-python-slugify = "*"
+invoke = "^2.2.0"
 
 [tool.black]
 line-length = 120
@@ -55,10 +54,6 @@ exclude = '''
         | examples
         )/
     '''
-
-[tool.isort]
-profile = "black"
-# known_first_party = [ "nornir_infrahub" ]
 
 [tool.coverage.run]
 branch = true
@@ -127,19 +122,19 @@ ignore_missing_imports = true
 [tool.ruff]
 
 select = [
-    "C90",
-    "DTZ",
-    "E",
-    "F",
-    "ICN",
-    "TCH",
-    "T10",
-    "Q",
-    "W",
-    "YTT",
+    "C90",  # mccabe
+    "DTZ",  # flake8-datetimez
+    "E",    # pycodestyle
+    "F",    # Pyflakes
+    "ICN",  # flake8-import-conventions
+    "TCH",  # flake8-type-checking
+    "T10",  # flake8-debugger
+    "Q",    # flake8-quotes
+    "W",    # pycodestyle
+    "YTT",  # flake8-2020
 ]
 
-line-length = 170
+line-length = 120
 
 [tool.ruff.mccabe]
 max-complexity = 10
