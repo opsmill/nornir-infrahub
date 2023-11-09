@@ -15,14 +15,16 @@ concurrency:
 
 jobs:
   lint:
-    if: needs.files-changed.outputs.yaml == 'true'
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
         uses: "actions/checkout@v3"
       - name: "Setup environment"
-        run: "pipx install poetry invoke toml"
+        run: | 
+          pipx install poetry
+          pipx install invoke
+          pipx install toml
       - name: "Install Linters"
         run: "poetry install --only=dev"
       - name: "Linting"
@@ -47,7 +49,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: "Setup environment"
-        run: "pipx install poetry invoke toml"
+        run: | 
+          pipx install poetry
+          pipx install invoke
+          pipx install toml
       - name: "Install Nornir Infrahub"
         run: "poetry install"
       - name: "Pytest Tests"
