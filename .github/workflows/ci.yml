@@ -12,11 +12,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# env:
-#   XXX
-
 jobs:
-  yaml-lint:
+  lint:
     if: needs.files-changed.outputs.yaml == 'true'
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
@@ -24,50 +21,47 @@ jobs:
       - name: "Check out repository code"
         uses: "actions/checkout@v3"
       - name: "Setup environment"
-        run: "pip install yamllint==1.29.0"
-      - name: "Linting: yamllint"
-        run: "yamllint ."
-
-  python-lint:
-    if: needs.files-changed.outputs.python == 'true'
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 5
-    steps:
-      - name: "Check out repository code"
-        uses: "actions/checkout@v3"
-      - name: "Setup environment"
-        run: "pip install black==23.1.0 ruff==0.0.265"
-      - name: "Linting: BLACK"
-        run: "black --check ."
-      - name: "Linting: ruff"
-        run: "ruff check ."
+        run: "pipx install poetry invoke toml"
+      - name: "Install Linters"
+        run: "poetry install --only=dev"
+      - name: "Linting"
+        run: "invoke lint"
 
   python-tests:
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
     if: |
       always() && !cancelled() &&
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled') &&
-    needs: ["yaml-lint", "python-lint"]
+    needs: ["lint"]
     runs-on: "ubuntu-latest"
     timeout-minutes: 30
     steps:
       - name: "Check out repository code"
         uses: "actions/checkout@v3"
-      - name: "Install Poetry"
-        run: "pipx install poetry"
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: "Setup environment"
+        run: "pipx install poetry invoke toml"
+      - name: "Install Nornir Infrahub"
+        run: "poetry install"
       - name: "Pytest Tests"
         run: "pytest -v tests/"
 
-  coverall-report:
-    needs: ["python-tests"]
-    if: |
-      always() && !cancelled()
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: coverallsapp/github-action@v2
-        env:
-          COVERALLS_SERVICE_NUMBER: ${{ github.sha }}
-        with:
-          carryforward: "nornir-unit"
-          parallel-finished: true
+  # coverall-report:
+  #   needs: ["python-tests"]
+  #   if: |
+  #     always() && !cancelled()
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   steps:
+  #     - uses: coverallsapp/github-action@v2
+  #       env:
+  #         COVERALLS_SERVICE_NUMBER: ${{ github.sha }}
+  #       with:
+  #         carryforward: "nornir-unit"
+  #         parallel-finished: true
