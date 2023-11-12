@@ -28,7 +28,7 @@ jobs:
       - name: "Install Linters"
         run: "poetry install --only=dev"
       - name: "Linting"
-        run: "invoke lint"
+        run: "poetry run invoke lint"
 
   python-tests:
     strategy:
@@ -56,7 +56,7 @@ jobs:
       - name: "Install Nornir Infrahub"
         run: "poetry install"
       - name: "Pytest Tests"
-        run: "pytest -v tests/"
+        run: "poetry run pytest -v tests/"
 
   # coverall-report:
   #   needs: ["python-tests"]
