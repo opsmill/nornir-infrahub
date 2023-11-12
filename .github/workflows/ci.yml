@@ -24,7 +24,6 @@ jobs:
         run: |
           pipx install poetry
           pip install invoke toml
-          poetry config virtualenvs.create false
       - name: "Install Linters"
         run: "poetry install --only=dev"
       - name: "Linting"
@@ -52,7 +51,6 @@ jobs:
         run: |
           pipx install poetry
           pip install invoke toml
-          poetry config virtualenvs.create false
       - name: "Install Nornir Infrahub"
         run: "poetry install"
       - name: "Pytest Tests"
