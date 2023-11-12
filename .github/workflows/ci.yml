@@ -1,0 +1,71 @@
+---
+# yamllint disable rule:truthy rule:truthy rule:line-length
+name: "CI"
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
+      - stable
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v3"
+      - name: "Setup environment"
+        run: |
+          pipx install poetry
+          pip install invoke toml
+      - name: "Install Linters"
+        run: "poetry install --only=dev"
+      - name: "Linting"
+        run: "poetry run invoke lint"
+
+  python-tests:
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+    if: |
+      always() && !cancelled() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    needs: ["lint"]
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v3"
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: "Setup environment"
+        run: |
+          pipx install poetry
+          pip install invoke toml
+      - name: "Install Nornir Infrahub"
+        run: "poetry install"
+      - name: "Pytest Tests"
+        run: "poetry run pytest -v tests/"
+
+  # coverall-report:
+  #   needs: ["python-tests"]
+  #   if: |
+  #     always() && !cancelled()
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   steps:
+  #     - uses: coverallsapp/github-action@v2
+  #       env:
+  #         COVERALLS_SERVICE_NUMBER: ${{ github.sha }}
+  #       with:
+  #         carryforward: "nornir-unit"
+  #         parallel-finished: true

@@ -132,7 +132,7 @@ class InfrahubInventory:
         group_file: Path to group file (defaults to ``group.yaml``)
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         host_node: Dict[str, Any],
         address: str = "http://localhost:8000",
@@ -169,7 +169,7 @@ class InfrahubInventory:
         )
         self.extra_nodes = get_related_nodes(host_node_schema, attrs)
 
-    def load(self) -> Inventory:
+    def load(self) -> Inventory:  # noqa: PLR0912
         yml = ruamel.yaml.YAML(typ="safe")
 
         hosts = Hosts()

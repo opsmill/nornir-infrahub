@@ -1,0 +1,12 @@
+---
+name: ✅ Task
+description: Create a task for minor issues that isn't a feature or a bug
+title: 'task: '
+labels: ["type/task"]
+body:
+  - type: textarea
+    attributes:
+      label: Task Description
+      description: A clear description of what it is you think should be done.
+    validations:
+      required: true
