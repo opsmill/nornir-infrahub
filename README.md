@@ -1,4 +1,4 @@
-# [Nornir](https://github.com/nornir-automation/nornir) plugin for [Infrahub][https://github.com/opsmill/infrahub]
+# [Nornir](https://github.com/nornir-automation/nornir) plugin for [Infrahub](https://github.com/opsmill/infrahub)
 
 ## Installation
 
