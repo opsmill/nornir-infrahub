@@ -29,6 +29,7 @@ ruamel-yaml = "^0.18.5"
 nornir = "^3.4.1"
 nornir-utils = "^0.2.0"
 python-slugify = "^8.0.1"
+pydantic = ">=1.7.4,!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
