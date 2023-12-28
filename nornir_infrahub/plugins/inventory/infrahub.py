@@ -17,7 +17,7 @@ from nornir.core.inventory import (
     Inventory,
     ParentGroups,
 )
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, model_validator
 from pydantic.dataclasses import dataclass
 from slugify import slugify
 
@@ -99,15 +99,17 @@ class HostNode(BaseModel):
     exclude: List[str] = Field(default_factory=list)
     filters: Dict[str, Any] = Field(default_factory=dict)
 
-    @validator("include", always=True)
-    def validate_include(cls, v: List[str]):
+    @model_validator(mode="before")
+    @classmethod
+    def validate_include(cls, data: Any) -> Any:
         # add member_of_groups to include property
         # this relation needs to be pre fetched to be able to determine the group membership of a HostNode
-        include = ["member_of_groups"]
-        for item in v:
-            include.append(item)
-        return include
-
+        if isinstance(data, dict):
+            if "include" in data and isinstance(data["include"], list):
+                data["include"].append("member_of_groups")
+            elif "include" not in data:
+                data["include"] = ["member_of_groups"]
+        return data
 
 def get_related_nodes(node_schema: NodeSchema, attrs: Set[str]) -> Set[str]:
     nodes = {"CoreStandardGroup"}
