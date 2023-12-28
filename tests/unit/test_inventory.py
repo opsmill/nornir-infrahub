@@ -13,7 +13,7 @@ from nornir_infrahub.plugins.inventory.infrahub import (  # _get_inventory_eleme
     ip_interface_to_ip_string,
     resolve_node_mapping,
 )
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 
 # from unittest.mock import Mock, patch
 
@@ -250,7 +250,7 @@ def test_create_host_node():
     host_node = HostNode(kind=kind, include=include, exclude=exclude, filters=filters)
 
     assert host_node.kind == kind
-    assert host_node.include == ["member_of_groups", "item1", "item2"]
+    assert sorted(host_node.include) == sorted(["member_of_groups", "item1", "item2"])
     assert host_node.exclude == exclude
     assert host_node.filters == filters
 
@@ -259,14 +259,14 @@ def test_validate_include_property():
     valid_include = ["item1", "item2"]
     valid_host_node = HostNode(kind="host", include=valid_include)
 
-    assert valid_host_node.include == ["member_of_groups", "item1", "item2"]
+    assert sorted(valid_host_node.include) == sorted(["member_of_groups", "item1", "item2"])
 
     invalid_include = 123
-    with pytest.raises(ValidationError, match="value is not a valid list"):
+    with pytest.raises(ValidationError, match="Input should be a valid list"):
         HostNode(kind="host", include=invalid_include)
 
     invalid_include_items = ["item1", [123]]
-    with pytest.raises(ValidationError, match="str type expected"):
+    with pytest.raises(ValidationError, match="Input should be a valid string"):
         HostNode(kind="host", include=invalid_include_items)
 
 
