@@ -166,20 +166,31 @@ smmap = ">=3.0.1,<6"
 
 [[package]]
 name = "gitpython"
-version = "3.1.40"
+version = "3.1.42"
 description = "GitPython is a Python library used to interact with Git repositories"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "GitPython-3.1.40-py3-none-any.whl", hash = "sha256:cf14627d5a8049ffbf49915732e5eddbe8134c3bdb9d476e6182b676fc573f8a"},
-    {file = "GitPython-3.1.40.tar.gz", hash = "sha256:22b126e9ffb671fdd0c129796343a02bf67bf2994b35449ffc9321aa755e18a4"},
+    {file = "GitPython-3.1.42-py3-none-any.whl", hash = "sha256:1bf9cd7c9e7255f77778ea54359e54ac22a72a5b51288c457c881057b7bb9ecd"},
+    {file = "GitPython-3.1.42.tar.gz", hash = "sha256:2d99869e0fef71a73cbd242528105af1d6c1b108c60dfabd994bf292f76c3ceb"},
 ]
 
 [package.dependencies]
 gitdb = ">=4.0.1,<5"
 
 [package.extras]
-test = ["black", "coverage[toml]", "ddt (>=1.1.1,!=1.4.3)", "mock", "mypy", "pre-commit", "pytest", "pytest-cov", "pytest-instafail", "pytest-subtests", "pytest-sugar"]
+test = ["black", "coverage[toml]", "ddt (>=1.1.1,!=1.4.3)", "mock", "mypy", "pre-commit", "pytest (>=7.3.1)", "pytest-cov", "pytest-instafail", "pytest-mock", "pytest-sugar"]
+
+[[package]]
+name = "graphql-core"
+version = "3.2.3"
+description = "GraphQL implementation for Python, a port of GraphQL.js, the JavaScript reference implementation for GraphQL."
+optional = false
+python-versions = ">=3.6,<4"
+files = [
+    {file = "graphql-core-3.2.3.tar.gz", hash = "sha256:06d2aad0ac723e35b1cb47885d3e5c45e956a53bc1b209a9fc5369007fe46676"},
+    {file = "graphql_core-3.2.3-py3-none-any.whl", hash = "sha256:5766780452bd5ec8ba133f8bf287dc92713e3868ddd83aee4faab9fc3e303dc3"},
+]
 
 [[package]]
 name = "h11"
@@ -286,25 +297,27 @@ testing = ["pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)",
 
 [[package]]
 name = "infrahub-sdk"
-version = "0.4.0"
+version = "0.8.0"
 description = "Python Client to interact with Infrahub"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "infrahub_sdk-0.4.0-py3-none-any.whl", hash = "sha256:323b7fa34c371b9c1049fc45a23cc6992dc57849b45988b87479722053266338"},
-    {file = "infrahub_sdk-0.4.0.tar.gz", hash = "sha256:bb761f2d9a56b7c4cd53cc77ea0579299f23775853b12333f6705360dd6acce9"},
+    {file = "infrahub_sdk-0.8.0-py3-none-any.whl", hash = "sha256:d07c6b7213d822414c841be262705af7f0448f991a2c8913510222a538ea3218"},
+    {file = "infrahub_sdk-0.8.0.tar.gz", hash = "sha256:5302796edcfc553cf43c67aa0700ab3f36ec009c7d6d5cce70cf922cd30cc2f9"},
 ]
 
 [package.dependencies]
 deepdiff = ">=6.2,<7.0"
-gitpython = "3.1.40"
+gitpython = ">=3.1.41,<4.0.0"
+graphql-core = ">=3.2.3,<4.0.0"
 httpx = ">=0.23,<0.24"
-Jinja2 = ">=3.1,<4.0"
+Jinja2 = ">=3.1.3,<4.0.0"
 jsonlines = ">=3.1,<4.0"
 numpy = {version = ">=1.24.2,<2.0.0", markers = "python_version >= \"3.8\" and python_version < \"3.12\""}
-pendulum = ">=3.0,<3.1"
+pendulum = {version = ">=2.1", markers = "python_version >= \"3.8\" and python_version < \"3.12\""}
 pyarrow = ">=14.0.1,<15.0.0"
 pydantic = ">=1.7.4,<1.8 || >1.8,<1.8.1 || >1.8.1,<2.0.0 || >2.0.0,<2.0.1 || >2.0.1,<2.1.0 || >2.1.0,<3.0.0"
+pytest = "*"
 pyyaml = ">=6.0,<7.0"
 rich = ">=13.3,<14.0"
 toml = ">=0.10.2,<0.11.0"
@@ -335,13 +348,13 @@ files = [
 
 [[package]]
 name = "jinja2"
-version = "3.1.2"
+version = "3.1.3"
 description = "A very fast and expressive template engine."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "Jinja2-3.1.2-py3-none-any.whl", hash = "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"},
-    {file = "Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
+    {file = "Jinja2-3.1.3-py3-none-any.whl", hash = "sha256:7d6d50dd97d52cbc355597bd845fabfbac3f551e1f99619e39a35ce8c370b5fa"},
+    {file = "Jinja2-3.1.3.tar.gz", hash = "sha256:ac8bd6544d4bb2c9792bf3a159e80bba8fda7f07e81bc3aed565432d5925ba90"},
 ]
 
 [package.dependencies]
@@ -1443,4 +1456,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8, <3.12"
-content-hash = "7de0b5cc0fe3aece7cc4a9e915b390034d79cfa7a218e5d45492c755d4d3a016"
+content-hash = "c5efa73b96382ddabe1ab30594f7dd5ae05c8223deda0b2789a8d8519d2e3375"
