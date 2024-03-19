@@ -265,7 +265,10 @@ httpx = [
     {version = ">=0.23", markers = "python_version >= \"3.11\""},
 ]
 Jinja2 = {version = ">=3,<4", optional = true, markers = "extra == \"ctl\" or extra == \"tests\" or extra == \"all\""}
-pendulum = {version = ">=2", markers = "python_version >= \"3.8\" and python_version < \"3.12\""}
+pendulum = [
+    {version = ">=2", markers = "python_version >= \"3.8\" and python_version < \"3.12\""},
+    {version = ">=3", markers = "python_version >= \"3.12\""},
+]
 pydantic = ">=1.7.4,<1.8 || >1.8,<1.8.1 || >1.8.1,<2.0.0 || >2.0.0,<2.0.1 || >2.0.1,<2.1.0 || >2.1.0,<3.0.0"
 pytest = {version = "*", optional = true, markers = "extra == \"tests\" or extra == \"all\""}
 pyyaml = {version = ">=6,<7", optional = true, markers = "extra == \"ctl\" or extra == \"tests\" or extra == \"all\""}
@@ -1146,5 +1149,5 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.8, <3.12"
-content-hash = "dd1eca897e29938db006fa2060c0569d177925072e7da5e0124b3ad2e6d7d032"
+python-versions = "^3.8, <3.13"
+content-hash = "31c4027d2135e161e509910849d1c70cfb67f61bb8b7499443a55b23214ba540"

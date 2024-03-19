@@ -17,13 +17,14 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 
 [tool.poetry.plugins."nornir.plugins.inventory"]
 "InfrahubInventory" = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 
 [tool.poetry.dependencies]
-python = "^3.8, <3.12"
+python = "^3.8, <3.13"
 infrahub-sdk = {version = "^0,>=0.9.1", extras = ["tests"]}
 ruamel-yaml = "^0.18.5"
 nornir = "^3.4.1"
