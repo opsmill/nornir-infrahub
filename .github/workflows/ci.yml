@@ -32,7 +32,7 @@ jobs:
   python-tests:
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     if: |
       always() && !cancelled() &&
       !contains(needs.*.result, 'failure') &&
