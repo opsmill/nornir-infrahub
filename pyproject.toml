@@ -24,7 +24,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.9, <3.13"
-infrahub-sdk = {version = "^0,>=0.9.1", extras = ["tests"]}
+infrahub-sdk = {version = "^0.10.0rc1", allow-prereleases = true, extras=["all"]}
 ruamel-yaml = "^0.18.5"
 nornir = "^3.4.1"
 nornir-utils = "^0.2.0"
