@@ -9,12 +9,12 @@ from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
 
 @pytest.fixture
 async def client() -> InfrahubClient:
-    return await InfrahubClient.init(address="http://mock", insert_tracker=True, pagination_size=3)
+    return await InfrahubClient.init(address="http://mock")
 
 
 @pytest.fixture
 async def client_sync() -> InfrahubClientSync:
-    return (InfrahubClientSync.init(address="http://mock", insert_tracker=True, pagination_size=3),)
+    return (InfrahubClientSync.init(address="http://mock"),)
 
 
 @pytest.fixture
