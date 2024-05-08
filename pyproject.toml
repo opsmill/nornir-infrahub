@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nornir-infrahub"
-version = "0.2.3"
+version = "0.3.0"
 description = "Nornir plugin for Infrahub"
 authors = ["OpsMill <info@opsmill.com>"]
 readme = "README.md"
@@ -13,7 +13,6 @@ documentation = "https://opsmill.io"
 classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -24,8 +23,8 @@ classifiers = [
 "InfrahubInventory" = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 
 [tool.poetry.dependencies]
-python = "^3.8, <3.13"
-infrahub-sdk = {version = "^0,>=0.9.1", extras = ["tests"]}
+python = "^3.9, <3.13"
+infrahub-sdk = {version = "^0,>=0.9.1", extras=["tests"]}
 ruamel-yaml = "^0.18.5"
 nornir = "^3.4.1"
 nornir-utils = "^0.2.0"
