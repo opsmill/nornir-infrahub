@@ -6,9 +6,9 @@ authors = ["OpsMill <info@opsmill.com>"]
 readme = "README.md"
 packages = [{include = "nornir_infrahub"}]
 license = "Apache-2.0"
-homepage = "https://opsmill.io"
-repository = "https://opsmill.io"
-documentation = "https://opsmill.io"
+homepage = "https://opsmill.com"
+repository = "https://github.com/opsmill/nornir-infrahub"
+documentation = "https://docs.infrahub.app/"
 
 classifiers = [
     "Intended Audience :: Developers",
