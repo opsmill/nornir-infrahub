@@ -2,16 +2,19 @@
 
 ## Installation
 
-	pip install nornir_infrahub
+```bash
+pip install nornir_infrahub
+```
 
 ## Infrahub as the Nornir inventory
 
-Infrahub can be used as an inventory source for Nonir.
+Infrahub can be used as an inventory source for Nornir.
 An example of this can be found in [./examples/nornir_inventory.py](./examples/nornir_inventory.py)
 
 ## Infrahub Artifact Tasks
 
-A set of tasks are provided to operate on Infrahub Artifacts.
+A set of tasks are provided to operate on Infrahub Artifacts:
+
 - `generate_artifacts`: generates the Artifacts for a Artifact Definition
 - `regenerate_artifact`: re-generates an Artifact for a Nornir Host
 - `get_artifact`: retrieve an Artifact for a Nornir Host
