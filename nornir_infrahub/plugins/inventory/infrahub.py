@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Type, Union
 
 import ruamel.yaml
-from infrahub_sdk import Config, InfrahubClientSync, InfrahubNodeSync, NodeSchema
+from infrahub_sdk import Config, InfrahubClientSync, InfrahubNodeSync, NodeNotFoundError, NodeSchema
 from nornir.core.inventory import (
     ConnectionOptions,
     Defaults,
@@ -110,6 +110,7 @@ class HostNode(BaseModel):
             elif "include" not in data:
                 data["include"] = ["member_of_groups"]
         return data
+
 
 def get_related_nodes(node_schema: NodeSchema, attrs: Set[str]) -> Set[str]:
     nodes = {"CoreStandardGroup"}
@@ -219,7 +220,12 @@ class InfrahubInventory:
             host["data"] = {"InfrahubNode": host_node}
             hosts[name] = _get_inventory_element(Host, host, name, defaults)
 
-            extracted_groups = [related_node.peer.name.value for related_node in host_node.member_of_groups.peers]
+            extracted_groups = []
+            for related_node in host_node.member_of_groups.peers:
+                try:
+                    extracted_groups.append(related_node.peer.name.value)
+                except NodeNotFoundError:
+                    continue
 
             for group_mapping in self.group_mappings:
                 attrs = group_mapping.split(".")
