@@ -42,7 +42,7 @@ def resolve_node_mapping(node: InfrahubNodeSync, attrs: List[str]) -> Any:
             }
             mapper = value_mapper.get(node_attr._schema.kind, lambda value: value)
             return mapper(node_attr.value)
-    raise RuntimeError("Unable to resolve mapping")
+        raise RuntimeError("Unable to resolve mapping")
 
 
 def _get_connection_options(data: Dict[str, Any]) -> Dict[str, ConnectionOptions]:
