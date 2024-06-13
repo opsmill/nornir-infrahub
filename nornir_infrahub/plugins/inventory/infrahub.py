@@ -42,7 +42,8 @@ def resolve_node_mapping(node: InfrahubNodeSync, attrs: List[str]) -> Any:
             }
             mapper = value_mapper.get(node_attr._schema.kind, lambda value: value)
             return mapper(node_attr.value)
-    raise RuntimeError("Unable to resolve mapping")
+        else:
+            raise RuntimeError("Unable to resolve mapping")
 
 
 def _get_connection_options(data: Dict[str, Any]) -> Dict[str, ConnectionOptions]:
@@ -232,7 +233,6 @@ class InfrahubInventory:
                 try:
                     extracted_groups.append(f"{attrs[0]}__{slugify(resolve_node_mapping(host_node, attrs))}")
                 except RuntimeError:
-                    print(f"Unable to extract group for {attrs}")
                     # TODO: what do we do in this case?
                     continue
 
