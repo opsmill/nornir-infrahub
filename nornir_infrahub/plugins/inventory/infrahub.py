@@ -215,6 +215,7 @@ class InfrahubInventory:
                 try:
                     host[schema_mapping.name] = resolve_node_mapping(host_node, attrs)
                 except RuntimeError:
+                    # TODO: what do we do in this case?
                     continue
 
             host["data"] = {"InfrahubNode": host_node}
@@ -232,6 +233,7 @@ class InfrahubInventory:
                 try:
                     extracted_groups.append(f"{attrs[0]}__{slugify(resolve_node_mapping(host_node, attrs))}")
                 except RuntimeError:
+                    # TODO: what do we do in this case?
                     continue
 
             for group in extracted_groups:
