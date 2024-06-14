@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nornir-infrahub"
-version = "0.3.1"
+version = "0.3.2"
 description = "Nornir plugin for Infrahub"
 authors = ["OpsMill <info@opsmill.com>"]
 readme = "README.md"
@@ -17,16 +17,14 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 
-packages = [
-    { include = "nornir_infrahub" }
-]
+packages = [{ include = "nornir_infrahub" }]
 
 [tool.poetry.plugins."nornir.plugins.inventory"]
 "InfrahubInventory" = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 
 [tool.poetry.dependencies]
 python = "^3.9, <3.13"
-infrahub-sdk = {version = "^0,>=0.9.1", extras=["tests"]}
+infrahub-sdk = { version = "^0,>=0.9.1", extras = ["tests"] }
 ruamel-yaml = "^0.18.5"
 nornir = "^3.4.1"
 nornir-utils = "^0.2.0"
@@ -47,19 +45,12 @@ yamllint = "*"
 branch = true
 
 [tool.coverage.report]
-exclude_lines = [
-    "if TYPE_CHECKING:",
-    "raise NotImplementedError()"
-]
+exclude_lines = ["if TYPE_CHECKING:", "raise NotImplementedError()"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = [
-    "tests"
-]
-filterwarnings = [
-    "ignore:pkg_resources is deprecated",
-]
+testpaths = ["tests"]
+filterwarnings = ["ignore:pkg_resources is deprecated"]
 addopts = "-vs"
 
 
@@ -72,19 +63,19 @@ line-length = 120
 
 [tool.ruff.lint]
 select = [
-    "C90",      # mccabe
-    "ASYNC",    # flake8-async
-    "DTZ",      # flake8-datetimez
-    "E",        # style errors
-    "F",        # flakes
-    "I",        # isort
-    "ICN",      # flake8-import-conventions
-    "TCH",      # flake8-type-checking
-    "T10",      # flake8-debugger
-    "PL",       # pylint
-    "Q",        # flake8-quotes
-    "W",        # pycodestyle
-    "YTT",      # flake8-2020
+    "C90",   # mccabe
+    "ASYNC", # flake8-async
+    "DTZ",   # flake8-datetimez
+    "E",     # style errors
+    "F",     # flakes
+    "I",     # isort
+    "ICN",   # flake8-import-conventions
+    "TCH",   # flake8-type-checking
+    "T10",   # flake8-debugger
+    "PL",    # pylint
+    "Q",     # flake8-quotes
+    "W",     # pycodestyle
+    "YTT",   # flake8-2020
 ]
 
 
