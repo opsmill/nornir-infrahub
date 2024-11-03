@@ -5,7 +5,9 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Type, Union
 
 import ruamel.yaml
-from infrahub_sdk import Config, InfrahubClientSync, InfrahubNodeSync, NodeSchema
+from infrahub_sdk import Config, InfrahubClientSync
+from infrahub_sdk.node import InfrahubNodeSync
+from infrahub_sdk.schema import NodeSchema
 from nornir.core.inventory import (
     ConnectionOptions,
     Defaults,
