@@ -2,7 +2,9 @@ import ipaddress
 from typing import Any
 
 import pytest
-from infrahub_sdk import InfrahubClient, InfrahubNodeSync, NodeSchema
+from infrahub_sdk import InfrahubClient
+from infrahub_sdk.node import InfrahubNodeSync
+from infrahub_sdk.schema import NodeSchema
 from nornir.core.inventory import ConnectionOptions, Defaults  # , HostOrGroup
 from nornir_infrahub.plugins.inventory.infrahub import (  # _get_inventory_element,
     HostNode,
