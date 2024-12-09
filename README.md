@@ -22,7 +22,7 @@ pip install nornir_infrahub
 
 ## Usage
 
-An example of this can be found in [./examples/nornir_inventory.py](./examples/nornir_inventory.py)
+An example of this can be found in [./examples/nornir_inventory.py](https://github.com/opsmill/nornir-infrahub/blob/stable/examples/nornir_inventory.py)
 
 ## Infrahub artifact tasks
 
@@ -32,4 +32,4 @@ A set of tasks are provided to operate on Infrahub Artifacts:
 - `regenerate_artifact`: re-generates an Artifact for a Nornir Host
 - `get_artifact`: retrieve an Artifact for a Nornir Host
 
-An example of this can be found in [./examples/nornir_tasks.py](./examples/nornir_tasks.py)
+An example of this can be found in [./examples/nornir_tasks.py](https://github.com/opsmill/nornir-infrahub/blob/stable/examples/nornir_tasks.py)
