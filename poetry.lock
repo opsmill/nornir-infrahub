@@ -207,13 +207,13 @@ testing = ["flake8 (<5)", "flufl.flake8", "importlib-resources (>=1.3)", "packag
 
 [[package]]
 name = "infrahub-sdk"
-version = "1.1.0"
+version = "1.2.0"
 description = "Python Client to interact with Infrahub"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "infrahub_sdk-1.1.0-py3-none-any.whl", hash = "sha256:b996a6d5d862e66f13a8dc68adad74a59a1f1175a33809db5e84fc58276ebf35"},
-    {file = "infrahub_sdk-1.1.0.tar.gz", hash = "sha256:b0f995053a6a92f72ec92abef2564080ff9c72e026db1bc0d686cb84ffd1e5e0"},
+    {file = "infrahub_sdk-1.2.0-py3-none-any.whl", hash = "sha256:915db1fc1a98d0547f9015fa500cde8713e21bc38e9469a0c0a814bd8f06f522"},
+    {file = "infrahub_sdk-1.2.0.tar.gz", hash = "sha256:5ea9df309a9d0330cbb07f0b48e717212bc8a4a6f987f2ef4b0423eeb3068f32"},
 ]
 
 [package.dependencies]
@@ -236,8 +236,8 @@ rich = {version = ">=13,<14", optional = true, markers = "extra == \"ctl\" or ex
 ujson = ">=5,<6"
 
 [package.extras]
-all = ["Jinja2 (>=3,<4)", "numpy (>=1.24.2,<2.0.0)", "numpy (>=1.26.2,<2.0.0)", "pyarrow (>=14,<15)", "pytest", "pyyaml (>=6,<7)", "rich (>=13,<14)", "toml (>=0.10,<0.11)", "typer (>=0.12.3,<0.13.0)"]
-ctl = ["Jinja2 (>=3,<4)", "numpy (>=1.24.2,<2.0.0)", "numpy (>=1.26.2,<2.0.0)", "pyarrow (>=14,<15)", "pyyaml (>=6,<7)", "rich (>=13,<14)", "toml (>=0.10,<0.11)", "typer (>=0.12.3,<0.13.0)"]
+all = ["Jinja2 (>=3,<4)", "numpy (>=1.24.2,<2.0.0)", "numpy (>=1.26.2,<2.0.0)", "pyarrow (>=14)", "pytest", "pyyaml (>=6,<7)", "rich (>=13,<14)", "toml (>=0.10,<0.11)", "typer (>=0.12.3,<0.13.0)"]
+ctl = ["Jinja2 (>=3,<4)", "numpy (>=1.24.2,<2.0.0)", "numpy (>=1.26.2,<2.0.0)", "pyarrow (>=14)", "pyyaml (>=6,<7)", "rich (>=13,<14)", "toml (>=0.10,<0.11)", "typer (>=0.12.3,<0.13.0)"]
 tests = ["Jinja2 (>=3,<4)", "pytest", "pyyaml (>=6,<7)", "rich (>=13,<14)"]
 
 [[package]]
