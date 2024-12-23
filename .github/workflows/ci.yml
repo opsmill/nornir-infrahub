@@ -23,7 +23,7 @@ jobs:
       - name: "Setup environment"
         run: |
           pipx install poetry
-          pip install invoke toml
+          pip install --upgrade invoke toml setuptools
       - name: "Install Linters"
         run: "poetry install --only=dev"
       - name: "Linting"
@@ -50,9 +50,9 @@ jobs:
       - name: "Setup environment"
         run: |
           pipx install poetry
-          pip install invoke toml
+          pip install --upgrade invoke toml setuptools
       - name: "Install Nornir Infrahub"
-        run: "poetry install"
+        run: "poetry install --with=dev"
       - name: "Pytest Tests"
         run: "poetry run pytest -v tests/"
 
