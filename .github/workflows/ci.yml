@@ -32,7 +32,13 @@ jobs:
   python-tests:
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11"]
+        experimental: [false]
+        # Added experimental and python 3.12 due to upstream dependency in nornir.
+        # This should be fixed once they release 3.5.0: https://github.com/nornir-automation/nornir/pull/981
+        include:
+          - python-version: "3.12"
+            experimental: true
     if: |
       always() && !cancelled() &&
       !contains(needs.*.result, 'failure') &&
@@ -58,6 +64,7 @@ jobs:
         run: "poetry install --with=dev"
       - name: "Pytest Tests"
         run: "poetry run pytest -v tests/"
+        continue-on-error: ${{ matrix.experimental }}
 
   # coverall-report:
   #   needs: ["python-tests"]
