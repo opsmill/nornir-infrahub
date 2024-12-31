@@ -19,11 +19,14 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
+        id: python
         uses: "actions/checkout@v3"
       - name: "Setup environment"
         run: |
           pipx install poetry
           pip install --upgrade invoke toml setuptools
+        env:
+          PIPX_DEFAULT_PYTHON: ${{ steps.python.outputs.python-path }}
       - name: "Install Linters"
         run: "poetry install --only=dev"
       - name: "Linting"
@@ -42,6 +45,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: "Check out repository code"
+        id: python
         uses: "actions/checkout@v3"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -51,6 +55,8 @@ jobs:
         run: |
           pipx install poetry
           pip install --upgrade invoke toml setuptools
+        env:
+          PIPX_DEFAULT_PYTHON: ${{ steps.python.outputs.python-path }}
       - name: "Install Nornir Infrahub"
         run: "poetry install --with=dev"
       - name: "Pytest Tests"
