@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nornir-infrahub"
-version = "1.0.1"
+version = "1.0.2"
 description = "Nornir plugin for Infrahub"
 authors = ["OpsMill <info@opsmill.com>"]
 readme = "README.md"
