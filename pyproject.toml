@@ -40,6 +40,7 @@ pytest-asyncio = "^0.21.1"
 types-python-slugify = "*"
 invoke = "2.2.0"
 yamllint = "*"
+setuptools = "^75.7.0"
 
 [tool.coverage.run]
 branch = true
