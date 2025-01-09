@@ -7,7 +7,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Type, Union
 import ruamel.yaml
 from infrahub_sdk import Config, InfrahubClientSync
 from infrahub_sdk.node import InfrahubNodeSync
-from infrahub_sdk.schema import NodeSchema
+from infrahub_sdk.schema import NodeSchemaAPI
 from nornir.core.inventory import (
     ConnectionOptions,
     Defaults,
@@ -115,7 +115,7 @@ class HostNode(BaseModel):
         return data
 
 
-def get_related_nodes(node_schema: NodeSchema, attrs: Set[str]) -> Set[str]:
+def get_related_nodes(node_schema: NodeSchemaAPI, attrs: Set[str]) -> Set[str]:
     nodes = {"CoreStandardGroup"}
     relationship_schemas = {schema.name: schema.peer for schema in node_schema.relationships}
     for attr in attrs:

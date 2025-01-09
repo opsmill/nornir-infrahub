@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 from infrahub_sdk import InfrahubClient
 from infrahub_sdk.node import InfrahubNodeSync
-from infrahub_sdk.schema import NodeSchema
+from infrahub_sdk.schema import NodeSchemaAPI
 from nornir.core.inventory import ConnectionOptions, Defaults  # , HostOrGroup
 from nornir_infrahub.plugins.inventory.infrahub import (  # _get_inventory_element,
     HostNode,
@@ -38,21 +38,21 @@ def test_ip_interface_to_ip_string_ipv6():
 # resolve_node_mapping
 
 
-def test_valid_mapping(client: InfrahubClient, ipaddress_schema: NodeSchema, ipaddress_data: dict[str, Any]):
+def test_valid_mapping(client: InfrahubClient, ipaddress_schema: NodeSchemaAPI, ipaddress_data: dict[str, Any]):
     node = InfrahubNodeSync(client=client, schema=ipaddress_schema, data=ipaddress_data)
     attrs = ["address"]
     result = resolve_node_mapping(node, attrs)
     assert result == "192.168.1.1"
 
 
-def test_unsupported_cardinality(client: InfrahubClient, location_schema: NodeSchema):
+def test_unsupported_cardinality(client: InfrahubClient, location_schema: NodeSchemaAPI):
     node = InfrahubNodeSync(client=client, schema=location_schema)
     attrs = ["tags"]
     with pytest.raises(RuntimeError, match="Relations with many cardinality are not supported!"):
         resolve_node_mapping(node, attrs)
 
 
-def test_invalid_mapping(client: InfrahubClient, ipaddress_schema: NodeSchema):
+def test_invalid_mapping(client: InfrahubClient, ipaddress_schema: NodeSchemaAPI):
     node = InfrahubNodeSync(client=client, schema=ipaddress_schema)
     attrs = ["invalid_attribute"]
     with pytest.raises(RuntimeError, match="Unable to resolve mapping"):
@@ -287,7 +287,7 @@ def test_get_related_nodes():
             {"name": "vehicules", "peer": "TestVehicule", "cardinality": "many", "identifier": "person__vehicule"}
         ],
     }
-    node_schema = NodeSchema(**schema)
+    node_schema = NodeSchemaAPI(**schema)
     attrs = {"vehicules", "address"}  # "Address" is not in the relationships
     result = get_related_nodes(node_schema, attrs)
     expected_result = {"CoreStandardGroup", "TestVehicule"}

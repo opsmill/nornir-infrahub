@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 from infrahub_sdk import InfrahubClient, InfrahubClientSync
-from infrahub_sdk.schema import NodeSchema
+from infrahub_sdk.schema import NodeSchemaAPI
 from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
 
 
@@ -18,7 +18,7 @@ async def client_sync() -> InfrahubClientSync:
 
 
 @pytest.fixture
-async def location_schema() -> NodeSchema:
+async def location_schema() -> NodeSchemaAPI:
     data = {
         "name": "Location",
         "namespace": "Builtin",
@@ -34,11 +34,11 @@ async def location_schema() -> NodeSchema:
             {"name": "member_of_groups", "peer": "CoreGroup", "optional": True, "cardinality": "many", "kind": "Group"},
         ],
     }
-    return NodeSchema(**data)
+    return NodeSchemaAPI(**data)
 
 
 @pytest.fixture
-async def device_schema() -> NodeSchema:
+async def device_schema() -> NodeSchemaAPI:
     data = {
         "name": "Device",
         "namespace": "Infra",
@@ -68,11 +68,11 @@ async def device_schema() -> NodeSchema:
             },
         ],
     }
-    return NodeSchema(**data)
+    return NodeSchemaAPI(**data)
 
 
 @pytest.fixture
-async def ipaddress_schema() -> NodeSchema:
+async def ipaddress_schema() -> NodeSchemaAPI:
     data = {
         "name": "IPAddress",
         "namespace": "Infra",
@@ -86,7 +86,7 @@ async def ipaddress_schema() -> NodeSchema:
             {"name": "interface", "peer": "InfraInterfaceL3", "optional": True, "cardinality": "one", "kind": "Parent"}
         ],
     }
-    return NodeSchema(**data)
+    return NodeSchemaAPI(**data)
 
 
 @pytest.fixture
