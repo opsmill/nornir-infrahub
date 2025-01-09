@@ -22,8 +22,7 @@ jobs:
         uses: "actions/checkout@v3"
       - name: "Setup environment"
         run: |
-          pipx install poetry
-          pip install invoke toml
+          pipx install poetry invoke
       - name: "Install Linters"
         run: "poetry install --only=dev"
       - name: "Linting"
@@ -51,11 +50,10 @@ jobs:
       - name: "Setup environment"
         run: |
           pipx install poetry
-          pip install invoke toml
         env:
           PIPX_DEFAULT_PYTHON: ${{ steps.python.outputs.python-path }}
       - name: "Install Nornir Infrahub"
-        run: "poetry install"
+        run: "poetry install --with=dev"
       - name: "Pytest Tests"
         run: "poetry run pytest -v tests/"
 
