@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nornir-infrahub"
-version = "1.0.0"
+version = "1.0.1"
 description = "Nornir plugin for Infrahub"
 authors = ["OpsMill <info@opsmill.com>"]
 readme = "README.md"
@@ -24,7 +24,7 @@ packages = [{ include = "nornir_infrahub" }]
 
 [tool.poetry.dependencies]
 python = "^3.9, <3.13"
-infrahub-sdk = { version = "^1", extras = ["tests"] }
+infrahub-sdk = { version = "^1,>=1.3.0", extras = ["tests"] }
 ruamel-yaml = "^0.18.5"
 nornir = "^3.4.1"
 nornir-utils = "^0.2.0"
@@ -40,6 +40,7 @@ pytest-asyncio = "^0.21.1"
 types-python-slugify = "*"
 invoke = "2.2.0"
 yamllint = "*"
+setuptools = "^75.7.0"
 
 [tool.coverage.run]
 branch = true

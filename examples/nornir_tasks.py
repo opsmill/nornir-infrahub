@@ -46,25 +46,31 @@ def main():
     # we only need to run this task once, per artifact definition
     run_once = nr.filter(name="jfk1-edge1")
     result = run_once.run(task=generate_artifacts, artifact="startup-config", timeout=20)
+    ocfg_result = run_once.run(task=generate_artifacts, artifact="openconfig-interfaces", timeout=20)
 
     for _, v in result.items():
         if v[0].failed:
             return 1
+    for _, v in ocfg_result.items():
+        if v[0].failed:
+            return 1
 
+    # These artifacts are generated for Arista EOS devices in demo-edge
+    eos_devices = nr.filter(platform="eos")
     # retrieves the artifact for all the hosts in the inventory
-    result = nr.run(task=get_artifact, artifact="startup-config")
+    result = eos_devices.run(task=get_artifact, artifact="Startup Config for Edge devices")
     print_result(result)
 
     # push the retrieved artifact to a device
     # print_result(run_once.run(task=napalm_configure, configuration=result["jfk1-edge1"][0].result, replace=True))
 
     # artifacts with content-type application/json get deserialized
-    result = nr.run(task=get_artifact, artifact="openconfig-interfaces")
+    result = eos_devices.run(task=get_artifact, artifact="Openconfig Interface for Arista devices")
     print_result(result)
     assert isinstance(result["den1-edge1"][0].result, dict)
 
     # regenerate an artifact for a host
-    print_result(nr.run(task=regenerate_host_artifact, artifact="startup-config"))
+    print_result(eos_devices.run(task=regenerate_host_artifact, artifact="Startup Config for Edge devices"))
 
     return 0
 
