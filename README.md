@@ -10,26 +10,10 @@
 - **Version Control**: Natively integrated into the graph database which opens up some new capabilities like branching, diffing, and merging data directly in the database.
 - **Unified Storage**: By combining a graph database and git, Infrahub stores data and code needed to manage the infrastructure.
 
-## Introduction
+## Nornir
 
 A [Nornir](https://github.com/nornir-automation/nornir) plugin for Infrahub. Infrahub can be used as an inventory source for Nornir.
 
-## Installation
+## Using the Nornir plugin
 
-```bash
-pip install nornir_infrahub
-```
-
-## Usage
-
-An example of this can be found in [./examples/nornir_inventory.py](https://github.com/opsmill/nornir-infrahub/blob/stable/examples/nornir_inventory.py)
-
-## Infrahub artifact tasks
-
-A set of tasks are provided to operate on Infrahub Artifacts:
-
-- `generate_artifacts`: generates the Artifacts for a Artifact Definition
-- `regenerate_artifact`: re-generates an Artifact for a Nornir Host
-- `get_artifact`: retrieve an Artifact for a Nornir Host
-
-An example of this can be found in [./examples/nornir_tasks.py](https://github.com/opsmill/nornir-infrahub/blob/stable/examples/nornir_tasks.py)
+Documentation for using Nornir is available [here](https://docs.infrahub.app/nornir/nornir/)
