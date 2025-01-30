@@ -9,8 +9,8 @@ DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent / "docs"
 MAIN_DIRECTORY_PATH = Path(__file__).parent
 
 
-@task
-def format(context: Context):
+@task(name="format")
+def ruff_format(context: Context):
     """Run RUFF to format all Python files."""
 
     exec_cmds = ["ruff format .", "ruff check . --fix"]
