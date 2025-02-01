@@ -1,12 +1,16 @@
+import sys
 from pathlib import Path
 
 from invoke import Context, task
 
+CURRENT_DIRECTORY = Path(__file__).resolve()
+DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent / "docs"
+
 MAIN_DIRECTORY_PATH = Path(__file__).parent
 
 
-@task
-def format(context: Context):
+@task(name="format")
+def ruff_format(context: Context):
     """Run RUFF to format all Python files."""
 
     exec_cmds = ["ruff format .", "ruff check . --fix"]
@@ -48,3 +52,15 @@ def lint_all(context: Context):
     lint_yaml(context)
     lint_ruff(context)
     lint_mypy(context)
+
+
+@task(name="docs")
+def docs_build(context: Context) -> None:
+    """Build documentation website."""
+    exec_cmd = "npm run build"
+
+    with context.cd(DOCUMENTATION_DIRECTORY):
+        output = context.run(exec_cmd)
+
+    if output.exited != 0:
+        sys.exit(-1)
