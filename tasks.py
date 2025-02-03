@@ -51,11 +51,21 @@ def lint_ruff(context: Context):
         context.run(exec_cmd)
 
 
+@task
+def lint_pylint(context: Context):
+    """Run Linter to check all Python files."""
+    print(" - Check code with pylint")
+    exec_cmd = "pylint nornir_infrahub *.py"
+    with context.cd(MAIN_DIRECTORY_PATH):
+        context.run(exec_cmd)
+
+
 @task(name="lint")
 def lint_all(context: Context):
     """Run all linters."""
     lint_yaml(context)
     lint_ruff(context)
+    lint_pylint(context)
     lint_mypy(context)
 
 
@@ -93,9 +103,9 @@ def find_plugin_files() -> dict[str, list[Path]]:
 
 
 def extract_docstrings(file_path):
-    import ast
+    import ast  # pylint: disable=C0415
 
-    from docstring_parser import parse
+    from docstring_parser import parse  # pylint: disable=C0415
 
     with open(file_path, "r", encoding="utf-8") as file:
         tree = ast.parse(file.read(), filename=file_path)
@@ -122,8 +132,8 @@ def extract_docstrings(file_path):
         "plugin_type": f"Generate docs for specific plugin type ({', '.join(PLUGIN_TYPES.keys())})",
     }
 )
-def generate_docs(context: Context, debug: bool = False, plugin_type: str | None = None) -> None:  # noqa: ARG001
-    import jinja2
+def generate_docs(context: Context, debug: bool = False, plugin_type: str | None = None) -> None:  # noqa: ARG001 pylint: disable=W0613
+    import jinja2  # pylint: disable=C0415
 
     template_dir = DOCUMENTATION_DIRECTORY / "_templates"
     environment = jinja2.Environment(
@@ -169,10 +179,10 @@ def generate_docs(context: Context, debug: bool = False, plugin_type: str | None
 
                 processed_plugins[p_type].append(plugin_doc)
 
-            except Exception:
+            except Exception:  # pylint: disable=W0718
                 print(f"✗ Error processing {plugin_file.name}")
                 if debug:
-                    import traceback
+                    import traceback  # pylint: disable=C0415
 
                     print(traceback.format_exc())
 
