@@ -58,6 +58,7 @@ httpx
 human_friendly_id
 idempotency
 include_in_menu
+infrahub
 Infrahub
 Infrahub's
 infrahubctl
