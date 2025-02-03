@@ -42,8 +42,10 @@ eslint
 excalidraw
 fanout
 file_path
+generate_artifacts
 generator_definition
 generator_definitions
+get_artifact
 github
 graphene
 graphiql
@@ -56,6 +58,7 @@ httpx
 human_friendly_id
 idempotency
 include_in_menu
+infrahub
 Infrahub
 Infrahub's
 infrahubctl
@@ -99,6 +102,7 @@ query_peers
 rebase
 rebased
 Redoc
+regenerate_host_artifact
 repo
 ressources
 REST

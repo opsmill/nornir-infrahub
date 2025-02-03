@@ -1,8 +1,56 @@
+"""
+Artifact management plugin
+"""
+
 import httpx
 from nornir.core.task import Result, Task
 
 
 def regenerate_host_artifact(task: Task, artifact: str) -> Result:
+    """
+    Regenerates a host artifact for a given task.
+
+    This function retrieves an artifact node associated with the given artifact name from the InfrahubNode,
+    then sends a request to regenerate the artifact using the Infrahub API.
+
+    Args:
+        task (Task): The task instance containing host-related data.
+        artifact (str): The name of the artifact to regenerate.
+
+    Returns:
+        Result: An object representing the outcome of the operation, indicating success or failure.
+
+    Raises:
+        httpx.HTTPStatusError: If the API request fails.
+
+    Example:
+        Regenerate artifact for a given device.
+
+        ```python
+        from nornir import InitNornir
+        from nornir.core.plugins.inventory import InventoryPluginRegister
+        from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
+        from nornir_infrahub.plugins.tasks import regenerate_host_artifact
+
+        from nornir_utils.plugins.functions import print_result
+
+
+        def main():
+            InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)
+            nr = InitNornir(inventory=...)
+
+            eos_devices = nr.filter(platform="eos")
+
+            # regenerate an artifact for a host
+            print_result(eos_devices.run(task=regenerate_host_artifact, artifact="Startup Config for Edge devices"))
+
+            return 0
+
+
+        if __name__ == "__main__":
+            raise SystemExit(main())
+        ```
+    """
     node = task.host.data["InfrahubNode"]
     artifact_node = node._client.get(kind="CoreArtifact", name__value=artifact, object__ids=[node.id])
 
@@ -21,6 +69,50 @@ def regenerate_host_artifact(task: Task, artifact: str) -> Result:
 
 
 def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result:
+    """
+    Generates an artifact for a given task.
+
+    This function retrieves an artifact definition from the InfrahubNode and triggers
+    an API request to generate the specified artifact.
+
+    Args:
+        task (Task): The task instance containing host-related data.
+        artifact (str): The name of the artifact to generate.
+        timeout (int, optional): The request timeout in seconds. Defaults to 10.
+
+    Returns:
+        Result: An object representing the outcome of the operation, indicating success or failure.
+
+    Raises:
+        httpx.HTTPStatusError: If the API request fails.
+
+    Example:
+        Example generating artifacts.
+
+        ```python
+        from nornir import InitNornir
+        from nornir.core.plugins.inventory import InventoryPluginRegister
+        from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
+        from nornir_infrahub.plugins.tasks import generate_artifacts
+
+
+        def main():
+            InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)
+            nr = InitNornir(inventory=...)
+
+            # generate_artifacts, generates the artifact for all the targets in the Artifact definition
+            # we only need to run this task once, per artifact definition
+            run_once = nr.filter(name="jfk1-edge1")
+            result = run_once.run(task=generate_artifacts, artifact="startup-config", timeout=20)
+            ocfg_result = run_once.run(task=generate_artifacts, artifact="openconfig-interfaces", timeout=20)
+
+            return 0
+
+
+        if __name__ == "__main__":
+            raise SystemExit(main())
+        ```
+    """
     node = task.host.data["InfrahubNode"]
     artifact_node = node._client.get(kind="CoreArtifactDefinition", artifact_name__value=artifact)
 
@@ -35,6 +127,51 @@ def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result:
 
 
 def get_artifact(task: Task, artifact: str) -> Result:
+    """
+    Retrieves the specified artifact from the Infrahub storage.
+
+    This function fetches an artifact node associated with the given artifact name and
+    sends a request to retrieve its stored content. The response is returned as JSON or text,
+    depending on the artifact's content type.
+
+    Args:
+        task (Task): The task instance containing host-related data.
+        artifact (str): The name of the artifact to retrieve.
+
+    Returns:
+        Result: An object containing the retrieved artifact data, its content type, and
+                the success status of the operation.
+
+    Raises:
+        httpx.HTTPStatusError: If the API request fails.
+
+    Example:
+        Example getting artifacts from Infrahub:
+
+        ```python
+        from nornir import InitNornir
+        from nornir.core.plugins.inventory import InventoryPluginRegister
+        from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
+        from nornir_infrahub.plugins.tasks import get_artifact
+        from nornir_utils.plugins.functions import print_result
+
+
+        def main():
+            InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)
+            nr = InitNornir(inventory=...)
+
+            eos_devices = nr.filter(platform="eos")
+            # retrieves the artifact for all the hosts in the inventory
+            result = eos_devices.run(task=get_artifact, artifact="Startup Config for Edge devices")
+            print_result(result)
+
+            return 0
+
+
+        if __name__ == "__main__":
+            raise SystemExit(main())
+        ```
+    """
     node = task.host.data["InfrahubNode"]
 
     artifact_node = node._client.get(kind="CoreArtifact", name__value=artifact, object__ids=[node.id])

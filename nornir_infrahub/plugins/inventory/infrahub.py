@@ -1,3 +1,5 @@
+"""Inventory plugin"""
+
 import ipaddress
 import itertools
 import logging
@@ -126,17 +128,62 @@ def get_related_nodes(node_schema: NodeSchemaAPI, attrs: Set[str]) -> Set[str]:
 
 class InfrahubInventory:
     """
-    Inventory pluging for `Opsmill - Infrahub <https://github.com/opsmill/infrahub>`
+    Nornir inventory plugin for integrating with `Opsmill - Infrahub`
+    (https://github.com/opsmill/infrahub).
 
-    Arguments:
-        address: Infrahub url (defaults to ``http://localhost:8000``)
-        branch: Infrahub branch to use (defaults to ``main``)
-        host_node: Infrahub Node type that will map to a Nornir Host
-        schema_mappings:
-        group_mapping: Definiton of relations and attributes to extract groups from
-        defaults_file: Path to defaults file (defaults to ``defaults.yaml``)
-        group_file: Path to group file (defaults to ``group.yaml``)
-    """
+    This plugin fetches inventory data from Infrahub, maps it to Nornir Hosts,
+    and supports the creation of Nornir groups based on attributes or relations
+    from Infrahub Nodes.
+
+    Args:
+        address (str, optional): The Infrahub URL to connect to. Defaults to "http://localhost:8000".
+        branch (str, optional): The Infrahub branch to use. Defaults to "main".
+        host_node (dict): A dictionary defining the Infrahub Node kind that will be mapped to Nornir Hosts. Example: `{"kind": "InfraDevice"}`
+        schema_mappings (list): A list of mappings that define how Nornir Host properties correspond to attributes or relations from Infrahub Nodes. Example: `[{"name": "hostname", "mapping": "primary_address.address"}]`.
+        group_mappings (list): A list of Infrahub Node attributes or relations used to create Nornir groups. Example: `["site.name"]`.
+        defaults_file (str, optional): Path to the defaults YAML file. Defaults to "defaults.yaml".
+        group_file (str, optional): Path to the group YAML file. Defaults to "group.yaml".
+
+    Example:
+        Basic usage of `InfrahubInventory` with Nornir.
+
+        ```python
+        from nornir import InitNornir
+        from nornir.core.plugins.inventory import InventoryPluginRegister
+        from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
+
+        def main():
+            # Register the custom InfrahubInventory plugin
+            InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)
+
+            # Initialize Nornir with InfrahubInventory as the inventory plugin
+            nr = InitNornir(
+                inventory={
+                    "plugin": "InfrahubInventory",
+                    "options": {
+                        "address": "http://localhost:8000",  # Infrahub API URL
+                        "token": "06438eb2-8019-4776-878c-0941b1f1d1ec",  # Infrahub API token
+                        "host_node": {"kind": "InfraDevice"},  # Infrahub Node kind to map to Nornir Hosts
+                        "schema_mappings": [
+                            {"name": "hostname", "mapping": "primary_address.address"},
+                            {"name": "platform", "mapping": "platform.nornir_platform"},
+                        ],  # Mapping Nornir Host properties to Infrahub Node attributes
+                        "group_mappings": ["site.name"],  # Create Nornir groups from Infrahub Node attributes
+                        "group_file": "dummy.yml",  # Path to the group file
+                    },
+                }
+            )
+
+            # Print Nornir inventory host and group names
+            print(nr.inventory.hosts.keys())
+            print(nr.inventory.groups.keys())
+
+            return 0
+
+        if __name__ == "__main__":
+            raise SystemExit(main())
+        ```
+    """  # noqa E501
 
     def __init__(  # noqa: PLR0913
         self,

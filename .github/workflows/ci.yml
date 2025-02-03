@@ -166,6 +166,8 @@ jobs:
         run: npm install
       - name: "Setup Python environment"
         run: "pip install invoke toml"
+      - name: "Generate docs"
+        run: "invoke generate-docs"
       - name: "Build docs website"
         run: "invoke docs"
 

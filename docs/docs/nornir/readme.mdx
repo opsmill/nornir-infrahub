@@ -10,16 +10,17 @@ A [Nornir](https://github.com/nornir-automation/nornir) plugin for Infrahub. Inf
 pip install nornir_infrahub
 ```
 
-## Usage
+## References
+### Inventory
+#### Inventory plugin
 
-An example of using this plugin can be found in [`./examples/nornir_inventory.py`](https://github.com/opsmill/nornir-infrahub/blob/stable/examples/nornir_inventory.py)
+- [InfrahubInventory](/nornir/references/plugins/infrahub_inventory.mdx#InfrahubInventory)
 
-## Infrahub artifact tasks
+### Tasks
+#### Artifact management plugin
 
-A set of tasks are provided to operate on Infrahub Artifacts:
+- [regenerate_host_artifact](/nornir/references/plugins/artifact_tasks.mdx#regenerate_host_artifact)
 
-- `generate_artifacts`: generates the Artifacts for an Artifact Definition
-- `regenerate_artifact`: re-generates an Artifact for a Nornir Host
-- `get_artifact`: retrieve an Artifact for a Nornir Host
+- [generate_artifacts](/nornir/references/plugins/artifact_tasks.mdx#generate_artifacts)
 
-An example of this can be found in [`./examples/nornir_tasks.py`](https://github.com/opsmill/nornir-infrahub/blob/stable/examples/nornir_tasks.py)
+- [get_artifact](/nornir/references/plugins/artifact_tasks.mdx#get_artifact)

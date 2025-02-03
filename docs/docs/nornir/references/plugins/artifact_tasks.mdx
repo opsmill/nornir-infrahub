@@ -1,0 +1,136 @@
+---
+title: Artifact management plugin
+---
+
+# Artifact management plugin
+
+
+
+## regenerate_host_artifact
+
+Regenerates a host artifact for a given task.
+
+This function retrieves an artifact node associated with the given artifact name from the InfrahubNode,
+then sends a request to regenerate the artifact using the Infrahub API.
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `task` | `Task` | Yes |  | The task instance containing host-related data. |
+| `artifact` | `str` | Yes |  | The name of the artifact to regenerate. |
+
+
+### Examples
+#### Regenerate artifact for a given device.
+
+
+```python
+from nornir import InitNornir
+from nornir.core.plugins.inventory import InventoryPluginRegister
+from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
+from nornir_infrahub.plugins.tasks import regenerate_host_artifact
+
+from nornir_utils.plugins.functions import print_result
+
+
+def main():
+    InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)
+    nr = InitNornir(inventory=...)
+
+    eos_devices = nr.filter(platform="eos")
+
+    # regenerate an artifact for a host
+    print_result(eos_devices.run(task=regenerate_host_artifact, artifact="Startup Config for Edge devices"))
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+## generate_artifacts
+
+Generates an artifact for a given task.
+
+This function retrieves an artifact definition from the InfrahubNode and triggers
+an API request to generate the specified artifact.
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `task` | `Task` | Yes |  | The task instance containing host-related data. |
+| `artifact` | `str` | Yes |  | The name of the artifact to generate. |
+| `timeout` | `int` | No | 10 | The request timeout in seconds. Defaults to 10. |
+
+
+### Examples
+#### Example generating artifacts.
+
+
+```python
+from nornir import InitNornir
+from nornir.core.plugins.inventory import InventoryPluginRegister
+from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
+from nornir_infrahub.plugins.tasks import generate_artifacts
+
+
+def main():
+    InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)
+    nr = InitNornir(inventory=...)
+
+    # generate_artifacts, generates the artifact for all the targets in the Artifact definition
+    # we only need to run this task once, per artifact definition
+    run_once = nr.filter(name="jfk1-edge1")
+    result = run_once.run(task=generate_artifacts, artifact="startup-config", timeout=20)
+    ocfg_result = run_once.run(task=generate_artifacts, artifact="openconfig-interfaces", timeout=20)
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+## get_artifact
+
+Retrieves the specified artifact from the Infrahub storage.
+
+This function fetches an artifact node associated with the given artifact name and
+sends a request to retrieve its stored content. The response is returned as JSON or text,
+depending on the artifact's content type.
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `task` | `Task` | Yes |  | The task instance containing host-related data. |
+| `artifact` | `str` | Yes |  | The name of the artifact to retrieve. |
+
+
+### Examples
+#### Example getting artifacts from Infrahub:
+
+
+```python
+from nornir import InitNornir
+from nornir.core.plugins.inventory import InventoryPluginRegister
+from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
+from nornir_infrahub.plugins.tasks import get_artifact
+from nornir_utils.plugins.functions import print_result
+
+
+def main():
+    InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)
+    nr = InitNornir(inventory=...)
+
+    eos_devices = nr.filter(platform="eos")
+    # retrieves the artifact for all the hosts in the inventory
+    result = eos_devices.run(task=get_artifact, artifact="Startup Config for Edge devices")
+    print_result(result)
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
