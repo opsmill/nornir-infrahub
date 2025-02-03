@@ -1,5 +1,5 @@
 """
-Artifact Management Plugin
+Artifact management plugin
 """
 
 import httpx
@@ -146,7 +146,7 @@ def get_artifact(task: Task, artifact: str) -> Result:
         httpx.HTTPStatusError: If the API request fails.
 
     Example:
-        Example Getting Artifacts from Infrahub:
+        Example getting artifacts from infrahub:
 
         ```python
         from nornir import InitNornir

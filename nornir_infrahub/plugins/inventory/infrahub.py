@@ -1,4 +1,4 @@
-"""Inventory Plugin"""
+"""Inventory plugin"""
 
 import ipaddress
 import itertools
