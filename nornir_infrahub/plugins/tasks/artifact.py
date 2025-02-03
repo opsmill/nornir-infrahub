@@ -146,7 +146,7 @@ def get_artifact(task: Task, artifact: str) -> Result:
         httpx.HTTPStatusError: If the API request fails.
 
     Example:
-        Example getting artifacts from infrahub:
+        Example getting artifacts from Infrahub:
 
         ```python
         from nornir import InitNornir
