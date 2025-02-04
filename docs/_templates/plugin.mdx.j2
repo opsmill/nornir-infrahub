@@ -1,16 +1,13 @@
 ---
 title: {{ module }}
 ---
-
-# {{ module }}
-
 {% for function_name, documentation in functions.items() %}
-
-## {{ function_name }}
+## `{{ function_name }}`
 
 {{ documentation.description }}
 
 {%- if documentation.params is defined %}
+
 ### Parameters
 
 | Parameter | Type | Required | Default | Description |
@@ -20,15 +17,14 @@ title: {{ module }}
 {%- endfor %}
 {%- endif %}
 
-
 ### Examples
 
 {%- if documentation.examples is defined and documentation.examples %}
 {%- for example in documentation.examples %}
-#### {{ example.description.split("\n", 1)[0] }}
 
+#### {{ example.description.split("\n", 1)[0] }}
 {{ example.description.split("\n", 1)[1] }}
-{%- endfor %}
+{% endfor %}
 {%- else %}
 No example provided.
 {%- endif %}

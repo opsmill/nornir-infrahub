@@ -183,6 +183,7 @@ class InfrahubInventory:
         if __name__ == "__main__":
             raise SystemExit(main())
         ```
+
     """  # noqa E501
 
     def __init__(  # noqa: PLR0913
