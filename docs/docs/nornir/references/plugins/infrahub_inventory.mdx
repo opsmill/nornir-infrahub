@@ -2,11 +2,7 @@
 title: Inventory plugin
 ---
 
-# Inventory plugin
-
-
-
-## InfrahubInventory
+## `InfrahubInventory`
 
 Nornir inventory plugin for integrating with `Opsmill - Infrahub`
 (https://github.com/opsmill/infrahub).
@@ -14,6 +10,7 @@ Nornir inventory plugin for integrating with `Opsmill - Infrahub`
 This plugin fetches inventory data from Infrahub, maps it to Nornir Hosts,
 and supports the creation of Nornir groups based on attributes or relations
 from Infrahub Nodes.
+
 ### Parameters
 
 | Parameter | Type | Required | Default | Description |
@@ -26,10 +23,9 @@ from Infrahub Nodes.
 | `defaults_file` | `str` | No | "defaults.yaml" | Path to the defaults YAML file. Defaults to "defaults.yaml". |
 | `group_file` | `str` | No | "group.yaml" | Path to the group YAML file. Defaults to "group.yaml". |
 
-
 ### Examples
-#### Basic usage of `InfrahubInventory` with Nornir.
 
+#### Basic usage of `InfrahubInventory` with Nornir.
 
 ```python
 from nornir import InitNornir
