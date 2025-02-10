@@ -42,7 +42,7 @@ def regenerate_host_artifact(task: Task, artifact: str) -> Result:
             eos_devices = nr.filter(platform="eos")
 
             # regenerate an artifact for a host
-            print_result(eos_devices.run(task=regenerate_host_artifact, artifact="Startup Config for Edge devices"))
+            print_result(eos_devices.run(task=regenerate_host_artifact, artifact="startup-config"))
 
             return 0
 
@@ -162,7 +162,7 @@ def get_artifact(task: Task, artifact: str) -> Result:
 
             eos_devices = nr.filter(platform="eos")
             # retrieves the artifact for all the hosts in the inventory
-            result = eos_devices.run(task=get_artifact, artifact="Startup Config for Edge devices")
+            result = eos_devices.run(task=get_artifact, artifact="startup-config")
             print_result(result)
 
             return 0
