@@ -8,7 +8,7 @@ MAIN_DIRECTORY_PATH = Path(__file__).parent
 
 CURRENT_DIRECTORY = Path(__file__).resolve()
 DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent / "docs"
-NORNIR_DOCUMENTATION_DIRECTORY = DOCUMENTATION_DIRECTORY / "docs" / "nornir"
+NORNIR_DOCUMENTATION_DIRECTORY = DOCUMENTATION_DIRECTORY / "docs"
 
 PLUGIN_TYPES: dict[str, str] = {"inventory": "inventory", "tasks": "tasks"}
 PLUGINS_DIRECTORY = Path("nornir_infrahub/plugins")
