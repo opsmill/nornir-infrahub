@@ -16,4 +16,4 @@ A [Nornir](https://github.com/nornir-automation/nornir) plugin for Infrahub. Inf
 
 ## Using the Nornir plugin
 
-Documentation for using Nornir is available [here](https://docs.infrahub.app/nornir/nornir/)
+Documentation for using Nornir is available [here](https://docs.infrahub.app/nornir/)
