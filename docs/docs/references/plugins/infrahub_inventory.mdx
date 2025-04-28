@@ -29,13 +29,8 @@ from Infrahub Nodes.
 
 ```python
 from nornir import InitNornir
-from nornir.core.plugins.inventory import InventoryPluginRegister
-from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
 
 def main():
-    # Register the custom InfrahubInventory plugin
-    InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)
-
     # Initialize Nornir with InfrahubInventory as the inventory plugin
     nr = InitNornir(
         inventory={
