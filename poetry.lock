@@ -316,13 +316,13 @@ testing = ["flake8 (<5)", "flufl.flake8", "importlib-resources (>=1.3)", "packag
 
 [[package]]
 name = "infrahub-sdk"
-version = "1.10.2"
+version = "1.11.0"
 description = "Python Client to interact with Infrahub"
 optional = false
 python-versions = "<3.14,>=3.9"
 files = [
-    {file = "infrahub_sdk-1.10.2-py3-none-any.whl", hash = "sha256:7adaffb1d01c2a88f741a10dfce88c7250e6c542b22cbfde407ff875cc83b81e"},
-    {file = "infrahub_sdk-1.10.2.tar.gz", hash = "sha256:b3a6260a9a038acbbd289d805f4d9bbcdcc84cfa2ba45cd8517ad45eab350df9"},
+    {file = "infrahub_sdk-1.11.0-py3-none-any.whl", hash = "sha256:bed62f03edc4e93329a4130f702e7d34330eea20511db6c49ea2bace90b3a91d"},
+    {file = "infrahub_sdk-1.11.0.tar.gz", hash = "sha256:e6f81a357975980559fdc621022ea40ae094c7a1b5a64a90313ea08a91c506ec"},
 ]
 
 [package.dependencies]
