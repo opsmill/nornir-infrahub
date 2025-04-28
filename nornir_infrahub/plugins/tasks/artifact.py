@@ -2,6 +2,8 @@
 Artifact management plugin
 """
 
+from typing import Optional
+
 import httpx
 from nornir.core.task import Result, Task
 
@@ -126,17 +128,18 @@ def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result:
     return Result(host=task.host, failed=False)
 
 
-def get_artifact(task: Task, artifact: str) -> Result:
+def get_artifact(task: Task, artifact: Optional[str] = None, artifact_id: Optional[str] = None) -> Result:
     """
     Retrieves the specified artifact from the Infrahub storage.
 
-    This function fetches an artifact node associated with the given artifact name and
+    This function fetches an artifact node associated with the given artifact name or id and
     sends a request to retrieve its stored content. The response is returned as JSON or text,
     depending on the artifact's content type.
 
     Args:
         task (Task): The task instance containing host-related data.
-        artifact (str): The name of the artifact to retrieve.
+        artifact (str, optional): The name of the artifact to retrieve.
+        artifact_id (str, optional): The id of the artifact to retrieve.
 
     Returns:
         Result: An object containing the retrieved artifact data, its content type, and
@@ -172,16 +175,25 @@ def get_artifact(task: Task, artifact: str) -> Result:
             raise SystemExit(main())
         ```
     """
+    if (artifact and artifact_id) or not (artifact or artifact_id):
+        raise RuntimeError(
+            "One of `artifact' or `artifact_id' arguments needs to be provided for the `get_artifact' task."
+        )
+
     node = task.host.data["InfrahubNode"]
+    client = node._client
 
-    artifact_node = node._client.get(kind="CoreArtifact", name__value=artifact, object__ids=[node.id])
+    if artifact:
+        artifact_node = client.get(kind="CoreArtifact", name__value=artifact, object__ids=[node.id])
+    elif artifact_id:
+        artifact_node = client.get(kind="CoreArtifact", ids=[artifact_id])
 
-    headers = node._client.headers
-    headers["X-INFRAHUB-KEY"] = f"{node._client.config.api_token}"
+    headers = client.headers
+    headers["X-INFRAHUB-KEY"] = f"{client.config.api_token}"
 
-    with httpx.Client() as client:
-        resp = client.get(
-            url=f"{node._client.address}/api/storage/object/{artifact_node.storage_id.value}",
+    with httpx.Client() as http_client:
+        resp = http_client.get(
+            url=f"{client.address}/api/storage/object/{artifact_node.storage_id.value}",
             headers=headers,
         )
     resp.raise_for_status()
