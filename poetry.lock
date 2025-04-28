@@ -316,13 +316,13 @@ testing = ["flake8 (<5)", "flufl.flake8", "importlib-resources (>=1.3)", "packag
 
 [[package]]
 name = "infrahub-sdk"
-version = "1.9.2"
+version = "1.10.2"
 description = "Python Client to interact with Infrahub"
 optional = false
 python-versions = "<3.14,>=3.9"
 files = [
-    {file = "infrahub_sdk-1.9.2-py3-none-any.whl", hash = "sha256:37cf3c92af6901a17d5da7e07f9e6dccd2e40b75d5c923df66c59533ca0fd3be"},
-    {file = "infrahub_sdk-1.9.2.tar.gz", hash = "sha256:39b7ca62fafb796626075e6172f0abd622c040334acd72e86d0ac052d217f1f2"},
+    {file = "infrahub_sdk-1.10.2-py3-none-any.whl", hash = "sha256:7adaffb1d01c2a88f741a10dfce88c7250e6c542b22cbfde407ff875cc83b81e"},
+    {file = "infrahub_sdk-1.10.2.tar.gz", hash = "sha256:b3a6260a9a038acbbd289d805f4d9bbcdcc84cfa2ba45cd8517ad45eab350df9"},
 ]
 
 [package.dependencies]
@@ -334,6 +334,7 @@ httpx = [
     {version = ">=0.23", markers = "python_version >= \"3.11\""},
 ]
 Jinja2 = {version = ">=3,<4", optional = true, markers = "extra == \"ctl\" or extra == \"tests\" or extra == \"all\""}
+netutils = ">=1.0.0,<2.0.0"
 pydantic = ">=2.0.0,<2.0.1 || >2.0.1,<2.1.0 || >2.1.0,<3.0.0"
 pydantic-settings = ">=2.0"
 pytest = {version = "*", optional = true, markers = "extra == \"tests\" or extra == \"all\""}
@@ -579,6 +580,20 @@ files = [
     {file = "mypy_extensions-1.0.0-py3-none-any.whl", hash = "sha256:4392f6c0eb8a5668a69e23d168ffa70f0be9ccfd32b5cc2d26a34ae5b844552d"},
     {file = "mypy_extensions-1.0.0.tar.gz", hash = "sha256:75dbf8955dc00442a438fc4d0666508a9a97b6bd41aa2f0ffe9d2f2725af0782"},
 ]
+
+[[package]]
+name = "netutils"
+version = "1.13.0"
+description = "Common helper functions useful in network automation."
+optional = false
+python-versions = "<4.0,>=3.8"
+files = [
+    {file = "netutils-1.13.0-py3-none-any.whl", hash = "sha256:61d58202cee4424ae3d261e10035a8f85cb72a282efc63fb3d70cc397106a3f2"},
+    {file = "netutils-1.13.0.tar.gz", hash = "sha256:0369fbb3248b43d52f5b59e7d4bffb7694d5d493718d65ffad4d6e50312873e0"},
+]
+
+[package.extras]
+optionals = ["jsonschema (>=4.17.3,<5.0.0)", "legacycrypt (==0.3)", "napalm (>=4.0.0,<5.0.0)"]
 
 [[package]]
 name = "nornir"
