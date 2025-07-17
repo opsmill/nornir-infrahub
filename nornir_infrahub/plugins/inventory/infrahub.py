@@ -205,7 +205,7 @@ class InfrahubInventory:
         self.defaults_file = Path(defaults_file).expanduser()
         self.group_file = Path(group_file).expanduser()
 
-        self.client = InfrahubClientSync(config=Config(api_token=token), address=self.address)
+        self.client = InfrahubClientSync(config=Config(api_token=token, default_branch=branch), address=self.address)
 
         schema_mappings = schema_mappings or []
         self.schema_mappings = [SchemaMappingNode(**mapping) for mapping in schema_mappings]
