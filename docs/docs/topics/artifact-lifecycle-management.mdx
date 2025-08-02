@@ -1,0 +1,400 @@
+---
+title: Understanding Artifact Lifecycle Management
+---
+
+This topic explores how Infrahub's artifact system works with Nornir to enable sophisticated configuration management workflows. Understanding artifact lifecycle management is crucial for implementing robust, auditable network automation.
+
+## Introduction
+
+Artifacts in Infrahub are generated outputs based on your infrastructure data and templates. They represent the "rendered truth" of your infrastructure at any point in time. This document explains:
+
+- What artifacts are and why they matter
+- How artifacts flow through generation, storage, and deployment
+- The relationship between artifacts, templates, and infrastructure data
+- How version control applies to generated configurations
+
+## What Are Artifacts?
+
+### Definition
+
+An artifact is any generated content that represents infrastructure state:
+
+- Device configurations
+- Compliance reports
+- Documentation
+- API payloads
+- Validation results
+
+### Key Characteristics
+
+Artifacts are:
+
+- **Generated**: Created from templates + data, not manually written
+- **Versioned**: Each generation creates a new version
+- **Immutable**: Once generated, artifacts don't change
+- **Traceable**: Linked to the exact data and templates used
+
+## The Artifact Lifecycle
+
+### 1. Definition Phase
+
+Artifacts start with an artifact definition in Infrahub:
+
+```yaml
+kind: CoreArtifactDefinition
+name: startup-config
+template_path: templates/ios/startup.j2
+targets:
+  - kind: InfraDevice
+    filter: platform__name="ios"
+```
+
+This defines:
+
+- What template to use
+- Which devices to target
+- When to regenerate
+
+### 2. Generation Phase
+
+Generation combines:
+
+- **Template**: Jinja2 template with logic
+- **Data**: Current state from Infrahub
+- **Context**: Device-specific variables
+
+```jinja2
+{# templates/ios/startup.j2 #}
+hostname {{ device.name }}
+!
+interface Loopback0
+ ip address {{ device.loopback_ip.address }} 255.255.255.255
+!
+{% for interface in device.interfaces %}
+interface {{ interface.name }}
+ description {{ interface.description }}
+ ip address {{ interface.ip_address.address }} {{ interface.ip_address.netmask }}
+{% endfor %}
+```
+
+### 3. Storage Phase
+
+Generated artifacts are stored in Infrahub:
+
+- Content saved with checksum
+- Metadata tracks generation time, user, branch
+- Previous versions retained for history
+
+### 4. Retrieval Phase
+
+Artifacts can be retrieved for:
+
+- Deployment to devices
+- Compliance validation
+- Change review
+- Disaster recovery
+
+## Artifact Management with Nornir
+
+### Task Plugin Functions
+
+The Nornir-Infrahub plugin provides three key functions:
+
+#### generate_artifacts()
+
+Triggers generation for all targets in a definition:
+
+```python
+# Generate configs for all IOS devices
+nr.run(task=generate_artifacts, artifact="startup-config")
+```
+
+This is typically used:
+
+- After template updates
+- On scheduled intervals
+- Before deployment windows
+
+#### regenerate_host_artifact()
+
+Regenerates artifact for specific hosts:
+
+```python
+# Regenerate after device-specific change
+changed_devices = nr.filter(name="router1")
+changed_devices.run(task=regenerate_host_artifact, artifact="startup-config")
+```
+
+Use cases:
+
+- After individual device updates
+- Testing template changes
+- Troubleshooting specific devices
+
+#### get_artifact()
+
+Retrieves stored artifact content:
+
+```python
+# Get current config for deployment
+result = nr.run(task=get_artifact, artifact="startup-config")
+for host, task_result in result.items():
+    config = task_result.result
+    # Deploy config to device
+```
+
+## Version Control Integration
+
+### Branch-Aware Artifacts
+
+Artifacts are generated per branch:
+
+```text
+main branch:
+  router1 startup-config v3 (current)
+  router1 startup-config v2
+  router1 startup-config v1
+
+feature branch:
+  router1 startup-config v2 (testing changes)
+  router1 startup-config v1
+```
+
+This enables:
+
+- Safe testing in feature branches
+- Comparison between branches
+- Controlled promotion to production
+
+### Change Tracking
+
+Every artifact generation is tracked:
+
+```python
+# Artifact metadata includes
+{
+    "generated_at": "2024-01-15T10:30:00Z",
+    "generated_by": "automation-user",
+    "branch": "feature/new-acl",
+    "template_version": "abc123",
+    "data_version": "def456"
+}
+```
+
+## Mental Models
+
+### Think "Generated, Not Stored"
+
+Traditional approach:
+
+- Store device configs in Git
+- Manual updates for changes
+- Configs drift from reality
+
+Artifact approach:
+
+- Store templates and data
+- Generate configs on demand
+- Single source of truth
+
+### Think "Immutable Versions"
+
+Each generation creates a new version:
+
+- Never modify existing artifacts
+- Compare versions to see changes
+- Rollback by deploying previous version
+
+### Think "Data + Template = Artifact"
+
+The equation is simple but powerful:
+
+```text
+Current Data + Template Logic = Generated Artifact
+```
+
+Change either input, get a new artifact version.
+
+## Architecture and Design
+
+### Generation Flow
+
+```text
+┌────────────┐     ┌───────────┐     ┌─────────────┐
+│   Trigger  │────▶│ Generator │────▶│   Storage   │
+└────────────┘     └───────────┘     └─────────────┘
+                          │
+                          ▼
+                   ┌──────────┐
+                   │ Template │
+                   │  Engine  │
+                   └──────────┘
+                          │
+                          ▼
+                   ┌──────────┐
+                   │   Data   │
+                   │  Query   │
+                   └──────────┘
+```
+
+### Storage Architecture
+
+Artifacts use content-addressable storage:
+
+- Same content = same storage location
+- Deduplication happens automatically
+- Metadata links content to devices/versions
+
+## Practical Workflows
+
+### Configuration Deployment
+
+1. **Generate**: Create new configs from current data
+2. **Validate**: Check configs before deployment
+3. **Deploy**: Push to devices
+4. **Verify**: Confirm successful application
+
+### Compliance Auditing
+
+1. **Define**: Create compliance report template
+2. **Generate**: Run against all devices
+3. **Review**: Identify non-compliant devices
+4. **Remediate**: Fix issues and regenerate
+
+### Disaster Recovery
+
+1. **Regular Generation**: Keep artifacts current
+2. **Backup Storage**: Replicate artifact store
+3. **Rapid Recovery**: Deploy last-known-good configs
+
+## Advanced Concepts
+
+### Artifact Dependencies
+
+Artifacts can depend on other artifacts:
+
+```yaml
+# BGP config depends on base config
+kind: CoreArtifactDefinition
+name: bgp-config
+depends_on:
+  - startup-config
+template_path: templates/bgp.j2
+```
+
+### Conditional Generation
+
+Generate only when needed:
+
+```python
+# Check if regeneration needed
+if device.last_modified > artifact.generated_at:
+    nr.run(task=regenerate_host_artifact, artifact="startup-config")
+```
+
+### Multi-Stage Artifacts
+
+Complex artifacts with multiple steps:
+
+1. Generate base config
+2. Apply security policies
+3. Add monitoring config
+4. Validate final result
+
+## Best Practices
+
+### Template Design
+
+- Keep templates modular
+- Use includes for common sections
+- Version control templates with semantic versioning
+- Document template variables
+
+### Generation Strategy
+
+- Generate regularly to catch drift
+- Use branches for testing
+- Validate before deployment
+- Keep generation logs
+
+### Storage Management
+
+- Set retention policies
+- Monitor storage growth
+- Archive old versions
+- Backup artifact store
+
+## Connections to Other Systems
+
+### CI/CD Integration
+
+```yaml
+# GitLab CI example
+generate-configs:
+  script:
+    - nornir-generate-artifacts --artifact startup-config
+  only:
+    - schedules
+
+deploy-configs:
+  script:
+    - nornir-deploy-configs --artifact startup-config
+  when: manual
+```
+
+### Monitoring Integration
+
+- Alert on generation failures
+- Track artifact age
+- Monitor deployment success
+- Measure config drift
+
+## Alternative Approaches Comparison
+
+### Static File Management
+
+Pros:
+
+- Simple to understand
+- Direct file editing
+- Git version control
+
+Cons:
+
+- Manual updates
+- Template/data separation
+- Drift between files and reality
+
+### Dynamic Generation Only
+
+Pros:
+
+- Always current
+- No storage needs
+
+Cons:
+
+- No history
+- Can't compare versions
+- Regeneration overhead
+
+### Infrahub Artifact Approach
+
+Pros:
+
+- Version history
+- Branch isolation
+- Audit trail
+- Performance (pre-generated)
+
+Cons:
+
+- Storage requirements
+- Generation complexity
+- Learning curve
+
+## Further Reading
+
+- [Your First Automation Workflow](../guides/your-first-automation-workflow.mdx) - Implement artifact workflows
+- [Infrahub Inventory Concepts](./infrahub-inventory-concepts.mdx) - Understand data sources
+- [Configuring Schema Mappings](../guides/configuring-schema-mappings.mdx) - Set up data access

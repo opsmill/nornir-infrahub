@@ -1,0 +1,292 @@
+---
+title: How to Configure Schema Mappings
+---
+
+This guide shows you how to configure schema mappings to control how Infrahub data translates into Nornir inventory properties. Schema mappings are the bridge between your Infrahub data model and Nornir's expected host attributes.
+
+## What You'll Accomplish
+
+By following this guide, you'll be able to:
+
+- Map Infrahub node attributes to Nornir host properties
+- Handle nested relationships and complex data structures
+- Create custom mappings for specialized use cases
+- Debug and troubleshoot mapping issues
+
+## Prerequisites
+
+- Working Nornir-Infrahub installation
+- Understanding of your Infrahub schema
+- Access to Infrahub GraphQL explorer (for testing queries)
+
+## Understanding Schema Mappings
+
+Schema mappings define how to extract values from Infrahub nodes and assign them to Nornir host properties. Each mapping consists of:
+
+- `name`: The Nornir property to set (e.g., "hostname", "platform")
+- `mapping`: The path to the value in the Infrahub node (e.g., "primary_address.address")
+
+## Step 1: Identify Required Nornir Properties
+
+First, determine which Nornir properties your automation tasks need:
+
+| Property | Purpose | Common Mapping Source |
+|----------|---------|----------------------|
+| `hostname` | IP/FQDN for connections | Device primary address |
+| `platform` | Device OS type | Platform or OS attribute |
+| `username` | Authentication user | Credential or static value |
+| `password` | Authentication password | Credential or static value |
+| `port` | Connection port | Interface or static value |
+| `data` | Custom data | Any Infrahub attributes |
+
+## Step 2: Explore Your Infrahub Schema
+
+Use the Infrahub GraphQL explorer to understand available attributes:
+
+```graphql
+query {
+  InfraDevice {
+    edges {
+      node {
+        name {
+          value
+        }
+        primary_address {
+          node {
+            address {
+              value
+            }
+          }
+        }
+        platform {
+          node {
+            name {
+              value
+            }
+            nornir_platform {
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+This helps you identify the exact paths to your data.
+
+## Step 3: Configure Basic Mappings
+
+### Simple Attribute Mapping
+
+For direct attributes on the node:
+
+```yaml
+schema_mappings:
+  - name: "hostname"
+    mapping: "name"  # Maps device name to hostname
+```
+
+### Nested Relationship Mapping
+
+For attributes through relationships:
+
+```yaml
+schema_mappings:
+  - name: "hostname"
+    mapping: "primary_address.address"  # Traverses relationship
+  - name: "platform"
+    mapping: "platform.nornir_platform"
+```
+
+### Multiple Level Nesting
+
+For deeply nested data:
+
+```yaml
+schema_mappings:
+  - name: "location"
+    mapping: "site.location.name"  # Multiple relationships
+```
+
+## Step 4: Handle Complex Mappings
+
+### IP Address Handling
+
+Infrahub stores IP addresses as interface objects. The integration automatically extracts the IP:
+
+```yaml
+schema_mappings:
+  - name: "hostname"
+    mapping: "primary_address.address"  # Automatically converts IPHost to string
+```
+
+### Conditional Mappings
+
+When devices might have different attribute paths:
+
+```yaml
+# First try primary, fallback handled by multiple mappings
+schema_mappings:
+  - name: "hostname"
+    mapping: "primary_address.address"
+  - name: "hostname"
+    mapping: "management_address.address"  # Used if first fails
+```
+
+### Custom Data Mappings
+
+Include additional data for use in tasks:
+
+```yaml
+schema_mappings:
+  - name: "data.serial_number"
+    mapping: "serial_number"
+  - name: "data.model"
+    mapping: "device_type.model"
+```
+
+## Step 5: Configure Group Mappings
+
+Group mappings create dynamic Nornir groups from Infrahub relationships:
+
+```yaml
+group_mappings:
+  - "site.name"        # Creates groups like "site__chicago"
+  - "role.name"        # Creates groups like "role__spine"
+  - "platform.name"    # Creates groups like "platform__eos"
+```
+
+Groups are automatically prefixed with the relationship name to avoid conflicts.
+
+## Step 6: Test Your Mappings
+
+Create a test script to verify mappings:
+
+```python
+from nornir import InitNornir
+import json
+
+def test_mappings():
+    nr = InitNornir(config_file="config.yaml")
+
+    # Check a specific host
+    if "router1" in nr.inventory.hosts:
+        host = nr.inventory.hosts["router1"]
+        print(f"Host: {host.name}")
+        print(f"Hostname: {host.hostname}")
+        print(f"Platform: {host.platform}")
+        print(f"Groups: {[g.name for g in host.groups]}")
+        print(f"Data: {json.dumps(host.data, indent=2)}")
+
+    # List all groups
+    print("\nAll groups:")
+    for group in nr.inventory.groups:
+        print(f"  - {group}")
+
+if __name__ == "__main__":
+    test_mappings()
+```
+
+## Validation
+
+### Check Mapping Success
+
+After configuration, verify:
+
+1. All hosts have required properties set
+2. Groups are created as expected
+3. No mapping errors in logs
+
+### Common Validation Commands
+
+```python
+# Check all hosts have hostname
+for host in nr.inventory.hosts.values():
+    assert host.hostname is not None, f"{host.name} missing hostname"
+
+# Verify platform mappings
+platforms = {h.platform for h in nr.inventory.hosts.values()}
+print(f"Discovered platforms: {platforms}")
+
+# Check group membership
+for group in nr.inventory.groups.values():
+    print(f"{group.name}: {len(group.hosts)} hosts")
+```
+
+## Advanced Usage
+
+### Using Mapping Results in Tasks
+
+Access mapped data in your tasks:
+
+```python
+def device_info(task):
+    # Access standard properties
+    print(f"Connecting to {task.host.hostname}")
+    print(f"Platform: {task.host.platform}")
+
+    # Access custom data
+    if "serial_number" in task.host.data:
+        print(f"Serial: {task.host.data['serial_number']}")
+
+    # Access Infrahub node
+    node = task.host.data["InfrahubNode"]
+    print(f"Infrahub ID: {node.id}")
+```
+
+### Dynamic Mapping Based on Node Type
+
+For environments with multiple device types:
+
+```yaml
+# Router-specific mappings
+host_node:
+  kind: "InfraRouter"
+
+schema_mappings:
+  - name: "hostname"
+    mapping: "loopback0.address"
+  - name: "platform"
+    mapping: "os.nornir_platform"
+
+# Switch-specific mappings (different config file)
+host_node:
+  kind: "InfraSwitch"
+
+schema_mappings:
+  - name: "hostname"
+    mapping: "management_ip.address"
+  - name: "platform"
+    mapping: "nos.nornir_platform"
+```
+
+### Troubleshooting Mapping Failures
+
+If mappings fail silently:
+
+1. Enable debug logging:
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+```
+
+2. Check the Infrahub GraphQL query:
+
+```python
+# Add to your script
+print(nr.inventory.hosts["device1"].data["InfrahubNode"]._raw_data)
+```
+
+3. Verify relationship cardinality:
+
+- Single relationships: `mapping: "platform.name"`
+- Many relationships not supported directly
+
+## Related Resources
+
+- [Understanding Nornir-Infrahub Integration](../topics/understanding-nornir-infrahub-integration.mdx)
+- [Infrahub Inventory Concepts](../topics/infrahub-inventory-concepts.mdx)
+- [Your First Automation Workflow](./your-first-automation-workflow.mdx)

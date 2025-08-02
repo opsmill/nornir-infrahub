@@ -1,0 +1,265 @@
+---
+title: Understanding the Nornir-Infrahub Integration
+---
+
+# Understanding the Nornir-Infrahub Integration
+
+This topic explains the core concepts behind the Nornir-Infrahub integration, how it works, and why it represents a paradigm shift in network automation.
+
+## Introduction
+
+The Nornir-Infrahub integration fundamentally changes how network automation handles inventory and configuration management. Instead of maintaining static files or simple databases, this integration leverages Infrahub's graph database and version control capabilities to create a dynamic, versioned, and relationship-aware automation platform.
+
+This document answers key questions:
+
+- How does Infrahub's data model translate to Nornir's inventory system?
+- What makes this approach different from traditional inventory management?
+- How do version control concepts apply to network automation?
+- What new capabilities does this integration enable?
+
+## Core Concepts
+
+### The Graph Database Advantage
+
+Traditional network inventory systems store data in flat files or relational databases. This creates challenges:
+
+- **Rigid relationships**: Difficult to model complex network topologies
+- **Limited context**: Device data exists in isolation
+- **No history**: Changes overwrite previous state
+
+Infrahub's graph database approach solves these issues:
+
+```text
+┌─────────────┐     belongs_to     ┌──────────┐
+│   Device    │──────────────────▶│   Site    │
+└─────────────┘                    └──────────┘
+       │                                  │
+       │ has_interface                    │ located_in
+       ▼                                  ▼
+┌─────────────┐                    ┌──────────┐
+│  Interface  │                    │ Location │
+└─────────────┘                    └──────────┘
+```
+
+This graph structure naturally represents network relationships, making it easy to:
+
+- Navigate from devices to their interfaces, sites, and roles
+- Query based on any relationship or attribute
+- Maintain referential integrity automatically
+
+### Dynamic Inventory Generation
+
+The integration transforms Infrahub's graph data into Nornir's inventory structure in real-time:
+
+1. **Query Infrahub**: Fetch nodes based on configured criteria
+2. **Apply mappings**: Transform Infrahub attributes to Nornir properties
+3. **Build relationships**: Create groups from Infrahub relationships
+4. **Inject metadata**: Include full Infrahub node data for tasks
+
+This process happens transparently when you initialize Nornir, ensuring your inventory always reflects the current state in Infrahub.
+
+### Version Control for Infrastructure
+
+Infrahub brings Git-like version control to infrastructure data:
+
+#### Branches
+
+Just as code has development branches, your infrastructure can too:
+
+```python
+# Work with production data
+nr_prod = InitNornir(
+    inventory={
+        "plugin": "InfrahubInventory",
+        "options": {"branch": "main"}
+    }
+)
+
+# Test changes in development
+nr_dev = InitNornir(
+    inventory={
+        "plugin": "InfrahubInventory",
+        "options": {"branch": "development"}
+    }
+)
+```
+
+#### Change Tracking
+
+Every modification in Infrahub is tracked:
+
+- Who made the change
+- When it was made
+- What was changed
+- Why (via commit messages)
+
+This audit trail is invaluable for compliance and troubleshooting.
+
+## Architecture and Design
+
+### Component Interaction
+
+The integration consists of three main components:
+
+1. **InfrahubInventory Plugin**: Bridges Infrahub and Nornir
+2. **Schema Mappings**: Define how Infrahub data maps to Nornir
+3. **Task Plugins**: Interact with Infrahub artifacts
+
+```text
+┌─────────────┐     HTTP/GraphQL    ┌──────────────┐
+│   Nornir    │◀──────────────────▶│   Infrahub    │
+│             │                     │              │
+│ ┌─────────┐ │                     │ ┌──────────┐ │
+│ │Inventory│ │                     │ │  Graph   │ │
+│ │ Plugin  │ │                     │ │Database  │ │
+│ └─────────┘ │                     │ └──────────┘ │
+│             │                     │              │
+│ ┌─────────┐ │                     │ ┌──────────┐ │
+│ │  Task   │ │                     │ │Artifacts │ │
+│ │Plugins  │ │                     │ │ Storage  │ │
+│ └─────────┘ │                     │ └──────────┘ │
+└─────────────┘                     └──────────────┘
+```
+
+### Data Flow
+
+1. **Initialization**: Nornir requests inventory from the plugin
+2. **Query**: Plugin queries Infrahub via GraphQL
+3. **Transform**: Results are mapped to Nornir's data model
+4. **Enrichment**: Additional metadata is preserved
+5. **Execution**: Tasks run with access to full Infrahub context
+
+## Mental Models
+
+### Think "Database, Not Files"
+
+Traditional approach:
+
+```yaml
+# hosts.yaml - static, manually updated
+router1:
+  hostname: 192.168.1.1
+  groups: [core_routers]
+```
+
+Infrahub approach:
+
+```python
+# Dynamic query from graph database
+devices = infrahub.query("""
+  InfraDevice(role__name="core-router") {
+    name
+    primary_address {
+      address
+    }
+  }
+""")
+```
+
+### Think "Relationships, Not Hierarchies"
+
+Traditional inventory forces hierarchical thinking:
+
+- Host belongs to one group
+- Groups have limited inheritance
+
+Infrahub enables relationship-based thinking:
+
+- Device connects to multiple sites via circuits
+- Interfaces belong to devices but connect to other interfaces
+- Services span multiple devices
+
+### Think "Versions, Not Snapshots"
+
+Instead of point-in-time backups, think continuous version history:
+
+- Every change is a commit
+- Branches enable parallel development
+- Merging reconciles different versions
+- Rollback is always possible
+
+## Connections to Other Concepts
+
+### Infrastructure as Code (IaC)
+
+The integration enhances IaC practices:
+
+- **Source of Truth**: Infrahub becomes the authoritative data source
+- **GitOps**: Apply Git workflows to infrastructure data
+- **Declarative**: Define desired state, let automation achieve it
+
+### CI/CD Pipelines
+
+Natural integration with CI/CD:
+
+1. Developer creates feature branch in Infrahub
+2. Makes changes to device configurations
+3. CI pipeline runs tests using branch inventory
+4. Merge to main triggers production deployment
+
+### Network Automation Frameworks
+
+Complements other tools:
+
+- **Ansible**: Can use Infrahub as dynamic inventory
+- **Netbox**: Infrahub can sync with existing CMDBs
+- **Terraform**: Provision infrastructure based on Infrahub data
+
+## Alternative Approaches
+
+### Static File Inventory
+
+Pros:
+
+- Simple to understand
+- No external dependencies
+- Complete control
+
+Cons:
+
+- Manual updates required
+- No version history
+- Limited relationship modeling
+
+### External CMDB Integration
+
+Pros:
+
+- Centralized data
+- Often includes ITSM features
+- Enterprise support
+
+Cons:
+
+- Complex integration
+- Limited automation focus
+- Expensive licensing
+
+### Custom Database Solutions
+
+Pros:
+
+- Tailored to specific needs
+- Full control over schema
+
+Cons:
+
+- Maintenance burden
+- Reinventing solved problems
+- No ecosystem
+
+## Why This Approach Matters
+
+The Nornir-Infrahub integration represents a fundamental shift because it:
+
+1. **Eliminates manual inventory management**: Changes in Infrahub automatically reflect in automation
+2. **Enables sophisticated workflows**: Branch, test, merge, and deploy like software
+3. **Provides complete audit trails**: Every change is tracked and attributable
+4. **Supports complex relationships**: Model real-world network topologies naturally
+5. **Scales with your infrastructure**: Graph databases excel at relationship queries
+
+## Further Reading
+
+- [Infrahub Inventory Concepts](./infrahub-inventory-concepts.mdx) - Deep dive into inventory mechanics
+- [Artifact Lifecycle Management](./artifact-lifecycle-management.mdx) - Understanding configuration artifacts
+- [Your First Automation Workflow](../guides/your-first-automation-workflow.mdx) - Practical implementation guide

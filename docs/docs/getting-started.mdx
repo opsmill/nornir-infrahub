@@ -1,0 +1,189 @@
+---
+title: Getting Started
+---
+
+This guide helps you set up your first integration between Nornir and Infrahub. By the end, you'll have a working automation setup that demonstrates the power of dynamic inventory management.
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- Python 3.9 or higher installed
+- An Infrahub instance running (local or remote)
+- Basic familiarity with Nornir concepts
+- At least one device defined in your Infrahub schema
+
+## Installation
+
+Install the Nornir-Infrahub plugin using pip:
+
+```bash
+pip install nornir-infrahub
+```
+
+This automatically installs all required dependencies including:
+
+- `nornir` - The automation framework
+- `infrahub-sdk` - Python SDK for Infrahub API
+- `nornir-utils` - Helpful utilities for Nornir
+
+## Setting Up Your First Integration
+
+### Step 1: Obtain Your Infrahub API Token
+
+First, you'll need an API token to authenticate with Infrahub:
+
+1. Log into your Infrahub web interface
+2. Navigate to your user profile settings
+3. Generate or copy your API token
+4. Store it securely (we'll use it in the next step)
+
+### Step 2: Create Your Nornir Configuration
+
+Create a file named `config.yaml` with your Nornir configuration:
+
+```yaml
+---
+inventory:
+  plugin: InfrahubInventory
+  options:
+    address: "http://localhost:8000"  # Your Infrahub URL
+    token: "your-api-token-here"       # Replace with your actual token
+    branch: "main"                     # Infrahub branch to use
+    
+    # Define which Infrahub node type represents network devices
+    host_node:
+      kind: "InfraDevice"              # Adjust based on your schema
+    
+    # Map Infrahub attributes to Nornir host properties
+    schema_mappings:
+      - name: "hostname"
+        mapping: "primary_address.address"
+      - name: "platform"
+        mapping: "platform.nornir_platform"
+    
+    # Create Nornir groups based on Infrahub attributes
+    group_mappings:
+      - "site.name"
+      - "role.name"
+
+runner:
+  plugin: threaded
+  options:
+    num_workers: 20
+```
+
+### Step 3: Test Your Connection
+
+Create a simple Python script to verify your setup:
+
+```python
+from nornir import InitNornir
+from nornir_utils.plugins.functions import print_result
+
+def main():
+    # Initialize Nornir with your configuration
+    nr = InitNornir(config_file="config.yaml")
+    
+    # Display discovered inventory
+    print("Discovered hosts:")
+    for host in nr.inventory.hosts.values():
+        print(f"  - {host.name} ({host.hostname})")
+    
+    print("\nDiscovered groups:")
+    for group in nr.inventory.groups.values():
+        print(f"  - {group.name}")
+    
+    return 0
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+Run the script:
+
+```bash
+python test_connection.py
+```
+
+You should see a list of hosts and groups discovered from your Infrahub instance.
+
+### Step 4: Run Your First Task
+
+Now let's run a simple task against your inventory:
+
+```python
+from nornir import InitNornir
+from nornir.core.task import Result, Task
+from nornir_utils.plugins.functions import print_result
+
+def hello_world(task: Task) -> Result:
+    """A simple task that returns a greeting."""
+    return Result(
+        host=task.host,
+        result=f"Hello from {task.host.name}!"
+    )
+
+def main():
+    # Initialize Nornir
+    nr = InitNornir(config_file="config.yaml")
+    
+    # Run the hello_world task on all hosts
+    results = nr.run(task=hello_world)
+    
+    # Display results
+    print_result(results)
+    
+    return 0
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+## Verifying Your Setup
+
+To ensure everything is working correctly:
+
+1. **Check Host Discovery**: Verify that all expected hosts appear in your inventory
+2. **Validate Groups**: Confirm that dynamic groups are created based on your mappings
+3. **Test Connectivity**: Run a simple task to ensure Nornir can process your inventory
+
+## Common Issues and Solutions
+
+### Authentication Errors
+
+If you see authentication errors:
+
+- Verify your API token is correct
+- Ensure your Infrahub instance is accessible at the specified address
+- Check that your token has appropriate permissions
+
+### Missing Hosts
+
+If hosts aren't appearing:
+
+- Verify the `host_node.kind` matches your Infrahub schema
+- Check that devices exist in the specified branch
+- Ensure devices have the required attributes for your schema mappings
+
+### Mapping Errors
+
+If you see errors about missing attributes:
+
+- Verify your schema mappings match your Infrahub data model
+- Use the Infrahub GraphQL explorer to check available attributes
+- Ensure related objects (like `primary_address`) are properly defined
+
+## Next Steps
+
+Now that you have a working integration:
+
+- Explore [Your First Automation Workflow](./guides/your-first-automation-workflow.mdx) to build a complete automation
+- Learn about [Schema Mappings](./guides/configuring-schema-mappings.mdx) for advanced inventory configuration
+- Understand [Artifact Management](./topics/artifact-lifecycle-management.mdx) for configuration generation
+
+## Getting Help
+
+- Check the [Infrahub Documentation](https://docs.infrahub.app/) for schema and API details
+- Review the [Nornir Documentation](https://nornir.readthedocs.io/) for automation concepts
+- Join the Infrahub community for support and best practices
