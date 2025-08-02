@@ -27,9 +27,9 @@ This automatically installs all required dependencies including:
 - `infrahub-sdk` - Python SDK for Infrahub API
 - `nornir-utils` - Helpful utilities for Nornir
 
-## Setting Up Your First Integration
+## Setting up your first integration
 
-### Step 1: Obtain Your Infrahub API Token
+### Step 1: Obtain your Infrahub API token
 
 First, you'll need an API token to authenticate with Infrahub:
 
@@ -38,7 +38,7 @@ First, you'll need an API token to authenticate with Infrahub:
 3. Generate or copy your API token
 4. Store it securely (we'll use it in the next step)
 
-### Step 2: Create Your Nornir Configuration
+### Step 2: Create your Nornir configuration
 
 Create a file named `config.yaml` with your Nornir configuration:
 
@@ -73,9 +73,9 @@ runner:
     num_workers: 20
 ```
 
-### Step 3: Test Your Connection
+### Step 3: Test your connection
 
-Create a simple Python script to verify your setup:
+Create a Python script to verify your setup:
 
 ```python
 from nornir import InitNornir
@@ -108,9 +108,9 @@ python test_connection.py
 
 You should see a list of hosts and groups discovered from your Infrahub instance.
 
-### Step 4: Run Your First Task
+### Step 4: Run your first task
 
-Now let's run a simple task against your inventory:
+Now let's run a task against your inventory:
 
 ```python
 from nornir import InitNornir
@@ -118,7 +118,7 @@ from nornir.core.task import Result, Task
 from nornir_utils.plugins.functions import print_result
 
 def hello_world(task: Task) -> Result:
-    """A simple task that returns a greeting."""
+    """A task that returns a greeting."""
     return Result(
         host=task.host,
         result=f"Hello from {task.host.name}!"
@@ -140,17 +140,17 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ```
 
-## Verifying Your Setup
+## Verifying your setup
 
 To ensure everything is working correctly:
 
 1. **Check Host Discovery**: Verify that all expected hosts appear in your inventory
 2. **Validate Groups**: Confirm that dynamic groups are created based on your mappings
-3. **Test Connectivity**: Run a simple task to ensure Nornir can process your inventory
+3. **Test Connectivity**: Run a task to ensure Nornir can process your inventory
 
-## Common Issues and Solutions
+## Common issues and solutions
 
-### Authentication Errors
+### Authentication errors
 
 If you see authentication errors:
 
@@ -158,7 +158,7 @@ If you see authentication errors:
 - Ensure your Infrahub instance is accessible at the specified address
 - Check that your token has appropriate permissions
 
-### Missing Hosts
+### Missing hosts
 
 If hosts aren't appearing:
 
@@ -166,7 +166,7 @@ If hosts aren't appearing:
 - Check that devices exist in the specified branch
 - Ensure devices have the required attributes for your schema mappings
 
-### Mapping Errors
+### Mapping errors
 
 If you see errors about missing attributes:
 
@@ -174,7 +174,7 @@ If you see errors about missing attributes:
 - Use the Infrahub GraphQL explorer to check available attributes
 - Ensure related objects (like `primary_address`) are properly defined
 
-## Next Steps
+## Next steps
 
 Now that you have a working integration:
 
@@ -182,7 +182,7 @@ Now that you have a working integration:
 - Learn about [Schema Mappings](./guides/configuring-schema-mappings.mdx) for advanced inventory configuration
 - Understand [Artifact Management](./topics/artifact-lifecycle-management.mdx) for configuration generation
 
-## Getting Help
+## Getting help
 
 - Check the [Infrahub Documentation](https://docs.infrahub.app/) for schema and API details
 - Review the [Nornir Documentation](https://nornir.readthedocs.io/) for automation concepts

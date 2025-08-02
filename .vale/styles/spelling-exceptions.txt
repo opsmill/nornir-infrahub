@@ -6,16 +6,20 @@ append_git_suffix
 artifact_definitions
 artifact_name
 async
+auditable
 Authentik
 boolean
 check_definitions
 class_name
 CloudFormation
+CMDBs
 codespace
 codespaces
 combobox
 config
 Config
+configs
+Configs
 Containerlab
 content_type
 convert_query_response
@@ -23,6 +27,7 @@ coroutine
 cypher
 Dagster
 datastore
+Deduplication
 default_branch
 default_filter
 deserialized
@@ -89,6 +94,7 @@ Nautobot
 Netbox
 Newsfragment
 Nornir
+Nornir's
 npm
 o'brian
 openconfig

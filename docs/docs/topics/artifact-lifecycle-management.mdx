@@ -13,7 +13,7 @@ Artifacts in Infrahub are generated outputs based on your infrastructure data an
 - The relationship between artifacts, templates, and infrastructure data
 - How version control applies to generated configurations
 
-## What Are Artifacts?
+## What are artifacts?
 
 ### Definition
 
@@ -25,7 +25,7 @@ An artifact is any generated content that represents infrastructure state:
 - API payloads
 - Validation results
 
-### Key Characteristics
+### Key characteristics
 
 Artifacts are:
 
@@ -34,9 +34,9 @@ Artifacts are:
 - **Immutable**: Once generated, artifacts don't change
 - **Traceable**: Linked to the exact data and templates used
 
-## The Artifact Lifecycle
+## The artifact lifecycle
 
-### 1. Definition Phase
+### 1. Definition phase
 
 Artifacts start with an artifact definition in Infrahub:
 
@@ -55,7 +55,7 @@ This defines:
 - Which devices to target
 - When to regenerate
 
-### 2. Generation Phase
+### 2. Generation phase
 
 Generation combines:
 
@@ -77,7 +77,7 @@ interface {{ interface.name }}
 {% endfor %}
 ```
 
-### 3. Storage Phase
+### 3. Storage phase
 
 Generated artifacts are stored in Infrahub:
 
@@ -85,7 +85,7 @@ Generated artifacts are stored in Infrahub:
 - Metadata tracks generation time, user, branch
 - Previous versions retained for history
 
-### 4. Retrieval Phase
+### 4. Retrieval phase
 
 Artifacts can be retrieved for:
 
@@ -94,9 +94,9 @@ Artifacts can be retrieved for:
 - Change review
 - Disaster recovery
 
-## Artifact Management with Nornir
+## Artifact management with Nornir
 
-### Task Plugin Functions
+### Task plugin functions
 
 The Nornir-Infrahub plugin provides three key functions:
 
@@ -143,9 +143,9 @@ for host, task_result in result.items():
     # Deploy config to device
 ```
 
-## Version Control Integration
+## Version control integration
 
-### Branch-Aware Artifacts
+### Branch-aware artifacts
 
 Artifacts are generated per branch:
 
@@ -166,7 +166,7 @@ This enables:
 - Comparison between branches
 - Controlled promotion to production
 
-### Change Tracking
+### Change tracking
 
 Every artifact generation is tracked:
 
@@ -181,9 +181,9 @@ Every artifact generation is tracked:
 }
 ```
 
-## Mental Models
+## Mental models
 
-### Think "Generated, Not Stored"
+### Think "generated, not stored"
 
 Traditional approach:
 
@@ -197,7 +197,7 @@ Artifact approach:
 - Generate configs on demand
 - Single source of truth
 
-### Think "Immutable Versions"
+### Think "immutable versions"
 
 Each generation creates a new version:
 
@@ -205,9 +205,9 @@ Each generation creates a new version:
 - Compare versions to see changes
 - Rollback by deploying previous version
 
-### Think "Data + Template = Artifact"
+### Think "data + template = artifact"
 
-The equation is simple but powerful:
+The equation is short but powerful:
 
 ```text
 Current Data + Template Logic = Generated Artifact
@@ -215,9 +215,9 @@ Current Data + Template Logic = Generated Artifact
 
 Change either input, get a new artifact version.
 
-## Architecture and Design
+## Architecture and design
 
-### Generation Flow
+### Generation flow
 
 ```text
 ┌────────────┐     ┌───────────┐     ┌─────────────┐
@@ -237,7 +237,7 @@ Change either input, get a new artifact version.
                    └──────────┘
 ```
 
-### Storage Architecture
+### Storage architecture
 
 Artifacts use content-addressable storage:
 
@@ -245,31 +245,31 @@ Artifacts use content-addressable storage:
 - Deduplication happens automatically
 - Metadata links content to devices/versions
 
-## Practical Workflows
+## Practical workflows
 
-### Configuration Deployment
+### Configuration deployment
 
 1. **Generate**: Create new configs from current data
 2. **Validate**: Check configs before deployment
 3. **Deploy**: Push to devices
 4. **Verify**: Confirm successful application
 
-### Compliance Auditing
+### Compliance auditing
 
 1. **Define**: Create compliance report template
 2. **Generate**: Run against all devices
 3. **Review**: Identify non-compliant devices
 4. **Remediate**: Fix issues and regenerate
 
-### Disaster Recovery
+### Disaster recovery
 
 1. **Regular Generation**: Keep artifacts current
 2. **Backup Storage**: Replicate artifact store
 3. **Rapid Recovery**: Deploy last-known-good configs
 
-## Advanced Concepts
+## Advanced concepts
 
-### Artifact Dependencies
+### Artifact dependencies
 
 Artifacts can depend on other artifacts:
 
@@ -282,7 +282,7 @@ depends_on:
 template_path: templates/bgp.j2
 ```
 
-### Conditional Generation
+### Conditional generation
 
 Generate only when needed:
 
@@ -292,41 +292,41 @@ if device.last_modified > artifact.generated_at:
     nr.run(task=regenerate_host_artifact, artifact="startup-config")
 ```
 
-### Multi-Stage Artifacts
+### Multi-stage artifacts
 
 Complex artifacts with multiple steps:
 
-1. Generate base config
+1. Generate base configuration
 2. Apply security policies
-3. Add monitoring config
+3. Add monitoring configuration
 4. Validate final result
 
-## Best Practices
+## Best practices
 
-### Template Design
+### Template design
 
 - Keep templates modular
 - Use includes for common sections
 - Version control templates with semantic versioning
 - Document template variables
 
-### Generation Strategy
+### Generation strategy
 
 - Generate regularly to catch drift
 - Use branches for testing
 - Validate before deployment
 - Keep generation logs
 
-### Storage Management
+### Storage management
 
 - Set retention policies
 - Monitor storage growth
 - Archive old versions
 - Backup artifact store
 
-## Connections to Other Systems
+## Connections to other systems
 
-### CI/CD Integration
+### CI/CD integration
 
 ```yaml
 # GitLab CI example
@@ -342,20 +342,20 @@ deploy-configs:
   when: manual
 ```
 
-### Monitoring Integration
+### Monitoring integration
 
 - Alert on generation failures
 - Track artifact age
 - Monitor deployment success
-- Measure config drift
+- Measure configuration drift
 
-## Alternative Approaches Comparison
+## Alternative approaches comparison
 
-### Static File Management
+### Static file management
 
 Pros:
 
-- Simple to understand
+- Quick to understand
 - Direct file editing
 - Git version control
 
@@ -365,7 +365,7 @@ Cons:
 - Template/data separation
 - Drift between files and reality
 
-### Dynamic Generation Only
+### Dynamic generation only
 
 Pros:
 
@@ -378,7 +378,7 @@ Cons:
 - Can't compare versions
 - Regeneration overhead
 
-### Infrahub Artifact Approach
+### Infrahub artifact approach
 
 Pros:
 
@@ -393,7 +393,7 @@ Cons:
 - Generation complexity
 - Learning curve
 
-## Further Reading
+## Further reading
 
 - [Your First Automation Workflow](../guides/your-first-automation-workflow.mdx) - Implement artifact workflows
 - [Infrahub Inventory Concepts](./infrahub-inventory-concepts.mdx) - Understand data sources

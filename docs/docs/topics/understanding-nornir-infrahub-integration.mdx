@@ -8,7 +8,7 @@ This topic explains the core concepts behind the Nornir-Infrahub integration, ho
 
 ## Introduction
 
-The Nornir-Infrahub integration fundamentally changes how network automation handles inventory and configuration management. Instead of maintaining static files or simple databases, this integration leverages Infrahub's graph database and version control capabilities to create a dynamic, versioned, and relationship-aware automation platform.
+The Nornir-Infrahub integration fundamentally changes how network automation handles inventory and configuration management. Instead of maintaining static files or basic databases, this integration leverages Infrahub's graph database and version control capabilities to create a dynamic, versioned, and relationship-aware automation platform.
 
 This document answers key questions:
 
@@ -17,9 +17,9 @@ This document answers key questions:
 - How do version control concepts apply to network automation?
 - What new capabilities does this integration enable?
 
-## Core Concepts
+## Core concepts
 
-### The Graph Database Advantage
+### The graph database advantage
 
 Traditional network inventory systems store data in flat files or relational databases. This creates challenges:
 
@@ -41,13 +41,13 @@ Infrahub's graph database approach solves these issues:
 └─────────────┘                    └──────────┘
 ```
 
-This graph structure naturally represents network relationships, making it easy to:
+This graph structure naturally represents network relationships, making it straightforward to:
 
 - Navigate from devices to their interfaces, sites, and roles
 - Query based on any relationship or attribute
 - Maintain referential integrity automatically
 
-### Dynamic Inventory Generation
+### Dynamic inventory generation
 
 The integration transforms Infrahub's graph data into Nornir's inventory structure in real-time:
 
@@ -58,7 +58,7 @@ The integration transforms Infrahub's graph data into Nornir's inventory structu
 
 This process happens transparently when you initialize Nornir, ensuring your inventory always reflects the current state in Infrahub.
 
-### Version Control for Infrastructure
+### Version control for infrastructure
 
 Infrahub brings Git-like version control to infrastructure data:
 
@@ -84,7 +84,7 @@ nr_dev = InitNornir(
 )
 ```
 
-#### Change Tracking
+#### Change tracking
 
 Every modification in Infrahub is tracked:
 
@@ -95,9 +95,9 @@ Every modification in Infrahub is tracked:
 
 This audit trail is invaluable for compliance and troubleshooting.
 
-## Architecture and Design
+## Architecture and design
 
-### Component Interaction
+### Component interaction
 
 The integration consists of three main components:
 
@@ -121,7 +121,7 @@ The integration consists of three main components:
 └─────────────┘                     └──────────────┘
 ```
 
-### Data Flow
+### Data flow
 
 1. **Initialization**: Nornir requests inventory from the plugin
 2. **Query**: Plugin queries Infrahub via GraphQL
@@ -129,9 +129,9 @@ The integration consists of three main components:
 4. **Enrichment**: Additional metadata is preserved
 5. **Execution**: Tasks run with access to full Infrahub context
 
-## Mental Models
+## Mental models
 
-### Think "Database, Not Files"
+### Think "database, not files"
 
 Traditional approach:
 
@@ -156,7 +156,7 @@ devices = infrahub.query("""
 """)
 ```
 
-### Think "Relationships, Not Hierarchies"
+### Think "relationships, not hierarchies"
 
 Traditional inventory forces hierarchical thinking:
 
@@ -169,7 +169,7 @@ Infrahub enables relationship-based thinking:
 - Interfaces belong to devices but connect to other interfaces
 - Services span multiple devices
 
-### Think "Versions, Not Snapshots"
+### Think "versions, not snapshots"
 
 Instead of point-in-time backups, think continuous version history:
 
@@ -178,9 +178,9 @@ Instead of point-in-time backups, think continuous version history:
 - Merging reconciles different versions
 - Rollback is always possible
 
-## Connections to Other Concepts
+## Connections to other concepts
 
-### Infrastructure as Code (IaC)
+### Infrastructure as code (IaC)
 
 The integration enhances IaC practices:
 
@@ -188,7 +188,7 @@ The integration enhances IaC practices:
 - **GitOps**: Apply Git workflows to infrastructure data
 - **Declarative**: Define desired state, let automation achieve it
 
-### CI/CD Pipelines
+### CI/CD pipelines
 
 Natural integration with CI/CD:
 
@@ -197,7 +197,7 @@ Natural integration with CI/CD:
 3. CI pipeline runs tests using branch inventory
 4. Merge to main triggers production deployment
 
-### Network Automation Frameworks
+### Network automation frameworks
 
 Complements other tools:
 
@@ -205,13 +205,13 @@ Complements other tools:
 - **Netbox**: Infrahub can sync with existing CMDBs
 - **Terraform**: Provision infrastructure based on Infrahub data
 
-## Alternative Approaches
+## Alternative approaches
 
-### Static File Inventory
+### Static file inventory
 
 Pros:
 
-- Simple to understand
+- Straightforward to understand
 - No external dependencies
 - Complete control
 
@@ -221,7 +221,7 @@ Cons:
 - No version history
 - Limited relationship modeling
 
-### External CMDB Integration
+### External CMDB integration
 
 Pros:
 
@@ -235,7 +235,7 @@ Cons:
 - Limited automation focus
 - Expensive licensing
 
-### Custom Database Solutions
+### Custom database solutions
 
 Pros:
 
@@ -248,7 +248,7 @@ Cons:
 - Reinventing solved problems
 - No ecosystem
 
-## Why This Approach Matters
+## Why this approach matters
 
 The Nornir-Infrahub integration represents a fundamental shift because it:
 
@@ -258,7 +258,7 @@ The Nornir-Infrahub integration represents a fundamental shift because it:
 4. **Supports complex relationships**: Model real-world network topologies naturally
 5. **Scales with your infrastructure**: Graph databases excel at relationship queries
 
-## Further Reading
+## Further reading
 
 - [Infrahub Inventory Concepts](./infrahub-inventory-concepts.mdx) - Deep dive into inventory mechanics
 - [Artifact Lifecycle Management](./artifact-lifecycle-management.mdx) - Understanding configuration artifacts

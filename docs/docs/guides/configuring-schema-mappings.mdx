@@ -4,7 +4,7 @@ title: How to Configure Schema Mappings
 
 This guide shows you how to configure schema mappings to control how Infrahub data translates into Nornir inventory properties. Schema mappings are the bridge between your Infrahub data model and Nornir's expected host attributes.
 
-## What You'll Accomplish
+## What you'll accomplish
 
 By following this guide, you'll be able to:
 
@@ -19,14 +19,14 @@ By following this guide, you'll be able to:
 - Understanding of your Infrahub schema
 - Access to Infrahub GraphQL explorer (for testing queries)
 
-## Understanding Schema Mappings
+## Understanding schema mappings
 
 Schema mappings define how to extract values from Infrahub nodes and assign them to Nornir host properties. Each mapping consists of:
 
-- `name`: The Nornir property to set (e.g., "hostname", "platform")
-- `mapping`: The path to the value in the Infrahub node (e.g., "primary_address.address")
+- `name`: The Nornir property to set (i.e., "hostname", "platform")
+- `mapping`: The path to the value in the Infrahub node (i.e., "primary_address.address")
 
-## Step 1: Identify Required Nornir Properties
+## Step 1: Identify required Nornir properties
 
 First, determine which Nornir properties your automation tasks need:
 
@@ -39,7 +39,7 @@ First, determine which Nornir properties your automation tasks need:
 | `port` | Connection port | Interface or static value |
 | `data` | Custom data | Any Infrahub attributes |
 
-## Step 2: Explore Your Infrahub Schema
+## Step 2: Explore your Infrahub schema
 
 Use the Infrahub GraphQL explorer to understand available attributes:
 
@@ -76,9 +76,9 @@ query {
 
 This helps you identify the exact paths to your data.
 
-## Step 3: Configure Basic Mappings
+## Step 3: Configure basic mappings
 
-### Simple Attribute Mapping
+### Basic attribute mapping
 
 For direct attributes on the node:
 
@@ -88,7 +88,7 @@ schema_mappings:
     mapping: "name"  # Maps device name to hostname
 ```
 
-### Nested Relationship Mapping
+### Nested relationship mapping
 
 For attributes through relationships:
 
@@ -100,7 +100,7 @@ schema_mappings:
     mapping: "platform.nornir_platform"
 ```
 
-### Multiple Level Nesting
+### Multiple level nesting
 
 For deeply nested data:
 
@@ -110,9 +110,9 @@ schema_mappings:
     mapping: "site.location.name"  # Multiple relationships
 ```
 
-## Step 4: Handle Complex Mappings
+## Step 4: Handle complex mappings
 
-### IP Address Handling
+### IP address handling
 
 Infrahub stores IP addresses as interface objects. The integration automatically extracts the IP:
 
@@ -122,7 +122,7 @@ schema_mappings:
     mapping: "primary_address.address"  # Automatically converts IPHost to string
 ```
 
-### Conditional Mappings
+### Conditional mappings
 
 When devices might have different attribute paths:
 
@@ -135,7 +135,7 @@ schema_mappings:
     mapping: "management_address.address"  # Used if first fails
 ```
 
-### Custom Data Mappings
+### Custom data mappings
 
 Include additional data for use in tasks:
 
@@ -147,7 +147,7 @@ schema_mappings:
     mapping: "device_type.model"
 ```
 
-## Step 5: Configure Group Mappings
+## Step 5: Configure group mappings
 
 Group mappings create dynamic Nornir groups from Infrahub relationships:
 
@@ -160,7 +160,7 @@ group_mappings:
 
 Groups are automatically prefixed with the relationship name to avoid conflicts.
 
-## Step 6: Test Your Mappings
+## Step 6: Test your mappings
 
 Create a test script to verify mappings:
 
@@ -191,7 +191,7 @@ if __name__ == "__main__":
 
 ## Validation
 
-### Check Mapping Success
+### Check mapping success
 
 After configuration, verify:
 
@@ -199,7 +199,7 @@ After configuration, verify:
 2. Groups are created as expected
 3. No mapping errors in logs
 
-### Common Validation Commands
+### Common validation commands
 
 ```python
 # Check all hosts have hostname
@@ -215,9 +215,9 @@ for group in nr.inventory.groups.values():
     print(f"{group.name}: {len(group.hosts)} hosts")
 ```
 
-## Advanced Usage
+## Advanced usage
 
-### Using Mapping Results in Tasks
+### Using mapping results in tasks
 
 Access mapped data in your tasks:
 
@@ -236,7 +236,7 @@ def device_info(task):
     print(f"Infrahub ID: {node.id}")
 ```
 
-### Dynamic Mapping Based on Node Type
+### Dynamic mapping based on node type
 
 For environments with multiple device types:
 
@@ -262,7 +262,7 @@ schema_mappings:
     mapping: "nos.nornir_platform"
 ```
 
-### Troubleshooting Mapping Failures
+### Troubleshooting mapping failures
 
 If mappings fail silently:
 
@@ -285,7 +285,7 @@ print(nr.inventory.hosts["device1"].data["InfrahubNode"]._raw_data)
 - Single relationships: `mapping: "platform.name"`
 - Many relationships not supported directly
 
-## Related Resources
+## Related resources
 
 - [Understanding Nornir-Infrahub Integration](../topics/understanding-nornir-infrahub-integration.mdx)
 - [Infrahub Inventory Concepts](../topics/infrahub-inventory-concepts.mdx)

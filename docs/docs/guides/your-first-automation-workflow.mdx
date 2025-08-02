@@ -4,7 +4,7 @@ title: How to Create Your First Automation Workflow
 
 This guide walks you through building a complete network automation workflow using Infrahub as your inventory source and artifact management system. You'll create a real-world automation that generates, validates, and deploys device configurations.
 
-## What You'll Accomplish
+## What you'll accomplish
 
 By the end of this guide, you'll have:
 
@@ -21,7 +21,7 @@ By the end of this guide, you'll have:
 - Basic Python and Nornir knowledge
 - Access to test network devices (or simulation)
 
-## Step 1: Set Up Your Project Structure
+## Step 1: Set up your project structure
 
 Create a project directory with the following structure:
 
@@ -78,7 +78,7 @@ logging:
   level: INFO
 ```
 
-## Step 3: Create Configuration Templates
+## Step 3: Create configuration templates
 
 Create a Cisco IOS template in `templates/cisco/base.j2`:
 
@@ -132,7 +132,7 @@ banner motd ^
 end
 ```
 
-## Step 4: Build the Workflow Script
+## Step 4: Build the workflow script
 
 Create `workflow.py` with your automation workflow:
 
@@ -362,7 +362,7 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ```
 
-## Step 5: Execute the Workflow
+## Step 5: Execute the workflow
 
 Run your automation workflow:
 
@@ -380,7 +380,7 @@ The workflow will:
 
 ## Validation
 
-### Check Generated Configurations
+### Check generated configurations
 
 Review the generated files in the `configs/` directory:
 
@@ -389,7 +389,7 @@ ls -la configs/
 cat configs/router1.cfg
 ```
 
-### Verify Backups
+### Verify backups
 
 Confirm backups were created:
 
@@ -397,13 +397,13 @@ Confirm backups were created:
 ls -la backups/*/
 ```
 
-### Monitor Deployment
+### Monitor deployment
 
 Watch the deployment output for any errors or warnings.
 
-## Advanced Usage
+## Advanced usage
 
-### Filtering Devices
+### Filtering devices
 
 Target specific devices or groups:
 
@@ -422,7 +422,7 @@ critical_devices = nr.filter(
 )
 ```
 
-### Parallel Execution Control
+### Parallel execution control
 
 Adjust parallelism for different tasks:
 
@@ -436,7 +436,7 @@ nr.config.runner.options["num_workers"] = 50
 backup_results = nr.run(task=backup_current_config)
 ```
 
-### Error Handling
+### Error handling
 
 Add robust error handling:
 
@@ -505,7 +505,7 @@ def ci_workflow():
     sys.exit(failed_count)
 ```
 
-## Related Resources
+## Related resources
 
 - [Understanding Nornir-Infrahub Integration](../topics/understanding-nornir-infrahub-integration.mdx)
 - [Configuring Schema Mappings](./configuring-schema-mappings.mdx)

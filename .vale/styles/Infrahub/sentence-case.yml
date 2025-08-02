@@ -20,13 +20,18 @@ exceptions:
   - BGP
   - CA certificates
   - CI
+  - CI/CD
+  - CMDB
+  - CMDBs
   - Codespaces
   - CoreArtifactTarget
-  - CoreRepository
   - CoreGroup
+  - CoreRepository
   - Docker Compose
   - E2E
+  - generate_artifacts()
   - Generics
+  - get_artifact()
   - Git
   - GitHub
   - GitHub Codespaces
@@ -34,17 +39,18 @@ exceptions:
   - GitPod
   - GraphQL
   - GraphQLQuery
-  - include_in_menu & menu_placement
   - Helm
   - High Availability
   - Human Friendly Identifier
+  - IaC
+  - include_in_menu & menu_placement
   - Infrahub
   - infrahubctl
-  - IPHost
   - IP
-  - IPAM
-  - IPNetwork
   - IP Fabric
+  - IPAM
+  - IPHost
+  - IPNetwork
   - JavaScript
   - JetStream
   - Jinja
@@ -53,6 +59,7 @@ exceptions:
   - Namespace
   - NATS
   - Node
+  - Nornir
   - OAuth2
   - OIDC
   - Open ID Connect
@@ -60,6 +67,7 @@ exceptions:
   - Pydantic
   - Python
   - RabbitMQ
+  - regenerate_host_artifact()
   - REST
   - RFile
   - SDK

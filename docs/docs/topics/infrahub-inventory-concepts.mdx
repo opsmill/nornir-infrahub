@@ -18,9 +18,9 @@ This document explores:
 - Dynamic group generation from relationships
 - Performance considerations and best practices
 
-## Core Mapping Concepts
+## Core mapping concepts
 
-### Nodes to Hosts
+### Nodes to hosts
 
 In Infrahub, devices are nodes in the graph. The inventory plugin transforms these into Nornir hosts:
 
@@ -35,7 +35,7 @@ Infrahub Node                    Nornir Host
 └─────────────────────┘         └─────────────────────┘
 ```
 
-### Attributes to Properties
+### Attributes to properties
 
 Node attributes become host properties through schema mappings:
 
@@ -45,7 +45,7 @@ Node attributes become host properties through schema mappings:
 | Nested relation | `primary_address.address` | `host.hostname` |
 | Deep nesting | `site.location.coordinates` | `host.data['coordinates']` |
 
-### Relationships to Groups
+### Relationships to groups
 
 Infrahub relationships automatically generate Nornir groups:
 
@@ -58,9 +58,9 @@ device.role.name = "spine"
 host.groups = ["site__chicago", "role__spine"]
 ```
 
-## The Inventory Loading Process
+## The inventory loading process
 
-### Step 1: Query Construction
+### Step 1: query construction
 
 The plugin builds a GraphQL query based on your configuration:
 
@@ -94,7 +94,7 @@ query {
 }
 ```
 
-### Step 2: Data Transformation
+### Step 2: data transformation
 
 Retrieved data undergoes transformation:
 
@@ -103,7 +103,7 @@ Retrieved data undergoes transformation:
 3. **Handle missing data**: Use defaults or skip mappings
 4. **Preserve metadata**: Store full node data for tasks
 
-### Step 3: Group Generation
+### Step 3: group generation
 
 Groups are created from:
 
@@ -111,9 +111,9 @@ Groups are created from:
 2. **Dynamic groups**: Generated from `group_mappings` configuration
 3. **Hierarchical groups**: Groups can have parent groups
 
-## Advanced Inventory Concepts
+## Advanced inventory concepts
 
-### Filtering at Source
+### Filtering at source
 
 Reduce data transfer by filtering in Infrahub:
 
@@ -128,7 +128,7 @@ host_node:
 
 This translates to GraphQL filters, ensuring only relevant nodes are fetched.
 
-### Include Optimization
+### Include optimization
 
 Minimize query complexity with selective includes:
 
@@ -142,19 +142,19 @@ host_node:
     # Only fetch what you need
 ```
 
-### Relationship Cardinality
+### Relationship cardinality
 
 Understanding cardinality is crucial:
 
-- **One-to-One**: Device → Primary Address (simple mapping)
+- **One-to-One**: Device → Primary Address (direct mapping)
 - **One-to-Many**: Device → Interfaces (requires special handling)
 - **Many-to-Many**: Devices ↔ Services (complex relationships)
 
 Currently, the plugin handles one-to-one and many-to-one relationships directly.
 
-## Performance Considerations
+## Performance considerations
 
-### Query Optimization
+### Query optimization
 
 Large inventories require optimization:
 
@@ -162,7 +162,7 @@ Large inventories require optimization:
 2. **Selective fetching**: Only request needed attributes
 3. **Relationship depth**: Limit traversal depth
 
-### Caching Strategy
+### Caching strategy
 
 The plugin implements intelligent caching:
 
@@ -175,7 +175,7 @@ nr.filter(platform="ios")  # No new query
 nr.run(task=my_task)       # Uses cached inventory
 ```
 
-### Parallel Processing
+### Parallel processing
 
 Inventory loading is optimized for parallel task execution:
 
@@ -183,9 +183,9 @@ Inventory loading is optimized for parallel task execution:
 - Groups are pre-computed
 - No shared state between hosts
 
-## Schema Design Best Practices
+## Schema design best practices
 
-### Naming Conventions
+### Naming conventions
 
 Design schemas with automation in mind:
 
@@ -205,9 +205,9 @@ NetworkElement:
     - name: "address"    # Too generic
 ```
 
-### Relationship Design
+### Relationship design
 
-Structure relationships for easy traversal:
+Structure relationships for efficient traversal:
 
 ```yaml
 # Efficient: Direct relationships
@@ -221,7 +221,7 @@ InfraDevice:
 InfraDevice → Rack → Room → Building → Site
 ```
 
-### Attribute Types
+### Attribute types
 
 Choose appropriate attribute types:
 
@@ -232,9 +232,9 @@ Choose appropriate attribute types:
 | Choices | Dropdown | `status: active/maintenance` |
 | Flags | Checkbox | `is_critical: true/false` |
 
-## Dynamic Inventory Patterns
+## Dynamic inventory patterns
 
-### Environment-Based Inventory
+### Environment-based inventory
 
 Use branches for environments:
 
@@ -256,7 +256,7 @@ def get_inventory(environment="production"):
     )
 ```
 
-### Role-Based Filtering
+### Role-based filtering
 
 Create specialized inventories:
 
@@ -277,7 +277,7 @@ core_nr = InitNornir(
 )
 ```
 
-### Multi-Vendor Support
+### Multi-vendor support
 
 Handle different device types:
 
@@ -296,9 +296,9 @@ group_mappings:
   - "platform.manufacturer.name"
 ```
 
-## Troubleshooting Inventory Issues
+## Troubleshooting inventory issues
 
-### Debug Mode
+### Debug mode
 
 Enable detailed logging:
 
@@ -310,7 +310,7 @@ nr = InitNornir(inventory={"plugin": "InfrahubInventory"})
 # Watch for GraphQL queries and responses
 ```
 
-### Validation Queries
+### Validation queries
 
 Test your mappings with GraphQL:
 
@@ -338,16 +338,16 @@ result = client.query(query)
 print(result)
 ```
 
-### Common Issues
+### Common issues
 
 1. **Missing Hosts**: Check filters and node kind
 2. **Empty Groups**: Verify relationship paths exist
 3. **Mapping Errors**: Ensure attributes are populated
 4. **Performance**: Reduce included attributes
 
-## Integration with Nornir Ecosystem
+## Integration with Nornir ecosystem
 
-### Custom Inventory Data
+### Custom inventory data
 
 Extend with additional data:
 
@@ -364,7 +364,7 @@ def enrich_inventory(nr):
     return nr
 ```
 
-### Transform Functions
+### Transform functions
 
 Apply transformations during loading:
 
@@ -382,7 +382,7 @@ class CustomInfrahubInventory(InfrahubInventory):
         return inventory
 ```
 
-## Further Reading
+## Further reading
 
 - [Understanding Nornir-Infrahub Integration](./understanding-nornir-infrahub-integration.mdx) - High-level concepts
 - [Configuring Schema Mappings](../guides/configuring-schema-mappings.mdx) - Practical mapping guide
