@@ -122,30 +122,33 @@ schema_mappings:
     mapping: "primary_address.address"  # Automatically converts IPHost to string
 ```
 
-### Conditional mappings
+### Handling missing attributes
 
-When devices might have different attribute paths:
+When a mapping fails (e.g., relationship doesn't exist), it's silently skipped:
 
 ```yaml
-# First try primary, fallback handled by multiple mappings
 schema_mappings:
   - name: "hostname"
-    mapping: "primary_address.address"
-  - name: "hostname"
-    mapping: "management_address.address"  # Used if first fails
+    mapping: "primary_address.address"  # Skipped if primary_address is not set
+  - name: "management_ip"
+    mapping: "management_address.address"  # Only sets management_ip if relationship exists
 ```
+
+Note: The plugin does not support fallback mappings. Each mapping is independent.
 
 ### Custom data mappings
 
-Include additional data for use in tasks:
+Store additional attributes as top-level host properties:
 
 ```yaml
 schema_mappings:
-  - name: "data.serial_number"
+  - name: "serial_number"
     mapping: "serial_number"
-  - name: "data.model"
+  - name: "model"
     mapping: "device_type.model"
 ```
+
+These can be accessed as `task.host.serial_number` or `task.host.model` in your tasks.
 
 ## Step 5: Configure group mappings
 
@@ -227,9 +230,9 @@ def device_info(task):
     print(f"Connecting to {task.host.hostname}")
     print(f"Platform: {task.host.platform}")
 
-    # Access custom data
-    if "serial_number" in task.host.data:
-        print(f"Serial: {task.host.data['serial_number']}")
+    # Access custom mapped attributes
+    if hasattr(task.host, 'serial_number'):
+        print(f"Serial: {task.host.serial_number}")
 
     # Access Infrahub node
     node = task.host.data["InfrahubNode"]

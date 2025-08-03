@@ -18,6 +18,7 @@ By the end of this guide, you'll have:
 
 - Infrahub instance with network devices defined
 - Nornir-Infrahub plugin installed (`pip install nornir-infrahub`)
+- Additional Nornir plugins: `pip install nornir-jinja2 nornir-netmiko`
 - Basic Python and Nornir knowledge
 - Access to test network devices (or simulation)
 
@@ -58,9 +59,9 @@ inventory:
         mapping: "primary_address.address"
       - name: "platform"
         mapping: "platform.nornir_platform"
-      - name: "data.site"
+      - name: "site_name"
         mapping: "site.name"
-      - name: "data.role"
+      - name: "role_name"
         mapping: "role.name"
 
     group_mappings:
@@ -86,8 +87,8 @@ Create a Cisco IOS template in `templates/cisco/base.j2`:
 !
 ! Generated configuration for {{ host.name }}
 ! Generated at: {{ now() }}
-! Site: {{ host.data.site }}
-! Role: {{ host.data.role }}
+! Site: {{ host.site_name }}
+! Role: {{ host.role_name }}
 !
 hostname {{ host.name }}
 !
@@ -104,7 +105,7 @@ interface Loopback0
 !
 ! SNMP Configuration
 snmp-server community {{ snmp_community | default('public') }} RO
-snmp-server location {{ host.data.site }}
+snmp-server location {{ host.site_name }}
 !
 ! NTP Configuration
 {% for ntp_server in ntp_servers %}
@@ -124,7 +125,7 @@ ip ssh authentication-retries 3
 ! Banner
 banner motd ^
 ******************************************
-* {{ host.name }} - {{ host.data.site }}
+* {{ host.name }} - {{ host.site_name }}
 * Unauthorized access is prohibited
 ******************************************
 ^
@@ -409,16 +410,16 @@ Target specific devices or groups:
 
 ```python
 # Filter by site
-site_devices = nr.filter(site__name="chicago")
+site_devices = nr.filter(site_name="chicago")
 site_results = site_devices.run(task=deploy_configuration)
 
 # Filter by role
-core_devices = nr.filter(role__name="core")
+core_devices = nr.filter(role_name="core")
 core_results = core_devices.run(task=render_configuration)
 
-# Complex filtering
+# Complex filtering  
 critical_devices = nr.filter(
-    filter_func=lambda h: h.data.get("criticality") == "high"
+    filter_func=lambda h: hasattr(h, 'criticality') and h.criticality == "high"
 )
 ```
 
@@ -444,12 +445,8 @@ Add robust error handling:
 def safe_deploy(task: Task) -> Result:
     try:
         # Pre-deployment checks
-        if not task.host.is_reachable():
-            return Result(
-                host=task.host,
-                failed=True,
-                result="Host not reachable"
-            )
+        # Note: is_reachable() is a custom method you'd need to implement
+        # This is just an example of pre-deployment validation
 
         # Deploy with rollback capability
         result = deploy_configuration(task)
@@ -495,7 +492,7 @@ def ci_workflow():
 
     # Filter if site specified
     if target_site:
-        nr = nr.filter(site__name=target_site)
+        nr = nr.filter(site_name=target_site)
 
     # Run workflow without prompts
     results = nr.run(task=render_configuration)
