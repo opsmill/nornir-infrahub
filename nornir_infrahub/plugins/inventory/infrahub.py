@@ -299,5 +299,5 @@ class InfrahubInventory:
         if "filters" in kwargs:
             filters = kwargs.pop("filters")
 
-        resources = self.client.all(kind=kind, branch=self.branch, populate_store=True, **kwargs, **filters)
+        resources = self.client.filters(kind=kind, branch=self.branch, populate_store=True, **kwargs, **filters)
         return resources

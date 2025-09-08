@@ -372,7 +372,7 @@ def test_infrahub_inventory_branch_used_in_get_resources():
         mock_schema = Mock()
         mock_schema.relationships = []  # Empty list to avoid iteration error
         mock_client.schema.get.return_value = mock_schema
-        mock_client.all.return_value = []
+        mock_client.filters.return_value = []
         mock_client_class.return_value = mock_client
 
         inventory = InfrahubInventory(host_node={"kind": "InfraDevice"}, branch=custom_branch)
@@ -381,8 +381,8 @@ def test_infrahub_inventory_branch_used_in_get_resources():
         inventory.get_resources(kind="InfraDevice")
 
         # Verify that client.all was called with the correct branch
-        mock_client.all.assert_called_once()
-        call_args = mock_client.all.call_args
+        mock_client.filters.assert_called_once()
+        call_args = mock_client.filters.call_args
         assert call_args[1]["branch"] == custom_branch
         assert call_args[1]["kind"] == "InfraDevice"
         assert call_args[1]["populate_store"] is True
