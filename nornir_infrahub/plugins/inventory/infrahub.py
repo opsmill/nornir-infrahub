@@ -246,7 +246,6 @@ class InfrahubInventory:
         for n, g in groups_dict.items():
             groups[n] = _get_inventory_element(Group, g, n, defaults)
 
-
         for g in groups.values():
             g.groups = ParentGroups([groups[g.name] for g in g.groups])
 
