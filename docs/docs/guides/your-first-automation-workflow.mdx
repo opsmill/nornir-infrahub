@@ -2,23 +2,24 @@
 title: How to Create Your First Automation Workflow
 ---
 
-This guide walks you through building a complete network automation workflow using Infrahub as your inventory source and artifact management system. You'll create a real-world automation that generates, validates, and deploys device configurations.
+This guide walks you through building a complete network automation workflow using Infrahub as your inventory source and artifact management system. You'll retrieve and deploy device configurations managed by Infrahub.
 
 ## What you'll accomplish
 
 By the end of this guide, you'll have:
 
 - Connected Nornir to your Infrahub instance
-- Created dynamic device groups based on site and role
-- Generated configuration artifacts for your devices
-- Validated configurations before deployment
-- Deployed configurations using Nornir tasks
+- Retrieved device configurations from Infrahub artifacts
+- Used dynamic device groups for targeted operations
+- Deployed configurations managed by Infrahub
+- Understood how to integrate Nornir with Infrahub's artifact system
 
 ## Prerequisites
 
-- Infrahub instance with network devices defined
+- Infrahub instance with network devices and artifact definitions configured
+    - You can use the [Infrahub sandbox instance](https://sandbox.infrahub.app) to try this workflow
 - Nornir-Infrahub plugin installed (`pip install nornir-infrahub`)
-- Additional Nornir plugins: `pip install nornir-jinja2 nornir-netmiko`
+- Connection plugin for your devices: `pip install nornir-netmiko` or `nornir-napalm`
 - Basic Python and Nornir knowledge
 - Access to test network devices (or simulation)
 
@@ -31,7 +32,7 @@ mkdir network-automation
 cd network-automation
 
 # Create directory structure
-mkdir -p templates/cisco
+mkdir -p configs
 touch config.yaml
 touch workflow.py
 ```
@@ -45,20 +46,19 @@ Create your `config.yaml` file:
 inventory:
   plugin: InfrahubInventory
   options:
-    address: "http://localhost:8000"
-    token: "your-infrahub-api-token"
+    address: "https://sandbox.infrahub.app"   # Use demo instance or your own
+    token: "your-infrahub-api-token"       # Get from Infrahub UI
     branch: "main"
 
+    # Using the schema structure from the getting started guide
     host_node:
-      kind: "InfraDevice"
-      filters:
-        status__value: "active"
+      kind: "InfraDevice"                  # Matches the Device node with Infra namespace
 
     schema_mappings:
       - name: "hostname"
-        mapping: "primary_address.address"
+        mapping: "primary_address.address" # Path to IP address through relationship
       - name: "platform"
-        mapping: "platform.nornir_platform"
+        mapping: "platform.nornir_platform" # Platform attribute for Nornir compatibility
       - name: "site_name"
         mapping: "site.name"
       - name: "role_name"
@@ -79,59 +79,22 @@ logging:
   level: INFO
 ```
 
-## Step 3: Create configuration templates
+## Step 3: Understand Infrahub artifact system
 
-Create a Cisco IOS template in `templates/cisco/base.j2`:
+Before proceeding, ensure your Infrahub instance has artifact definitions configured. In this workflow, we'll use Infrahub's artifact system to retrieve generated configurations rather than creating templates locally.
 
-```jinja2
-!
-! Generated configuration for {{ host.name }}
-! Generated at: {{ now() }}
-! Site: {{ host.site_name }}
-! Role: {{ host.role_name }}
-!
-hostname {{ host.name }}
-!
-! Management Interface
-interface GigabitEthernet0/0
- description Management Interface
- ip address {{ host.hostname }} 255.255.255.0
- no shutdown
-!
-! Loopback Interface
-interface Loopback0
- description Router ID
- ip address {{ host.data.get('loopback_ip', '1.1.1.1') }} 255.255.255.255
-!
-! SNMP Configuration
-snmp-server community {{ snmp_community | default('public') }} RO
-snmp-server location {{ host.site_name }}
-!
-! NTP Configuration
-{% for ntp_server in ntp_servers %}
-ntp server {{ ntp_server }}
-{% endfor %}
-!
-! Logging Configuration
-logging buffered 32768
-logging console informational
-logging monitor informational
-!
-! SSH Configuration
-ip ssh version 2
-ip ssh time-out 60
-ip ssh authentication-retries 3
-!
-! Banner
-banner motd ^
-******************************************
-* {{ host.name }} - {{ host.site_name }}
-* Unauthorized access is prohibited
-******************************************
-^
-!
-end
-```
+Infrahub artifacts provide:
+
+- **Centralized Templates**: Jinja2 templates stored in Git repositories
+- **Data-Driven Generation**: Configurations generated from your Infrahub data model
+- **Version Control**: All templates and generated artifacts are versioned
+- **Consistency**: Ensure all network configurations follow organizational standards
+
+The Nornir-Infrahub plugin provides tasks to interact with these artifacts:
+
+- `get_artifact()`: Retrieve generated configuration content
+- `generate_artifacts()`: Trigger artifact generation for targets
+- `regenerate_host_artifact()`: Regenerate configuration for a specific device
 
 ## Step 4: Build the workflow script
 
@@ -140,7 +103,7 @@ Create `workflow.py` with your automation workflow:
 ```python
 #!/usr/bin/env python3
 """
-Complete network automation workflow using Nornir and Infrahub
+Complete network automation workflow using Nornir and Infrahub artifacts
 """
 import logging
 from datetime import datetime
@@ -149,7 +112,6 @@ from pathlib import Path
 from nornir import InitNornir
 from nornir.core.task import Task, Result
 from nornir_utils.plugins.functions import print_result
-from nornir_jinja2.plugins.tasks import template_render
 from nornir_netmiko.tasks import netmiko_send_config
 from nornir_infrahub.plugins.tasks import (
     generate_artifacts,
@@ -165,47 +127,71 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def render_configuration(task: Task) -> Result:
-    """Render device configuration from template."""
-    # Template variables
-    template_vars = {
-        "host": task.host,
-        "now": datetime.now,
-        "snmp_community": "netops-ro",
-        "ntp_servers": ["10.1.1.1", "10.1.1.2"]
-    }
+def retrieve_configuration(task: Task) -> Result:
+    """Retrieve device configuration from Infrahub artifacts."""
+    try:
+        # Get the configuration artifact from Infrahub
+        # This assumes you have a 'startup_config' artifact definition
+        result = get_artifact(
+            task,
+            artifact_name="startup_config",  # Adjust based on your artifact definition
+            target_id=task.host.data["InfrahubNode"].id
+        )
 
-    # Determine template based on platform
-    platform_templates = {
-        "ios": "cisco/base.j2",
-        "eos": "arista/base.j2",
-        "junos": "juniper/base.j2"
-    }
+        if result.failed:
+            return Result(
+                host=task.host,
+                failed=True,
+                result=f"Failed to retrieve artifact: {result.result}"
+            )
 
-    template_file = platform_templates.get(
-        task.host.platform,
-        "generic/base.j2"
-    )
+        # Save configuration locally for deployment
+        output_dir = Path("configs")
+        output_dir.mkdir(exist_ok=True)
 
-    # Render template
-    result = template_render(
-        task=task,
-        template=template_file,
-        path="templates",
-        **template_vars
-    )
+        config_file = output_dir / f"{task.host.name}.cfg"
+        config_file.write_text(result.result)
 
-    # Save rendered config
-    output_dir = Path("configs")
-    output_dir.mkdir(exist_ok=True)
+        return Result(
+            host=task.host,
+            result=f"Configuration retrieved from Infrahub and saved to {config_file}"
+        )
 
-    config_file = output_dir / f"{task.host.name}.cfg"
-    config_file.write_text(result.result)
+    except Exception as e:
+        return Result(
+            host=task.host,
+            failed=True,
+            result=f"Failed to retrieve configuration: {str(e)}"
+        )
 
-    return Result(
-        host=task.host,
-        result=f"Configuration rendered to {config_file}"
-    )
+
+def regenerate_configuration(task: Task) -> Result:
+    """Trigger regeneration of device configuration in Infrahub."""
+    try:
+        # Regenerate the artifact in Infrahub
+        result = regenerate_host_artifact(
+            task,
+            artifact_name="startup_config",  # Adjust based on your artifact definition
+        )
+
+        if result.failed:
+            return Result(
+                host=task.host,
+                failed=True,
+                result=f"Failed to regenerate artifact: {result.result}"
+            )
+
+        return Result(
+            host=task.host,
+            result="Configuration regenerated successfully in Infrahub"
+        )
+
+    except Exception as e:
+        return Result(
+            host=task.host,
+            failed=True,
+            result=f"Failed to regenerate configuration: {str(e)}"
+        )
 
 
 def validate_configuration(task: Task) -> Result:
@@ -224,9 +210,8 @@ def validate_configuration(task: Task) -> Result:
     # Basic validation checks
     validations = {
         "has_hostname": f"hostname {task.host.name}" in config_content,
-        "has_ssh": "ip ssh version 2" in config_content,
-        "has_ntp": "ntp server" in config_content,
-        "has_logging": "logging buffered" in config_content,
+        "not_empty": len(config_content.strip()) > 0,
+        "has_end_marker": config_content.strip().endswith("end") or "!" in config_content,
     }
 
     failed_checks = [
@@ -318,13 +303,18 @@ def main():
     backup_results = nr.run(task=backup_current_config)
     print_result(backup_results)
 
-    # Step 2: Generate new configurations
-    logger.info("Step 2: Generating new configurations...")
-    render_results = nr.run(task=render_configuration)
-    print_result(render_results)
+    # Step 2: Regenerate configurations in Infrahub
+    logger.info("Step 2: Regenerating configurations in Infrahub...")
+    regen_results = nr.run(task=regenerate_configuration)
+    print_result(regen_results)
 
-    # Step 3: Validate configurations
-    logger.info("Step 3: Validating configurations...")
+    # Step 3: Retrieve updated configurations from Infrahub
+    logger.info("Step 3: Retrieving configurations from Infrahub...")
+    retrieve_results = nr.run(task=retrieve_configuration)
+    print_result(retrieve_results)
+
+    # Step 4: Validate configurations
+    logger.info("Step 4: Validating configurations...")
     validation_results = nr.run(task=validate_configuration)
     print_result(validation_results)
 
@@ -339,8 +329,8 @@ def main():
         logger.info("Aborting deployment due to validation failures")
         return 1
 
-    # Step 4: Deploy configurations (with confirmation)
-    logger.info("Step 4: Ready to deploy configurations")
+    # Step 5: Deploy configurations (with confirmation)
+    logger.info("Step 5: Ready to deploy configurations")
     response = input("Deploy configurations to all devices? (yes/no): ")
 
     if response.lower() == "yes":
@@ -374,16 +364,17 @@ python workflow.py
 The workflow will:
 
 1. Connect to Infrahub and load device inventory
-2. Backup current configurations as artifacts
-3. Generate new configurations from templates
-4. Validate the generated configurations
-5. Deploy configurations (with user confirmation)
+2. Backup current configurations locally
+3. Regenerate configurations in Infrahub using artifact system
+4. Retrieve updated configurations from Infrahub
+5. Validate the retrieved configurations
+6. Deploy configurations (with user confirmation)
 
 ## Validation
 
-### Check generated configurations
+### Check retrieved configurations
 
-Review the generated files in the `configs/` directory:
+Review the configuration files retrieved from Infrahub in the `configs/` directory:
 
 ```bash
 ls -la configs/
@@ -415,7 +406,7 @@ site_results = site_devices.run(task=deploy_configuration)
 
 # Filter by role
 core_devices = nr.filter(role_name="core")
-core_results = core_devices.run(task=render_configuration)
+core_results = core_devices.run(task=retrieve_configuration)
 
 # Complex filtering  
 critical_devices = nr.filter(
@@ -495,7 +486,7 @@ def ci_workflow():
         nr = nr.filter(site_name=target_site)
 
     # Run workflow without prompts
-    results = nr.run(task=render_configuration)
+    results = nr.run(task=retrieve_configuration)
 
     # Exit with proper code
     failed_count = len([r for r in results.values() if r.failed])

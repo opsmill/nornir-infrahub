@@ -16,7 +16,7 @@ By following this guide, you'll be able to:
 ## Prerequisites
 
 - Working Nornir-Infrahub installation
-- Understanding of your Infrahub schema
+- Understanding of your Infrahub schema (see example schema in [Getting Started](../getting-started.mdx#example-schema-structure))
 - Access to Infrahub GraphQL explorer (for testing queries)
 
 ## Understanding schema mappings
@@ -41,7 +41,7 @@ First, determine which Nornir properties your automation tasks need:
 
 ## Step 2: Explore your Infrahub schema
 
-Use the Infrahub GraphQL explorer to understand available attributes:
+Use the Infrahub GraphQL explorer to understand available attributes. Based on the example schema from the [Getting Started guide](../getting-started.mdx#example-schema-structure), you can query:
 
 ```graphql
 query {
@@ -68,13 +68,27 @@ query {
             }
           }
         }
+        site {
+          node {
+            name {
+              value
+            }
+          }
+        }
+        role {
+          node {
+            name {
+              value
+            }
+          }
+        }
       }
     }
   }
 }
 ```
 
-This helps you identify the exact paths to your data.
+This helps you identify the exact paths to your data based on your schema structure.
 
 ## Step 3: Configure basic mappings
 
@@ -90,14 +104,14 @@ schema_mappings:
 
 ### Nested relationship mapping
 
-For attributes through relationships:
+For attributes through relationships (based on the example schema):
 
 ```yaml
 schema_mappings:
   - name: "hostname"
-    mapping: "primary_address.address"  # Traverses relationship
+    mapping: "primary_address.address"  # Traverses to InfraIPAddress node
   - name: "platform"
-    mapping: "platform.nornir_platform"
+    mapping: "platform.nornir_platform" # Traverses to InfraPlatform node
 ```
 
 ### Multiple level nesting
@@ -138,17 +152,20 @@ Note: The plugin does not support fallback mappings. Each mapping is independent
 
 ### Custom data mappings
 
-Store additional attributes as top-level host properties:
+Additional attributes from Infrahub nodes are stored in the host's `data` dictionary:
 
-```yaml
-schema_mappings:
-  - name: "serial_number"
-    mapping: "serial_number"
-  - name: "model"
-    mapping: "device_type.model"
+```python
+def example_task(task):
+    # Access the Infrahub node data
+    infrahub_node = task.host.data["InfrahubNode"]
+
+    # Access node attributes directly
+    if hasattr(infrahub_node, 'serial_number'):
+        serial = infrahub_node.serial_number.value
+        print(f"Device {task.host.name} serial: {serial}")
 ```
 
-These can be accessed as `task.host.serial_number` or `task.host.model` in your tasks.
+Note: Custom schema mappings create Nornir host properties for standard attributes like `hostname` and `platform`. Additional node data is accessible through the `InfrahubNode` object.
 
 ## Step 5: Configure group mappings
 

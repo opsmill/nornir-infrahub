@@ -10,6 +10,7 @@ Before starting, ensure you have:
 
 - Python 3.9 or higher installed
 - An Infrahub instance running (local or remote)
+    - You can use the [Infrahub sandbox instance](https://sandbox.infrahub.app) for testing
 - Basic familiarity with Nornir concepts
 - At least one device defined in your Infrahub schema
 
@@ -38,7 +39,80 @@ First, you'll need an API token to authenticate with Infrahub:
 3. Generate or copy your API token
 4. Store it securely (we'll use it in the next step)
 
-### Step 2: Create your Nornir configuration
+### Step 2: Understand your Infrahub schema
+
+Before configuring Nornir, you need to understand your Infrahub schema structure. The sandbox instance at [sandbox.infrahub.app](https://sandbox.infrahub.app) uses a schema similar to this example:
+
+#### Example Schema Structure
+
+For the examples in this documentation to work, you'll need a schema with at least these node types:
+
+```yaml
+# Device node definition
+nodes:
+  - name: Device
+    namespace: Infra
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+      - name: description
+        kind: Text
+        optional: true
+      - name: type
+        kind: Text
+    relationships:
+      - name: site
+        peer: BuiltinLocation
+        cardinality: one
+      - name: role
+        peer: BuiltinRole
+        cardinality: one
+      - name: primary_address
+        peer: InfraIPAddress
+        cardinality: one
+        optional: true
+      - name: platform
+        peer: InfraPlatform
+        cardinality: one
+        optional: true
+
+  # Supporting nodes
+  - name: IPAddress
+    namespace: Infra
+    attributes:
+      - name: address
+        kind: IPHost
+
+  - name: Platform
+    namespace: Infra
+    attributes:
+      - name: name
+        kind: Text
+      - name: nornir_platform
+        kind: Text
+```
+
+#### Key Schema Requirements
+
+For Nornir integration, ensure your schema has:
+
+1. **Device node** (`InfraDevice` or similar) representing network devices
+2. **IP Address relationship** for device connectivity (`primary_address`)
+3. **Platform relationship** for device type identification
+4. **Location/Site relationship** for grouping devices by location
+5. **Role relationship** for grouping devices by function
+
+#### Checking Your Schema
+
+To verify your schema structure:
+
+1. Open your Infrahub web interface
+2. Navigate to the Schema section
+3. Look for device node types and their relationships
+4. Note the exact attribute names and relationship paths for mapping
+
+### Step 3: Create your Nornir configuration
 
 Create a file named `config.yaml` with your Nornir configuration:
 
@@ -47,21 +121,22 @@ Create a file named `config.yaml` with your Nornir configuration:
 inventory:
   plugin: InfrahubInventory
   options:
-    address: "http://localhost:8000"  # Your Infrahub URL
-    token: "your-api-token-here"       # Replace with your actual token
-    branch: "main"                     # Infrahub branch to use
-    
+    address: "https://sandbox.infrahub.app"   # Infrahub instance URL
+    token: "your-api-token-here"           # Replace with your actual token
+    branch: "main"                         # Infrahub branch to use
+
     # Define which Infrahub node type represents network devices
+    # Using the schema example above
     host_node:
-      kind: "InfraDevice"              # Adjust based on your schema
-    
+      kind: "InfraDevice"                  # Matches the Device node with Infra namespace
+
     # Map Infrahub attributes to Nornir host properties
     schema_mappings:
       - name: "hostname"
-        mapping: "primary_address.address"
+        mapping: "primary_address.address" # Path to IP address through relationship
       - name: "platform"
-        mapping: "platform.nornir_platform"
-    
+        mapping: "platform.nornir_platform" # Platform attribute for Nornir compatibility
+
     # Create Nornir groups based on Infrahub attributes
     group_mappings:
       - "site.name"
@@ -73,7 +148,7 @@ runner:
     num_workers: 20
 ```
 
-### Step 3: Test your connection
+### Step 4: Test your connection
 
 Create a Python script to verify your setup:
 
@@ -108,7 +183,7 @@ python test_connection.py
 
 You should see a list of hosts and groups discovered from your Infrahub instance.
 
-### Step 4: Run your first task
+### Step 5: Run your first task
 
 Now let's run a task against your inventory:
 
