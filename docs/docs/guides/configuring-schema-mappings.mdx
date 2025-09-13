@@ -145,7 +145,7 @@ schema_mappings:
   - name: "hostname"
     mapping: "primary_address.address"  # Skipped if primary_address is not set
   - name: "management_ip"
-    mapping: "management_address.address"  # Only sets management_ip if relationship exists
+    mapping: "primary_address.address"  # Only sets hostname if relationship exists
 ```
 
 Note: The plugin does not support fallback mappings. Each mapping is independent.
@@ -269,7 +269,7 @@ schema_mappings:
   - name: "hostname"
     mapping: "loopback0.address"
   - name: "platform"
-    mapping: "os.nornir_platform"
+    mapping: "platform.nornir_platform"
 
 # Switch-specific mappings (different config file)
 host_node:
@@ -279,7 +279,7 @@ schema_mappings:
   - name: "hostname"
     mapping: "management_ip.address"
   - name: "platform"
-    mapping: "nos.nornir_platform"
+    mapping: "platform.nornir_platform"
 ```
 
 ### Troubleshooting mapping failures
