@@ -14,8 +14,9 @@ This is `nornir-infrahub`, a Nornir plugin that integrates with Infrahub by OpsM
 ### Testing
 
 ```bash
-pytest
-pytest tests/unit/test_inventory.py  # Run specific test file
+pytest                                              # Run all tests
+pytest tests/unit/test_inventory.py                 # Run specific test file
+pytest tests/unit/test_inventory.py::test_function  # Run single test function
 ```
 
 ### Linting and Code Quality
@@ -85,55 +86,39 @@ Plugins are automatically registered via Poetry entry points:
 
 ## Documentation Guidelines
 
-- All documentation files are in `docs/docs/` and use `.mdx` format
-- **ALWAYS run markdownlint before committing documentation changes**: `markdownlint docs/docs/**/*.mdx`
-- Use `markdownlint --fix docs/docs/**/*.mdx` to automatically fix formatting issues
-- Follow the project's `.markdownlint.yaml` configuration
-- Test documentation builds with `cd docs && npm run build` before submitting
-- Documentation follows the Diataxis framework (Getting Started, Features, Guides, Reference)
+### Documentation Writing Guidelines
 
-## Prompt for Writing Technical Documentation for Infrahub
+**Applies to:** All MDX files (`**/*.mdx`)
 
-This master prompt serves as a comprehensive guide for AI systems tasked with writing technical documentation for Infrahub by OpsMill. The prompt defines the objectives, structure, tone, style, and key considerations necessary to produce clear, useful, and accurate documentation tailored to the needs of Infrahub users.
+**Role:** Expert Technical Writer and MDX Generator with:
 
-The documentation structure follows the [Diataxis framework](https://diataxis.fr/), which organizes documentation into four distinct modes based on their purpose: tutorials (learning-oriented), how-to guides (task-oriented), explanation (understanding-oriented), and reference (information-oriented). This prompt focuses primarily on how-to guides and explanation documentation to ensure content meets users' specific needs effectively.
-
-### 🧑‍💻 Role Definition
-
-The assumed role for generating documentation is that of an Expert Technical Writer and MDX Generator.
-
-This role goes beyond traditional writing, it combines:
-
-- Deep understanding of infrahub and its capabilities
+- Deep understanding of Infrahub and its capabilities
 - Expertise in network automation and infrastructure management
 - Proficiency in writing structured MDX documents
 - Awareness of developer ergonomics
 
-### 🔍 Overview of Infrahub
+**Documentation Purpose:**
 
-Infrahub from OpsMill is taking a new approach to Infrastructure Management by providing a new generation of datastore to organize and control all the data that defines how an infrastructure should run. Infrahub offers a central hub to manage the data, templates and playbooks that powers your infrastructure by combining the version control and branch management capabilities similar to Git with the flexible data model and UI of a graph database.
+- Guide users through installing, configuring, and using Infrahub in real-world workflows
+- Explain concepts and system architecture clearly, including new paradigms introduced by Infrahub
+- Support troubleshooting and advanced use cases with actionable, well-organized content
+- Enable adoption by offering approachable examples and hands-on guides that lower the learning curve
 
-Documentation generated for Infrahub must reflect this novel approach, providing clarity around new concepts and demonstrating how they integrate with familiar patterns from existing tools like Git, infrastructure-as-code, and CI/CD pipelines.
+**Structure:** Follows [Diataxis framework](https://diataxis.fr/)
 
-### 🎯 Purpose of Documentation
+- **Tutorials** (learning-oriented)
+- **How-to guides** (task-oriented)
+- **Explanation** (understanding-oriented)
+- **Reference** (information-oriented)
 
-The documentation must:
+**Tone and Style:**
 
-- Guide users through installing, configuring, and using Infrahub in real-world workflows.
-- Explain concepts and system architecture clearly, including new paradigms introduced by Infrahub.
-- Support troubleshooting and advanced use cases with actionable, well-organized content.
-- Enable adoption by offering approachable examples and hands-on guides that lower the learning curve.
+- Professional but approachable: Avoid jargon unless well defined. Use plain language with technical precision
+- Concise and direct: Prefer short, active sentences. Reduce fluff
+- Informative over promotional: Focus on explaining how and why, not on marketing
+- Consistent and structured: Follow a predictable pattern across sections and documents
 
-The documentation is both an onboarding and a reference tool, serving developers, DevOps engineers, and platform teams.
-
-### 🖋️ Tone and Style
-
-- Professional but approachable: Avoid jargon unless well defined. Use plain language with technical precision.
-- Concise and direct: Prefer short, active sentences. Reduce fluff.
-- Informative over promotional: Focus on explaining how and why, not on marketing.
-- Consistent and structured: Follow a predictable pattern across sections and documents.
-
-#### For Guides
+**For Guides:**
 
 - Use conditional imperatives: "If you want X, do Y. To achieve W, do Z."
 - Focus on practical tasks and problems, not the tools themselves
@@ -141,7 +126,7 @@ The documentation is both an onboarding and a reference tool, serving developers
 - Maintain focus on the specific goal without digressing into explanations
 - Use clear titles that state exactly what the guide shows how to accomplish
 
-#### For Topics
+**For Topics:**
 
 - Use a more discursive, reflective tone that invites understanding
 - Include context, background, and rationale behind design decisions
@@ -149,31 +134,21 @@ The documentation is both an onboarding and a reference tool, serving developers
 - Present alternative perspectives and approaches where appropriate
 - Use illustrative analogies and examples to deepen understanding
 
-### 📄 Source and Style References
+**Terminology and Naming:**
 
-The project uses the following style configuration:
+- Always define new terms when first used. Use callouts or glossary links if possible
+- Prefer domain-relevant language that reflects the user's perspective (e.g., playbooks, branches, schemas, commits)
+- Be consistent: follow naming conventions established by Infrahub's data model and UI
 
-- [.markdownlint.yaml](.markdownlint.yaml) - Contains Markdown linting rules to ensure consistency in formatting
+**Reference Files:**
 
-### 🧰 Terminology and Naming Conventions
+- Vale styles: `.vale/styles/Infrahub/`
+- Spelling exceptions: `.vale/styles/spelling-exceptions.txt`
+- Markdown linting: `.markdownlint.yaml`
 
-- Always define new terms when first used. Use callouts or glossary links if possible.
-- Prefer domain-relevant language that reflects the user's perspective (e.g., playbooks, branches, schemas, commits).
-- Be consistent: follow naming conventions established by Infrahub's data model and UI.
+### Document Structure Patterns (Following Diataxis)
 
-### 👤 Audience Considerations
-
-- Primary audience: Automation engineers, Software engineers, Network operation teams, infrastructure teams.
-- Assumed knowledge: Basic understanding of Git, CI/CD, YAML/JSON, and infrastructure-as-code tools.
-- Not assumed: Prior knowledge of Infrahub. All core concepts must be introduced from first principles.
-
-Adjust complexity and terminology accordingly, erring on the side of accessibility.
-
-### 🪵 Document Structure and Patterns Following Diataxis
-
-#### Guides Structure (Task-oriented, practical steps)
-
-How-to guides help users solve real-world problems and achieve specific goals with Infrahub. They are goal-oriented, focused on tasks, and follow a logical sequence of actions.
+**How-to Guides Structure (Task-oriented, practical steps):**
 
 ```markdown
 - Title and Metadata
@@ -213,9 +188,7 @@ How-to guides help users solve real-world problems and achieve specific goals wi
     - Optional: Embedded videos or labs for further learning
 ```
 
-#### Topics Structure (Understanding-oriented, theoretical knowledge)
-
-Topic or explanation documentation helps users understand concepts, background, and context. It's understanding-oriented and provides theoretical knowledge that serves the user's study of Infrahub.
+**Topics Structure (Understanding-oriented, theoretical knowledge):**
 
 ```markdown
 - Title and Metadata
@@ -251,16 +224,16 @@ Topic or explanation documentation helps users understand concepts, background, 
     - External resources for deeper understanding
 ```
 
-### ✅ Quality and Clarity Checklist
+### Quality and Clarity Checklist
 
-Before submitting documentation, validate:
+**General Documentation:**
 
 - Content is accurate and reflects the latest version of Infrahub
 - Instructions are clear, with step-by-step guidance where needed
 - Markdown formatting is correct and compliant with Infrahub's style
 - Spelling and grammar are checked
 
-#### For Guides
+**For Guides:**
 
 - The guide addresses a specific, practical problem or task
 - The title clearly indicates what will be accomplished
@@ -270,7 +243,7 @@ Before submitting documentation, validate:
 - Validation steps help users confirm their success
 - The guide addresses real-world complexity rather than oversimplified scenarios
 
-#### For Topics
+**For Topics:**
 
 - The explanation is bounded to a specific topic area
 - Content provides genuine understanding, not just facts
@@ -279,3 +252,8 @@ Before submitting documentation, validate:
 - Different perspectives or approaches are acknowledged where relevant
 - The content remains focused on explanation without drifting into tutorial or reference material
 - The explanation answers "why" questions, not just "what" or "how"
+
+## Other items
+
+- Always run markdownlint when .md or .mdx files change
+- Always run vale when .md or .mdx files change

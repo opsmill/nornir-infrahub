@@ -134,8 +134,7 @@ def retrieve_configuration(task: Task) -> Result:
         # This assumes you have a 'startup_config' artifact definition
         result = get_artifact(
             task,
-            artifact_name="startup_config",  # Adjust based on your artifact definition
-            target_id=task.host.data["InfrahubNode"].id
+            artifact="startup_config"  # Adjust based on your artifact definition
         )
 
         if result.failed:
@@ -171,7 +170,7 @@ def regenerate_configuration(task: Task) -> Result:
         # Regenerate the artifact in Infrahub
         result = regenerate_host_artifact(
             task,
-            artifact_name="startup_config",  # Adjust based on your artifact definition
+            artifact="startup_config"  # Adjust based on your artifact definition
         )
 
         if result.failed:
