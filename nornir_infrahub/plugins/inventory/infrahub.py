@@ -205,7 +205,7 @@ class InfrahubInventory:
         self.defaults_file = Path(defaults_file).expanduser()
         self.group_file = Path(group_file).expanduser()
 
-        self.client = InfrahubClientSync(config=Config(api_token=token), address=self.address)
+        self.client = InfrahubClientSync(config=Config(api_token=token, default_branch=branch), address=self.address)
 
         schema_mappings = schema_mappings or []
         self.schema_mappings = [SchemaMappingNode(**mapping) for mapping in schema_mappings]
@@ -247,7 +247,7 @@ class InfrahubInventory:
             groups[n] = _get_inventory_element(Group, g, n, defaults)
 
         for g in groups.values():
-            g.groups = ParentGroups([groups[g] for g in g.groups])
+            g.groups = ParentGroups([groups[g.name] for g in g.groups])
 
         host: Dict[str, Any] = {}
 
@@ -299,5 +299,5 @@ class InfrahubInventory:
         if "filters" in kwargs:
             filters = kwargs.pop("filters")
 
-        resources = self.client.all(kind=kind, branch=self.branch, populate_store=True, **kwargs, **filters)
+        resources = self.client.filters(kind=kind, branch=self.branch, populate_store=True, **kwargs, **filters)
         return resources
