@@ -2,6 +2,9 @@
 title: Getting Started
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 This guide helps you set up your first integration between Nornir and Infrahub. By the end, you'll have a working automation setup that demonstrates the power of dynamic inventory management.
 
 ## Prerequisites
@@ -18,19 +21,18 @@ Before starting, ensure you have:
 
 Install the Nornir-Infrahub plugin:
 
-Using pip:
-
-```bash
-pip install nornir-infrahub nornir_netmiko
-```
-
-Using uv:
-
-```bash
-uv add nornir-infrahub nornir_netmiko
-```
-
-
+<Tabs>
+  <TabItem value="pip" label="pip" default>
+    ```bash
+    pip install nornir-infrahub nornir_netmiko
+    ```
+  </TabItem>
+  <TabItem value="uv" label="uv">
+    ```bash
+    uv add nornir-infrahub nornir_netmiko
+    ```
+  </TabItem>
+</Tabs>
 
 This automatically installs all required dependencies including:
 
