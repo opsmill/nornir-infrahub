@@ -38,7 +38,7 @@ Artifacts are:
 
 ### 1. Definition phase
 
-Artifacts start with an artifact definition in Infrahub:
+Artifacts start with an artifact definition in the `.infrahub.yml` file:
 
 ```yaml
 # Example artifact definition structure
@@ -81,7 +81,7 @@ interface {{ interface.name }}
 
 ### 3. Storage phase
 
-Generated artifacts are stored in Infrahub:
+Generated artifacts are stored in a S3 bucket or locally in Infrahub:
 
 - Content saved with checksum
 - Metadata tracks generation time, user, branch
@@ -183,40 +183,6 @@ Every artifact generation is tracked:
 }
 ```
 
-## Mental models
-
-### Think "generated, not stored"
-
-Traditional approach:
-
-- Store device configs in Git
-- Manual updates for changes
-- Configs drift from reality
-
-Artifact approach:
-
-- Store templates and data
-- Generate configs on demand
-- Single source of truth
-
-### Think "immutable versions"
-
-Each generation creates a new version:
-
-- Never modify existing artifacts
-- Compare versions to see changes
-- Rollback by deploying previous version
-
-### Think "data + template = artifact"
-
-The equation is short but powerful:
-
-```text
-Current Data + Template Logic = Generated Artifact
-```
-
-Change either input, get a new artifact version.
-
 ## Architecture and design
 
 ### Generation flow
@@ -293,107 +259,6 @@ Generate only when needed:
 if device.last_modified > artifact.generated_at:
     nr.run(task=regenerate_host_artifact, artifact="startup-config")
 ```
-
-### Multi-stage artifacts
-
-Complex artifacts with multiple steps:
-
-1. Generate base configuration
-2. Apply security policies
-3. Add monitoring configuration
-4. Validate final result
-
-## Best practices
-
-### Template design
-
-- Keep templates modular
-- Use includes for common sections
-- Version control templates with semantic versioning
-- Document template variables
-
-### Generation strategy
-
-- Generate regularly to catch drift
-- Use branches for testing
-- Validate before deployment
-- Keep generation logs
-
-### Storage management
-
-- Set retention policies
-- Monitor storage growth
-- Archive old versions
-- Backup artifact store
-
-## Connections to other systems
-
-### CI/CD integration
-
-```yaml
-# GitLab CI example
-generate-configs:
-  script:
-    - nornir-generate-artifacts --artifact startup-config
-  only:
-    - schedules
-
-deploy-configs:
-  script:
-    - nornir-deploy-configs --artifact startup-config
-  when: manual
-```
-
-### Monitoring integration
-
-- Alert on generation failures
-- Track artifact age
-- Monitor deployment success
-- Measure configuration drift
-
-## Alternative approaches comparison
-
-### Static file management
-
-Pros:
-
-- Quick to understand
-- Direct file editing
-- Git version control
-
-Cons:
-
-- Manual updates
-- Template/data separation
-- Drift between files and reality
-
-### Dynamic generation only
-
-Pros:
-
-- Always current
-- No storage needs
-
-Cons:
-
-- No history
-- Can't compare versions
-- Regeneration overhead
-
-### Infrahub artifact approach
-
-Pros:
-
-- Version history
-- Branch isolation
-- Audit trail
-- Performance (pre-generated)
-
-Cons:
-
-- Storage requirements
-- Generation complexity
-- Learning curve
 
 ## Further reading
 
