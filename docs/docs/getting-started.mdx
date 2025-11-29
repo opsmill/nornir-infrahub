@@ -16,11 +16,21 @@ Before starting, ensure you have:
 
 ## Installation
 
-Install the Nornir-Infrahub plugin using pip:
+Install the Nornir-Infrahub plugin:
+
+Using pip:
 
 ```bash
-pip install nornir-infrahub
+pip install nornir-infrahub nornir_netmiko
 ```
+
+Using uv:
+
+```bash
+uv add nornir-infrahub nornir_netmiko
+```
+
+
 
 This automatically installs all required dependencies including:
 
@@ -122,7 +132,7 @@ inventory:
   plugin: InfrahubInventory
   options:
     address: "https://sandbox.infrahub.app"   # Infrahub instance URL
-    token: "your-api-token-here"           # Replace with your actual token
+    token: "1808d43b-c370-48e8-d0ef-c51781c02ddf"           # Replace with your actual token
     branch: "main"                         # Infrahub branch to use
 
     # Define which Infrahub node type represents network devices
@@ -133,14 +143,15 @@ inventory:
     # Map Infrahub attributes to Nornir host properties
     schema_mappings:
       - name: "hostname"
-        mapping: "primary_address.address" # Path to IP address through relationship
+        mapping: "name"                    # Use device name as hostname
       - name: "platform"
         mapping: "platform.nornir_platform" # Platform attribute for Nornir compatibility
 
     # Create Nornir groups based on Infrahub attributes
-    group_mappings:
-      - "site.name"
-      - "role.name"
+    # Note: Disabled due to some devices missing site/role in sandbox
+    # group_mappings:
+    #   - "site.name"
+    #   - "role.name"
 
 runner:
   plugin: threaded
@@ -150,26 +161,28 @@ runner:
 
 ### Step 4: Test your connection
 
-Create a Python script to verify your setup:
+Create a Python script called `test_connection.py` to verify your setup:
 
 ```python
 from nornir import InitNornir
 from nornir_utils.plugins.functions import print_result
 
+
 def main():
     # Initialize Nornir with your configuration
     nr = InitNornir(config_file="config.yaml")
-    
+
     # Display discovered inventory
     print("Discovered hosts:")
     for host in nr.inventory.hosts.values():
         print(f"  - {host.name} ({host.hostname})")
-    
+
     print("\nDiscovered groups:")
     for group in nr.inventory.groups.values():
         print(f"  - {group.name}")
-    
+
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
@@ -202,13 +215,13 @@ def hello_world(task: Task) -> Result:
 def main():
     # Initialize Nornir
     nr = InitNornir(config_file="config.yaml")
-    
+
     # Run the hello_world task on all hosts
     results = nr.run(task=hello_world)
-    
+
     # Display results
     print_result(results)
-    
+
     return 0
 
 if __name__ == "__main__":
