@@ -1,49 +1,52 @@
-[tool.poetry]
+[project]
 name = "nornir-infrahub"
 version = "1.1.2"
 description = "Nornir plugin for Infrahub"
-authors = ["OpsMill <info@opsmill.com>"]
+authors = [{ name = "OpsMill", email = "info@opsmill.com" }]
 readme = "README.md"
 license = "Apache-2.0"
-homepage = "https://opsmill.com"
-repository = "https://github.com/opsmill/nornir-infrahub"
-documentation = "https://docs.infrahub.app/"
+requires-python = ">=3.10,<3.14"
 classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "infrahub-sdk>=1.17.0,<2",
+    "ruamel-yaml>=0.18.17,<0.19",
+    "nornir>=3.5.0,<4",
+    "nornir-utils>=0.2.0,<0.3",
+    "python-slugify>=8.0.4,<9",
+    "pydantic>=2.0.0,<3",
 ]
 
-packages = [{ include = "nornir_infrahub" }]
+[project.urls]
+Homepage = "https://opsmill.com"
+Repository = "https://github.com/opsmill/nornir-infrahub"
+Documentation = "https://docs.infrahub.app/"
 
-[tool.poetry.plugins."nornir.plugins.inventory"]
-"InfrahubInventory" = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
+[project.entry-points."nornir.plugins.inventory"]
+InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 
-[tool.poetry.dependencies]
-python = "^3.9, <3.13"
-infrahub-sdk = { version = "^1,>=1.3.0", extras = ["tests"] }
-ruamel-yaml = "^0.18.5"
-nornir = "^3.5"
-nornir-utils = "^0.2.0"
-python-slugify = "^8.0.1"
-pydantic = ">=1.7.4,!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0"
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff>=0.14.0,<0.15",
+    "ty>=0.0.1a11",
+    "pytest-asyncio>=1.3.0,<2",
+    "invoke>=2.2.0,<3",
+    "yamllint",
+    "pylint>=3.3.0,<4",
+    "docstring-parser>=0.17,<0.18",
+    "jinja2>=3.1.6,<4",
+    "vale>=3.13.0.0,<4",
+]
 
-
-[tool.poetry.group.dev.dependencies]
-pytest = "*"
-ruff = "0.9.5"
-mypy = "*"
-pytest-asyncio = "^0.21.1"
-types-python-slugify = "*"
-invoke = "2.2.0"
-yamllint = "*"
-pylint = "~3.1"
-docstring-parser = "^0.16"
-jinja2 = "^3.1.5"
-vale = "^3.9.4.0"
+[tool.uv]
+package = true
 
 [tool.coverage.run]
 branch = true
@@ -57,9 +60,11 @@ testpaths = ["tests"]
 filterwarnings = ["ignore:pkg_resources is deprecated"]
 addopts = "-vs"
 
-[tool.mypy]
-pretty = true
-ignore_missing_imports = true
+[tool.ty.rules]
+unresolved-import = "ignore"
+# Infrahub SDK uses dynamic types that ty cannot fully understand without plugin support
+invalid-argument-type = "ignore"
+possibly-missing-attribute = "ignore"
 
 [tool.pylint.general]
 extension-pkg-whitelist = ["pydantic", "ujson"]
@@ -142,8 +147,9 @@ max-complexity = 15
 known-third-party = ["nornir_infrahub"]
 
 [tool.ruff.lint.per-file-ignores]
-
+"tasks.py" = ["PLC0415"]  # Allow deferred imports in invoke tasks
+"tests/**" = ["PLC0415"]  # Allow deferred imports in tests
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

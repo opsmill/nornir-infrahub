@@ -11,9 +11,9 @@ doc_files: &doc_files
   - package.json
   - package-lock.json
 
-poetry_all: &poetry_all
+uv_all: &uv_all
   - pyproject.toml
-  - poetry.lock
+  - uv.lock
 
 python_all: &python_all
   - "**/*.py"
