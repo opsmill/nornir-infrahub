@@ -13,8 +13,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
-  VALE_VERSION: "3.7.1"
+  VALE_VERSION: "3.13.0"
 
 jobs:
   files-changed:
@@ -24,11 +27,12 @@ jobs:
     outputs:
       documentation: ${{ steps.changes.outputs.documentation_all }}
       python: ${{ steps.changes.outputs.python_all }}
-      poetry: ${{ steps.changes.outputs.poetry_all }}
+      uv: ${{ steps.changes.outputs.uv_all }}
       yaml: ${{ steps.changes.outputs.yaml_all }}
+      markdown: ${{ steps.changes.outputs.markdown_all }}
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v5"
       - name: Check for file changes
         uses: opsmill/paths-filter@v3.0.2
         id: changes
@@ -44,39 +48,49 @@ jobs:
       matrix:
         python-version:
           - "3.12"
-        poetry-version:
-          - "1.8.5"
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v5"
 
       - name: "Set up Python ${{ matrix.python-version }}"
         uses: "actions/setup-python@v5"
         with:
           python-version: ${{ matrix.python-version }}
-      - name: "Install Poetry ${{ matrix.poetry-version }}"
-        uses: "snok/install-poetry@v1"
+
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v7"
         with:
-          version: ${{ matrix.poetry-version }}
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-          installer-parallel: true
-      - name: "Setup Python environment"
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry env use ${{ matrix.python-version }}
+          version: "0.9.18"
+
       - name: "Install dependencies"
-        run: "poetry install --no-interaction --no-ansi --with dev"
+        run: "uv sync --group dev"
 
       - name: "Linting: ruff check"
-        run: "poetry run ruff check ."
+        run: "uv run ruff check ."
       - name: "Linting: ruff format"
-        run: "poetry run ruff format --check --diff ."
-      - name: "Mypy Tests"
-        run: "poetry run mypy --show-error-codes nornir_infrahub"
+        run: "uv run ruff format --check --diff ."
+      - name: "Type check with ty"
+        run: "uv run ty check nornir_infrahub"
       - name: "Pylint Tests"
-        run: "poetry run pylint nornir_infrahub *.py"
+        run: "uv run pylint nornir_infrahub *.py"
+
+  markdown-lint:
+    if: needs.files-changed.outputs.markdown == 'true'
+    needs: ["files-changed"]
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v5"
+      - name: "Install NodeJS"
+        uses: "actions/setup-node@v6"
+        with:
+          node-version: 20
+      - name: "Install markdownlint-cli"
+        run: "npm install -g markdownlint-cli"
+      - name: "Run markdownlint"
+        run: 'markdownlint "**/*.{md,mdx}" --ignore node_modules --ignore docs/node_modules'
 
   yaml-lint:
     if: needs.files-changed.outputs.yaml == 'true'
@@ -85,47 +99,44 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v5"
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v7"
         with:
-          submodules: true
-      - name: "Setup environment"
-        run: "pip install yamllint==1.35.1"
+          version: "0.9.18"
+      - name: "Install dependencies"
+        run: "uv sync --group dev"
       - name: "Linting: yamllint"
-        run: "yamllint -s ."
+        run: "uv run yamllint -s ."
 
   python-tests:
     if: needs.files-changed.outputs.python == 'true' ||
-        needs.files-changed.outputs.poetry == 'true'
+        needs.files-changed.outputs.uv == 'true'
     needs: ["files-changed"]
     runs-on: "ubuntu-latest"
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
-        poetry-version:
-          - "1.8.5"
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     timeout-minutes: 30
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v5"
+
       - name: "Set up Python ${{ matrix.python-version }}"
         uses: "actions/setup-python@v5"
         with:
           python-version: ${{ matrix.python-version }}
-      - name: "Install Poetry ${{ matrix.poetry-version }}"
-        uses: "snok/install-poetry@v1"
+
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v7"
         with:
-          version: ${{ matrix.poetry-version }}
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-          installer-parallel: true
-      - name: "Setup Python environment"
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry env use ${{ matrix.python-version }}
+          version: "0.9.18"
+
       - name: "Install dependencies"
-        run: "poetry install --no-interaction --no-ansi --with dev"
+        run: "uv sync --group dev"
+
       - name: "Pytest Tests"
-        run: "poetry run pytest -v tests/"
+        run: "uv run pytest -v tests/"
 
   # coverall-report:
   #   needs: ["python-tests"]
@@ -150,28 +161,35 @@ jobs:
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled') &&
       needs.files-changed.outputs.documentation == 'true'
-    needs: ["files-changed", "yaml-lint", "python-lint"]
+    needs: ["files-changed", "yaml-lint", "python-lint", "markdown-lint"]
     runs-on: "ubuntu-22.04"
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v5"
         with:
           submodules: true
       - name: Install NodeJS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: 'npm'
           cache-dependency-path: docs/package-lock.json
       - name: "Install dependencies"
         run: npm install
-      - name: "Setup Python environment"
-        run: "pip install invoke toml"
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v7"
+        with:
+          version: "0.9.18"
+      - name: "Install Python dependencies"
+        run: "uv sync --group dev"
+        working-directory: ./
       - name: "Generate docs"
-        run: "invoke generate-docs"
+        run: "uv run invoke generate-docs"
+        working-directory: ./
       - name: "Build docs website"
-        run: "invoke docs"
+        run: "uv run invoke docs"
+        working-directory: ./
 
   validate-documentation-style:
     if: |
@@ -179,12 +197,12 @@ jobs:
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled') &&
       needs.files-changed.outputs.documentation == 'true'
-    needs: ["files-changed", "yaml-lint", "python-lint"]
+    needs: ["files-changed", "yaml-lint", "python-lint", "markdown-lint"]
     runs-on: "ubuntu-22.04"
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v5"
         with:
           submodules: true
 
@@ -197,4 +215,4 @@ jobs:
         env:
           VALE_VERSION: ${{ env.VALE_VERSION }}
       - name: "Validate documentation style"
-        run: ./vale $(find ./docs -type f \( -name "*.mdx" -o -name "*.md" \) )
+        run: ./vale $(find ./docs/docs -type f \( -name "*.mdx" -o -name "*.md" \) )
