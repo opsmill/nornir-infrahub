@@ -32,7 +32,7 @@ jobs:
       markdown: ${{ steps.changes.outputs.markdown_all }}
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v6"
       - name: Check for file changes
         uses: opsmill/paths-filter@v3.0.2
         id: changes
@@ -51,7 +51,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v6"
 
       - name: "Set up Python ${{ matrix.python-version }}"
         uses: "actions/setup-python@v5"
@@ -82,7 +82,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v6"
       - name: "Install NodeJS"
         uses: "actions/setup-node@v6"
         with:
@@ -99,7 +99,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v6"
       - name: "Install uv"
         uses: "astral-sh/setup-uv@v7"
         with:
@@ -120,7 +120,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v6"
 
       - name: "Set up Python ${{ matrix.python-version }}"
         uses: "actions/setup-python@v5"
@@ -166,7 +166,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v6"
         with:
           submodules: true
       - name: Install NodeJS
@@ -202,7 +202,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v6"
         with:
           submodules: true
 
