@@ -45,19 +45,6 @@ Node attributes become host properties through schema mappings:
 | Nested relation | `primary_address.address` | `host.hostname` |
 | Deep nesting | `site.location.coordinates` | `host.data['coordinates']` |
 
-### Relationships to groups
-
-Infrahub relationships automatically generate Nornir groups:
-
-```python
-# Infrahub relationship
-device.site.name = "chicago"
-device.role.name = "spine"
-
-# Becomes Nornir groups
-host.groups = ["site__chicago", "role__spine"]
-```
-
 ## The inventory loading process
 
 ### Step 1: query construction
@@ -107,9 +94,25 @@ Retrieved data undergoes transformation:
 
 Groups are created from:
 
-1. **Explicit groups**: Infrahub `CoreStandardGroup` memberships
+1. **Infrahub group memberships**: Devices assigned to `CoreStandardGroup` in Infrahub
 2. **Dynamic groups**: Generated from `group_mappings` configuration
 3. **Hierarchical groups**: Groups can have parent groups
+
+```yaml title="config.yaml"
+group_mappings:
+  - "site.name"
+  - "role.name"
+```
+
+```python
+# For a device where site.name = "chicago" and role.name = "spine"
+# Results in Nornir groups:
+host.groups = [
+  "core_router", # Infrahub group membership
+  "site__chicago", # dynamic groups from group_mappings
+  "role__spine" # dynamic groups from group_mappings
+]
+```
 
 ## Advanced inventory concepts
 
@@ -122,11 +125,11 @@ host_node:
   kind: "InfraDevice"
   filters:
     status__value: "active"
-    site__name__in: ["chicago", "dallas"]
-    role__name__not: "decommissioned"
+    site__name__values: ["chicago", "dallas"]
+    role__value: "spine"
 ```
 
-This translates to GraphQL filters, ensuring only relevant nodes are fetched.
+This translates to GraphQL filters, ensuring only relevant nodes are fetched. Use `__value` for single values and `__values` for lists.
 
 ### Include optimization
 
@@ -162,17 +165,17 @@ Large inventories require optimization:
 2. **Selective fetching**: Only request needed attributes
 3. **Relationship depth**: Limit traversal depth
 
-### Caching strategy
+### Inventory loading
 
-The plugin implements intelligent caching:
+Nornir loads the inventory once during initialization:
 
 ```python
-# First access fetches from Infrahub
-nr = InitNornir(inventory={"plugin": "InfrahubInventory"})
+# Inventory is fetched from Infrahub during initialization
+nr = InitNornir(config_file="config.yaml")
 
-# Subsequent operations use cached data
+# Subsequent operations use the loaded inventory
 nr.filter(platform="ios")  # No new query
-nr.run(task=my_task)       # Uses cached inventory
+nr.run(task=my_task)       # Uses loaded inventory
 ```
 
 ### Parallel processing
@@ -201,6 +204,7 @@ def get_inventory(environment="production"):
         inventory={
             "plugin": "InfrahubInventory",
             "options": {
+                "host_node": {"kind": "InfraDevice"},
                 "branch": branch_map.get(environment, "main")
             }
         }
@@ -220,7 +224,7 @@ core_nr = InitNornir(
             "host_node": {
                 "kind": "InfraDevice",
                 "filters": {
-                    "role__name__in": ["spine", "core-router"]
+                    "role__values": ["core", "edge"]
                 }
             }
         }
@@ -228,23 +232,20 @@ core_nr = InitNornir(
 )
 ```
 
-### Multi-vendor support
+### Multi-platform support
 
-Handle different device types:
+Handle different device platforms:
 
-```yaml
-# Separate node types per vendor
+```yaml title="config.yaml"
 schema_mappings:
   - name: "hostname"
     mapping: "primary_address.address"
   - name: "platform"
     mapping: "platform.nornir_platform"
-  - name: "vendor"
-    mapping: "platform.manufacturer.name"
 
-# Groups by vendor automatically
+# Groups by platform automatically
 group_mappings:
-  - "platform.manufacturer.name"
+  - "platform.name"
 ```
 
 ## Troubleshooting inventory issues
@@ -257,36 +258,40 @@ Enable detailed logging:
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-nr = InitNornir(inventory={"plugin": "InfrahubInventory"})
+nr = InitNornir(config_file="config.yaml")
 # Watch for GraphQL queries and responses
 ```
 
 ### Validation queries
 
-Test your mappings with GraphQL:
+Test your mappings with GraphQL using the Infrahub GraphQL explorer or SDK:
 
 ```python
+import asyncio
 from infrahub_sdk import InfrahubClient
 
-client = InfrahubClient()
-query = """
-query {
-  InfraDevice {
-    edges {
-      node {
-        name { value }
-        primary_address {
+async def test_query():
+    client = InfrahubClient(address="http://localhost:8000")
+    query = """
+    query {
+      InfraDevice {
+        edges {
           node {
-            address { value }
+            name { value }
+            primary_address {
+              node {
+                address { value }
+              }
+            }
           }
         }
       }
     }
-  }
-}
-"""
-result = client.query(query)
-print(result)
+    """
+    result = await client.execute_graphql(query=query)
+    print(result)
+
+asyncio.run(test_query())
 ```
 
 ### Common issues
@@ -320,6 +325,8 @@ def enrich_inventory(nr):
 Apply transformations during loading:
 
 ```python
+from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
+
 class CustomInfrahubInventory(InfrahubInventory):
     def load(self):
         inventory = super().load()
