@@ -11,37 +11,23 @@ jobs:
     name: "Publish nornir_infrahub to PyPI"
     runs-on: "ubuntu-22.04"
     steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v6"
+
       - name: "Set up Python"
-        uses: "actions/setup-python@v5"
+        uses: "actions/setup-python@v6"
         with:
           python-version: "3.11"
 
-      - name: "Install Poetry"
-        uses: "snok/install-poetry@v1"
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v7"
         with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-          installer-parallel: true
+          version: "0.9.18"
 
-      - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+      - name: "Build package"
+        run: "uv build"
 
-      - name: "Cache poetry venv"
-        uses: "actions/cache@v3"
-        id: "cached-poetry-dependencies"
-        with:
-          path: ".venv"
-          key: "venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}"
-
-      - name: "Install Dependencies"
-        run: "poetry install"
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-
-      - name: "Add PyPI secret"
-        run: "poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}"
-
-      - name: "Poetry build"
-        run: "poetry build"
-
-      - name: "Poetry push PyPI"
-        run: "poetry publish"
+      - name: "Publish to PyPI"
+        run: "uv publish"
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
