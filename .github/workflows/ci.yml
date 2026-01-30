@@ -188,7 +188,7 @@ jobs:
         run: "uv run invoke generate-docs"
         working-directory: ./
       - name: "Build docs website"
-        run: "uv run invoke docs"
+        run: "uv run invoke docs-build"
         working-directory: ./
 
   validate-documentation-style:

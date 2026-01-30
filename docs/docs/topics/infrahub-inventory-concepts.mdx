@@ -40,7 +40,7 @@ Infrahub Node                    Nornir Host
 Node attributes become host properties through schema mappings:
 
 | Infrahub Attribute | Mapping Path | Nornir Property |
-|-------------------|--------------|-----------------|
+| ------------------ | ------------ | --------------- |
 | Direct attribute | `name` | `host.name` |
 | Nested relation | `primary_address.address` | `host.hostname` |
 | Deep nesting | `site.location.coordinates` | `host.data['coordinates']` |

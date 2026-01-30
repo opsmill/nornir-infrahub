@@ -22,7 +22,7 @@ pip install nornir-infrahub
 
 ## Documentation
 
-Documentation for using Nornir is available [here](https://docs.infrahub.app/nornir/)
+Documentation for using Nornir is available in the [Nornir-Infrahub documentation](https://docs.infrahub.app/nornir/).
 
 ## Development
 
