@@ -44,6 +44,12 @@ This automatically installs all required dependencies including:
 
 ### Step 1: Obtain your Infrahub API token
 
+:::note
+
+You can skip this step if you will be using the Infrahub Sandbox as the `config.yaml` file below already has the Infrahub Sandbox token!
+
+:::
+
 First, you'll need an API token to authenticate with Infrahub:
 
 1. Log into your Infrahub web interface
@@ -141,6 +147,8 @@ inventory:
     # Using the schema example above
     host_node:
       kind: "InfraDevice"                  # Matches the Device node with Infra namespace
+      include:
+        - "platform"
 
     # Map Infrahub attributes to Nornir host properties
     schema_mappings:

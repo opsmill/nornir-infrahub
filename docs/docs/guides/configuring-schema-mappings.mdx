@@ -16,8 +16,11 @@ By following this guide, you'll be able to:
 ## Prerequisites
 
 - Working Nornir-Infrahub installation
+- Infrahub instance with network devices configured
+    - You can use the [Infrahub sandbox instance](https://sandbox.infrahub.app) to follow along
 - Understanding of your Infrahub schema (see example schema in [Getting Started](../getting-started.mdx#example-schema-structure))
 - Access to Infrahub GraphQL explorer (for testing queries)
+    - Sandbox GraphQL explorer: [sandbox.infrahub.app/graphql](https://sandbox.infrahub.app/graphql)
 
 ## Understanding schema mappings
 
@@ -41,7 +44,7 @@ First, determine which Nornir properties your automation tasks need:
 
 ## Step 2: Explore your Infrahub schema
 
-Use the Infrahub GraphQL explorer to understand available attributes. Based on the example schema from the [Getting Started guide](../getting-started.mdx#example-schema-structure), you can query:
+Use the Infrahub GraphQL explorer to understand available attributes. For the [Infrahub sandbox](https://sandbox.infrahub.app/graphql), you can query:
 
 ```graphql
 query {
@@ -76,17 +79,17 @@ query {
           }
         }
         role {
-          node {
-            name {
-              value
-            }
-          }
+          value
         }
       }
     }
   }
 }
 ```
+
+:::note
+The query structure depends on your schema. In the sandbox, `role` is a Dropdown attribute (use `value`), while `site` and `platform` are relationships (use `node`). Adapt your queries to match your schema structure.
+:::
 
 This helps you identify the exact paths to your data based on your schema structure.
 
@@ -136,23 +139,9 @@ schema_mappings:
     mapping: "primary_address.address"  # Automatically converts IPHost to string
 ```
 
-### Handling missing attributes
+### Infrahub Node Object
 
-When a mapping fails (for example, relationship doesn't exist), it's silently skipped:
-
-```yaml
-schema_mappings:
-  - name: "hostname"
-    mapping: "primary_address.address"  # Skipped if primary_address is not set
-  - name: "management_ip"
-    mapping: "primary_address.address"  # Only sets hostname if relationship exists
-```
-
-Note: The plugin does not support fallback mappings. Each mapping is independent.
-
-### Custom data mappings
-
-Additional attributes from Infrahub nodes are stored in the host's `data` dictionary:
+Along with schema mappings that allow mapping Infrahub inventory data to Nornir host attributes, we also include the Infrahub object that can be used in tasks, etc.
 
 ```python
 def example_task(task):
@@ -164,8 +153,6 @@ def example_task(task):
         serial = infrahub_node.serial_number.value
         print(f"Device {task.host.name} serial: {serial}")
 ```
-
-Note: Custom schema mappings create Nornir host properties for standard attributes like `hostname` and `platform`. Additional node data is accessible through the `InfrahubNode` object.
 
 ## Step 5: Configure group mappings
 
@@ -180,25 +167,25 @@ group_mappings:
 
 Groups are automatically prefixed with the relationship name to avoid conflicts.
 
+Additionally, the plugin will auto add groups based on each node's groups it is assigned to within Infrahub.
+
 ## Step 6: Test your mappings
 
 Create a test script to verify mappings:
 
 ```python
 from nornir import InitNornir
-import json
 
 def test_mappings():
     nr = InitNornir(config_file="config.yaml")
 
-    # Check a specific host
-    if "router1" in nr.inventory.hosts:
-        host = nr.inventory.hosts["router1"]
-        print(f"Host: {host.name}")
-        print(f"Hostname: {host.hostname}")
-        print(f"Platform: {host.platform}")
-        print(f"Groups: {[g.name for g in host.groups]}")
-        print(f"Data: {json.dumps(host.data, indent=2)}")
+    # Check hosts
+    print("Sample hosts:")
+    for host in list(nr.inventory.hosts.values())[:3]:  # First 3 hosts
+        print(f"\n  {host.name}:")
+        print(f"    Hostname: {host.hostname}")
+        print(f"    Platform: {host.platform}")
+        print(f"    Groups: {[g.name for g in host.groups]}")
 
     # List all groups
     print("\nAll groups:")
@@ -219,7 +206,7 @@ After configuration, verify:
 2. Groups are created as expected
 3. No mapping errors in logs
 
-### Common validation commands
+### Validation Example
 
 ```python
 # Check all hosts have hostname
@@ -247,39 +234,9 @@ def device_info(task):
     print(f"Connecting to {task.host.hostname}")
     print(f"Platform: {task.host.platform}")
 
-    # Access custom mapped attributes
-    if hasattr(task.host, 'serial_number'):
-        print(f"Serial: {task.host.serial_number}")
-
     # Access Infrahub node
     node = task.host.data["InfrahubNode"]
     print(f"Infrahub ID: {node.id}")
-```
-
-### Dynamic mapping based on node type
-
-For environments with multiple device types:
-
-```yaml
-# Router-specific mappings
-host_node:
-  kind: "InfraRouter"
-
-schema_mappings:
-  - name: "hostname"
-    mapping: "loopback0.address"
-  - name: "platform"
-    mapping: "platform.nornir_platform"
-
-# Switch-specific mappings (different config file)
-host_node:
-  kind: "InfraSwitch"
-
-schema_mappings:
-  - name: "hostname"
-    mapping: "management_ip.address"
-  - name: "platform"
-    mapping: "platform.nornir_platform"
 ```
 
 ### Troubleshooting mapping failures
@@ -293,11 +250,11 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 ```
 
-2. Check the Infrahub GraphQL query:
+2. Check the Infrahub GraphQL query result for the specific node:
 
 ```python
 # Add to your script
-print(nr.inventory.hosts["device1"].data["InfrahubNode"]._raw_data)
+print(nr.inventory.hosts["device1"].data["InfrahubNode"]._data)
 ```
 
 3. Verify relationship cardinality:

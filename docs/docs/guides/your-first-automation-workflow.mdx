@@ -2,7 +2,7 @@
 title: How to Create Your First Automation Workflow
 ---
 
-This guide walks you through building a complete network automation workflow using Infrahub as your inventory source and artifact management system. You'll retrieve and deploy device configurations managed by Infrahub.
+This guide walks you through building a complete network automation workflow using Infrahub as your inventory source and artifact management system. You'll retrieve device configurations managed by Infrahub.
 
 ## What you'll accomplish
 
@@ -11,7 +11,6 @@ By the end of this guide, you'll have:
 - Connected Nornir to your Infrahub instance
 - Retrieved device configurations from Infrahub artifacts
 - Used dynamic device groups for targeted operations
-- Deployed configurations managed by Infrahub
 - Understood how to integrate Nornir with Infrahub's artifact system
 
 ## Prerequisites
@@ -19,9 +18,7 @@ By the end of this guide, you'll have:
 - Infrahub instance with network devices and artifact definitions configured
     - You can use the [Infrahub sandbox instance](https://sandbox.infrahub.app) to try this workflow
 - Nornir-Infrahub plugin installed (`pip install nornir-infrahub`)
-- Connection plugin for your devices: `pip install nornir-netmiko` or `nornir-napalm`
 - Basic Python and Nornir knowledge
-- Access to test network devices (or simulation)
 
 ## Step 1: Set up your project structure
 
@@ -41,7 +38,7 @@ touch workflow.py
 
 Create your `config.yaml` file:
 
-```yaml
+```yaml title="config.yaml"
 ---
 inventory:
   plugin: InfrahubInventory
@@ -54,6 +51,8 @@ inventory:
     # Using the schema example above
     host_node:
       kind: "InfraDevice"                  # Matches the Device node with Infra namespace
+      include:
+        - "platform"
 
     # Map Infrahub attributes to Nornir host properties
     schema_mappings:
@@ -95,15 +94,15 @@ The Nornir-Infrahub plugin provides tasks to interact with these artifacts:
 
 Create `workflow.py` with your automation workflow:
 
-```python
+```python title="workflow.py"
 #!/usr/bin/env python3
 """Network automation workflow using Nornir and Infrahub artifacts.
 
 This module implements a complete configuration management workflow that:
 1. Connects to Infrahub to load device inventory
 2. Regenerates device configurations using Infrahub's artifact system
-3. Retrieves and validates the generated configurations
-4. Deploys configurations to network devices (with user confirmation)
+3. Retrieves the generated configurations
+4. Validates the generated configurations
 
 The workflow is designed to work with the Infrahub sandbox environment and
 targets edge devices that have the "Startup Config for Edge devices" artifact
@@ -112,7 +111,6 @@ definition configured.
 Requirements:
     - nornir: Core automation framework
     - nornir-infrahub: Infrahub inventory and task plugins
-    - nornir-netmiko: Device configuration deployment
     - nornir-utils: Result printing utilities
 
 Example:
@@ -125,19 +123,14 @@ Example:
         from workflow import main
         main()
 
-Note:
-    The backup functionality requires a "running-config" artifact definition
-    in Infrahub, which is not available in the public sandbox.
 """
 
 import logging
-from datetime import datetime
 from pathlib import Path
 
 from nornir import InitNornir
 from nornir.core.task import Task, Result
 from nornir_utils.plugins.functions import print_result
-from nornir_netmiko.tasks import netmiko_send_config
 from nornir_infrahub.plugins.tasks import (
     get_artifact,
     regenerate_host_artifact,
@@ -154,7 +147,7 @@ def retrieve_configuration(task: Task) -> Result:
     """Retrieve device configuration from Infrahub artifacts.
 
     Fetches the generated configuration artifact from Infrahub and saves it
-    locally for validation and deployment. The configuration is saved to
+    locally for validation. The configuration is saved to
     the `configs/` directory with the filename `{hostname}.cfg`.
 
     Args:
@@ -310,96 +303,15 @@ def validate_configuration(task: Task) -> Result:
     )
 
 
-def deploy_configuration(task: Task) -> Result:
-    """Deploy configuration to the network device via Netmiko.
-
-    Reads the configuration from the local `configs/` directory and pushes
-    it to the device using Netmiko's send_config method. Requires the device
-    to have proper connection parameters configured in the Nornir inventory.
-
-    Args:
-        task: Nornir task object containing host information and connection details.
-
-    Returns:
-        Result object with:
-            - On success: Deployment confirmation message
-            - On failure: Error message from Netmiko or file not found error
-    """
-    config_file = Path("configs") / f"{task.host.name}.cfg"
-
-    if not config_file.exists():
-        return Result(
-            host=task.host, failed=True, result="Configuration file not found"
-        )
-
-    # Read configuration
-    config_commands = config_file.read_text().splitlines()
-
-    # Deploy via Netmiko
-    netmiko_result = netmiko_send_config(task=task, config_commands=config_commands)
-
-    if netmiko_result.failed:
-        return Result(
-            host=task.host,
-            failed=True,
-            result=f"Deployment failed: {netmiko_result.result}",
-        )
-
-    return Result(host=task.host, result="Configuration deployed successfully")
-
-
-def backup_current_config(task: Task) -> Result:
-    """Backup current device configuration using Infrahub artifacts.
-
-    Triggers generation of a running-config artifact in Infrahub, then
-    retrieves and saves it locally. Backups are stored in timestamped
-    directories under `backups/`.
-
-    Note:
-        This function requires a "running-config" artifact definition in
-        Infrahub. The public sandbox does not have this artifact configured,
-        so this step is skipped in the main workflow.
-
-    Args:
-        task: Nornir task object containing host information and Infrahub client.
-
-    Returns:
-        Result object with:
-            - On success: Path to the backup file
-            - On failure: Error message describing the issue
-    """
-    # Trigger artifact generation for this host
-    result = regenerate_host_artifact(task=task, artifact="running-config")
-
-    if result.failed:
-        return Result(
-            host=task.host, failed=True, result="Failed to generate backup artifact"
-        )
-
-    # Retrieve the generated artifact
-    artifact_result = get_artifact(task=task, artifact="running-config")
-
-    # Save backup locally
-    backup_dir = Path("backups") / datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_dir.mkdir(parents=True, exist_ok=True)
-
-    backup_file = backup_dir / f"{task.host.name}_running.cfg"
-    backup_file.write_text(artifact_result.result)
-
-    return Result(host=task.host, result=f"Configuration backed up to {backup_file}")
-
-
 def main() -> int:
     """Execute the complete network automation workflow.
 
     Orchestrates the following steps:
         1. Load device inventory from Infrahub
         2. Filter to edge devices (which have startup config artifacts)
-        3. Skip backup (not available in sandbox)
-        4. Regenerate configurations in Infrahub
-        5. Retrieve configurations to local `configs/` directory
-        6. Validate all retrieved configurations
-        7. Deploy configurations (requires user confirmation)
+        3. Regenerate configurations in Infrahub
+        4. Retrieve configurations to local `configs/` directory
+        5. Validate all retrieved configurations
 
     The workflow will abort if any validation failures occur, preventing
     deployment of invalid configurations.
@@ -408,6 +320,7 @@ def main() -> int:
         Exit code: 0 for success, 1 for validation failures.
     """
     # Initialize Nornir
+    # Step 1: Load devices/init Nornir dynamic inventory from Infrahub
     nr = InitNornir(config_file="config.yaml")
 
     logger.info(f"Loaded {len(nr.inventory.hosts)} hosts from Infrahub")
@@ -417,9 +330,6 @@ def main() -> int:
     logger.info(
         f"Filtered to {len(edge_devices.inventory.hosts)} edge devices with artifacts"
     )
-
-    # Step 1: Skip backup (no running-config artifact in sandbox)
-    logger.info("Step 1: Skipping backup (no running-config artifact in sandbox)")
 
     # Step 2: Regenerate configurations in Infrahub
     logger.info("Step 2: Regenerating configurations in Infrahub...")
@@ -446,23 +356,6 @@ def main() -> int:
         logger.info("Aborting deployment due to validation failures")
         return 1
 
-    # Step 5: Deploy configurations (with confirmation)
-    logger.info("Step 5: Ready to deploy configurations")
-    response = input("Deploy configurations to all devices? (yes/no): ")
-
-    if response.lower() == "yes":
-        logger.info("Deploying configurations...")
-        deploy_results = edge_devices.run(task=deploy_configuration)
-        print_result(deploy_results)
-
-        # Generate completion report
-        successful = len([r for r in deploy_results.values() if not r.failed])
-        failed = len([r for r in deploy_results.values() if r.failed])
-
-        logger.info(f"Deployment complete: {successful} successful, {failed} failed")
-    else:
-        logger.info("Deployment cancelled by user")
-
     return 0
 
 
@@ -481,11 +374,9 @@ python workflow.py
 The workflow will:
 
 1. Connect to Infrahub and load device inventory
-2. Backup current configurations locally
-3. Regenerate configurations in Infrahub using artifact system
-4. Retrieve updated configurations from Infrahub
-5. Validate the retrieved configurations
-6. Deploy configurations (with user confirmation)
+2. Regenerate configurations in Infrahub using artifact system
+3. Retrieve updated configurations from Infrahub
+4. Validate the retrieved configurations
 
 ## Validation
 
@@ -498,18 +389,6 @@ ls -la configs/
 cat configs/router1.cfg
 ```
 
-### Verify backups
-
-Confirm backups were created:
-
-```bash
-ls -la backups/*/
-```
-
-### Monitor deployment
-
-Watch the deployment output for any errors or warnings.
-
 ## Advanced usage
 
 ### Filtering devices
@@ -517,19 +396,16 @@ Watch the deployment output for any errors or warnings.
 Target specific devices or groups:
 
 ```python
-# Filter by site
-site_devices = nr.filter(site_name="chicago")
-site_results = site_devices.run(task=deploy_configuration)
+# Filter by platform
+junos_devices = nr.filter(platform="juniper_junos")
+results = junos_devices.run(task=deploy_configuration)
 
-# Filter by role
-core_devices = nr.filter(role_name="core")
+# Filter by group 
+core_devices = nr.filter(F(groups__contains="core_router"))
 core_results = core_devices.run(task=retrieve_configuration)
-
-# Complex filtering
-critical_devices = nr.filter(
-    filter_func=lambda h: hasattr(h, 'criticality') and h.criticality == "high"
-)
 ```
+
+Further information on [Nornir filters](https://nornir.readthedocs.io/en/latest/tutorial/inventory.html#Filtering-the-inventory).
 
 ### Parallel execution control
 
