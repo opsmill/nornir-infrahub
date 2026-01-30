@@ -303,41 +303,122 @@ asyncio.run(test_query())
 
 ## Integration with Nornir ecosystem
 
-### Custom inventory data
-
-Extend with additional data:
-
-```python
-def enrich_inventory(nr):
-    """Add custom data to hosts after loading."""
-    for host in nr.inventory.hosts.values():
-        # Add computed properties
-        host.data["is_core"] = "core" in host.name
-
-        # Add external data
-        host.data["monitoring_enabled"] = check_monitoring(host.name)
-
-    return nr
-```
-
 ### Transform functions
 
-Apply transformations during loading:
+Nornir provides a `transform_function` mechanism to enrich host data during inventory loading. Register a transform function and reference it by name:
+
+```python
+from nornir import InitNornir
+from nornir.core.plugins.inventory import TransformFunctionRegister
+
+def enrich_host(host):
+    """Transform function called for each host during inventory loading."""
+    # Add computed properties based on naming conventions
+    host.data["is_core"] = "core" in host.name
+    host.data["is_edge"] = "edge" in host.name
+
+    # Derive datacenter from hostname prefix
+    if "-" in host.name:
+        host.data["datacenter"] = host.name.split("-")[0]
+
+# Register the transform function
+TransformFunctionRegister.register("enrich_host", enrich_host)
+
+# Use transform_function in InitNornir
+nr = InitNornir(
+    inventory={
+        "plugin": "InfrahubInventory",
+        "options": {
+            "address": "http://localhost:8000",
+            "host_node": {"kind": "InfraDevice"}
+        },
+        "transform_function": "enrich_host"
+    }
+)
+
+# Filter using enriched data
+core_devices = nr.filter(filter_func=lambda h: h.data.get("is_core", False))
+print(f"Found {len(core_devices.inventory.hosts)} core devices")
+```
+
+### Using Infrahub node data in tasks
+
+Access the full Infrahub node object within tasks for attributes not mapped to Nornir properties:
+
+```python
+from nornir.core.task import Task, Result
+
+def device_audit(task: Task) -> Result:
+    """Audit device using both Nornir properties and Infrahub data."""
+    # Access standard Nornir host properties
+    hostname = task.host.hostname
+    platform = task.host.platform
+
+    # Access the full Infrahub node for additional attributes
+    infrahub_node = task.host.data.get("InfrahubNode")
+
+    audit_info = {
+        "name": task.host.name,
+        "hostname": hostname,
+        "platform": platform,
+    }
+
+    # Extract additional Infrahub attributes if available
+    if infrahub_node:
+        if hasattr(infrahub_node, "role") and infrahub_node.role:
+            audit_info["role"] = infrahub_node.role.value
+
+    return Result(host=task.host, result=audit_info)
+
+# Run the audit task
+results = nr.run(task=device_audit)
+```
+
+### Custom inventory plugins
+
+Create a custom inventory class to apply transformations during loading:
 
 ```python
 from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
+from nornir.core.plugins.inventory import InventoryPluginRegister
 
 class CustomInfrahubInventory(InfrahubInventory):
+    """Custom inventory with platform name normalization."""
+
     def load(self):
         inventory = super().load()
 
-        # Custom transformations
+        # Normalize platform names for Nornir/NAPALM compatibility
+        platform_map = {
+            "juniper_junos": "junos",
+            "arista_eos": "eos",
+            "cisco_ios": "ios",
+        }
+
         for host in inventory.hosts.values():
-            # Standardize platform names
-            if host.platform == "cisco_ios":
-                host.platform = "ios"
+            if host.platform in platform_map:
+                host.platform = platform_map[host.platform]
 
         return inventory
+
+# Register and use the custom plugin
+InventoryPluginRegister.register("CustomInfrahubInventory", CustomInfrahubInventory)
+
+nr = InitNornir(
+    inventory={
+        "plugin": "CustomInfrahubInventory",
+        "options": {
+            "address": "http://localhost:8000",
+            "host_node": {
+                "kind": "InfraDevice",
+                "include": ["platform"]
+            },
+            "schema_mappings": [
+                {"name": "platform", "mapping": "platform.nornir_platform"}
+            ]
+        }
+    }
+)
 ```
 
 ## Further reading

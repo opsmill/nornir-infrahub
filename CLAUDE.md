@@ -33,7 +33,9 @@ invoke format            # Auto-format code with ruff
 ### Documentation
 
 ```bash
-invoke docs              # Build documentation website (requires npm)
+invoke docs-install      # Install npm dependencies for docs
+invoke docs-serve        # Start dev server at http://localhost:3000
+invoke docs-build        # Build documentation website (requires npm)
 invoke generate-docs     # Generate plugin documentation from docstrings
 ```
 

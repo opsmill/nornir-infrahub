@@ -34,67 +34,13 @@ Artifacts are:
 - **Immutable**: Once generated, artifacts don't change
 - **Traceable**: Linked to the exact data and templates used
 
-## The artifact lifecycle
+### References
 
-### 1. Definition phase
+For detailed information about artifacts in Infrahub:
 
-Artifacts start with an artifact definition in the `.infrahub.yml` file:
-
-```yaml
-# Example artifact definition structure
-# (Actual structure may vary - see Infrahub documentation)
-kind: CoreArtifactDefinition
-name: startup-config
-template_path: templates/ios/startup.j2
-targets:
-  - kind: InfraDevice
-    filter: platform__name="ios"
-```
-
-This defines:
-
-- What template to use
-- Which devices to target
-- When to regenerate
-
-### 2. Generation phase
-
-Generation combines:
-
-- **Template**: Jinja2 template with logic
-- **Data**: Current state from Infrahub
-- **Context**: Device-specific variables
-
-```jinja2
-{# templates/ios/startup.j2 #}
-hostname {{ device.name }}
-!
-interface Loopback0
- ip address {{ device.loopback_ip.address }} 255.255.255.255
-!
-{% for interface in device.interfaces %}
-interface {{ interface.name }}
- description {{ interface.description }}
- ip address {{ interface.ip_address.address }} {{ interface.ip_address.netmask }}
-{% endfor %}
-```
-
-### 3. Storage phase
-
-Generated artifacts are stored in a S3 bucket or locally in Infrahub:
-
-- Content saved with checksum
-- Metadata tracks generation time, user, branch
-- Previous versions retained for history
-
-### 4. Retrieval phase
-
-Artifacts can be retrieved for:
-
-- Deployment to devices
-- Compliance validation
-- Change review
-- Disaster recovery
+- [Artifact Topic](https://docs.infrahub.app/topics/artifact) - How artifacts work in Infrahub
+- [Transformation Topic](https://docs.infrahub.app/topics/transformation) - How transformations generate artifacts
+- [Repository Configuration Reference](https://docs.infrahub.app/reference/dotinfrahub) - `.infrahub.yml` artifact definition syntax
 
 ## Artifact management with Nornir
 
@@ -102,13 +48,13 @@ Artifacts can be retrieved for:
 
 The Nornir-Infrahub plugin provides three key functions:
 
-#### generate_artifacts()
+#### [generate_artifacts()](../references/plugins/artifact_tasks.mdx#generate_artifacts)
 
 Triggers generation for all targets in a definition:
 
 ```python
-# Generate configs for all IOS devices
-nr.run(task=generate_artifacts, artifact="startup-config")
+# Generate configs for all edge devices
+nr.run(task=generate_artifacts, artifact="Startup Config for Edge devices")
 ```
 
 This is typically used:
@@ -117,14 +63,14 @@ This is typically used:
 - On scheduled intervals
 - Before deployment windows
 
-#### regenerate_host_artifact()
+#### [regenerate_host_artifact()](../references/plugins/artifact_tasks.mdx#regenerate_host_artifact)
 
 Regenerates artifact for specific hosts:
 
 ```python
 # Regenerate after device-specific change
-changed_devices = nr.filter(name="router1")
-changed_devices.run(task=regenerate_host_artifact, artifact="startup-config")
+changed_devices = nr.filter(name="atl1-edge1")
+changed_devices.run(task=regenerate_host_artifact, artifact="Startup Config for Edge devices")
 ```
 
 Use cases:
@@ -133,17 +79,23 @@ Use cases:
 - Testing template changes
 - Troubleshooting specific devices
 
-#### get_artifact()
+#### [get_artifact()](../references/plugins/artifact_tasks.mdx#get_artifact)
 
 Retrieves stored artifact content:
 
 ```python
 # Get current config for deployment
-result = nr.run(task=get_artifact, artifact="startup-config")
+result = nr.run(task=get_artifact, artifact="Startup Config for Edge devices")
 for host, task_result in result.items():
     config = task_result.result
     # Deploy config to device
 ```
+
+Use cases:
+
+- Deploying configurations to devices
+- Comparing current vs desired state
+- Feeding into validation pipelines
 
 ## Version control integration
 
@@ -153,13 +105,13 @@ Artifacts are generated per branch:
 
 ```text
 main branch:
-  router1 startup-config v3 (current)
-  router1 startup-config v2
-  router1 startup-config v1
+  atl1-edge1 startup-config v3 (current)
+  atl1-edge1 startup-config v2
+  atl1-edge1 startup-config v1
 
 feature branch:
-  router1 startup-config v2 (testing changes)
-  router1 startup-config v1
+  atl1-edge1 startup-config v2 (testing changes)
+  atl1-edge1 startup-config v1
 ```
 
 This enables:
@@ -167,51 +119,6 @@ This enables:
 - Safe testing in feature branches
 - Comparison between branches
 - Controlled promotion to production
-
-### Change tracking
-
-Every artifact generation is tracked:
-
-```python
-# Artifact metadata includes
-{
-    "generated_at": "2024-01-15T10:30:00Z",
-    "generated_by": "automation-user",
-    "branch": "feature/new-acl",
-    "template_version": "abc123",
-    "data_version": "def456"
-}
-```
-
-## Architecture and design
-
-### Generation flow
-
-```text
-┌────────────┐     ┌───────────┐     ┌─────────────┐
-│   Trigger  │────▶│ Generator │────▶│   Storage   │
-└────────────┘     └───────────┘     └─────────────┘
-                          │
-                          ▼
-                   ┌──────────┐
-                   │ Template │
-                   │  Engine  │
-                   └──────────┘
-                          │
-                          ▼
-                   ┌──────────┐
-                   │   Data   │
-                   │  Query   │
-                   └──────────┘
-```
-
-### Storage architecture
-
-Artifacts use content-addressable storage:
-
-- Same content = same storage location
-- Deduplication happens automatically
-- Metadata links content to devices/versions
 
 ## Practical workflows
 
@@ -237,19 +144,6 @@ Artifacts use content-addressable storage:
 
 ## Advanced concepts
 
-### Artifact dependencies
-
-Artifacts can depend on other artifacts:
-
-```yaml
-# BGP config depends on base config
-kind: CoreArtifactDefinition
-name: bgp-config
-depends_on:
-  - startup-config
-template_path: templates/bgp.j2
-```
-
 ### Conditional generation
 
 Generate only when needed:
@@ -257,11 +151,10 @@ Generate only when needed:
 ```python
 # Check if regeneration needed
 if device.last_modified > artifact.generated_at:
-    nr.run(task=regenerate_host_artifact, artifact="startup-config")
+    nr.run(task=regenerate_host_artifact, artifact="Startup Config for Edge devices")
 ```
 
 ## Further reading
 
-- [Your First Automation Workflow](../guides/your-first-automation-workflow.mdx) - Implement artifact workflows
-- [Infrahub Inventory Concepts](./infrahub-inventory-concepts.mdx) - Understand data sources
-- [Configuring Schema Mappings](../guides/configuring-schema-mappings.mdx) - Set up data access
+- [Your First Automation Workflow](../guides/your-first-automation-workflow.mdx) - Implement artifact workflows with Nornir
+- [Artifact Management Plugin Reference](../references/plugins/artifact_tasks.mdx) - Full API documentation for artifact tasks

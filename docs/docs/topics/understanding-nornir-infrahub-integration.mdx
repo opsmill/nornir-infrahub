@@ -69,7 +69,10 @@ Just as code has development branches, your infrastructure can too:
 nr_prod = InitNornir(
     inventory={
         "plugin": "InfrahubInventory",
-        "options": {"branch": "main"}
+        "options": {
+            "host_node": {"kind": "InfraDevice"},
+            "branch": "main"
+        }
     }
 )
 
@@ -77,7 +80,10 @@ nr_prod = InitNornir(
 nr_dev = InitNornir(
     inventory={
         "plugin": "InfrahubInventory",
-        "options": {"branch": "development"}
+        "options": {
+            "host_node": {"kind": "InfraDevice"},
+            "branch": "development"
+        }
     }
 )
 ```
