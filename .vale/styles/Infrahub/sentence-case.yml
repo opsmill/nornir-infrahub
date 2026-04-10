@@ -51,6 +51,9 @@ exceptions:
   - Context Menu Integration
   - Context Menus
   - CoreArtifactTarget
+  - CoreFileObject
+  - CoreFileObject management tasks
+  - Upload a contract PDF to a CoreFileObject node
   - CoreGroup
   - CoreRepository
   - Create an application in Entra ID

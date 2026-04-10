@@ -27,6 +27,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'references/plugins/infrahub_inventory',
         'references/plugins/artifact_tasks',
+        'references/plugins/file_object_tasks',
       ],
     }
   ]

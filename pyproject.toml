@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "infrahub-sdk>=1.17.0,<2",
+    "infrahub-sdk>=1.19.0,<2",
     "ruamel-yaml>=0.18.17,<0.20",
     "nornir>=3.5.0,<4",
     "nornir-utils>=0.2.0,<0.3",
@@ -71,6 +71,8 @@ markers = ["integration: marks tests as integration tests (requires Docker)"]
 unresolved-import = "ignore"
 # Infrahub SDK uses dynamic types that ty cannot fully understand without plugin support
 invalid-argument-type = "ignore"
+invalid-return-type = "ignore"
+invalid-assignment = "ignore"
 possibly-missing-attribute = "ignore"
 
 [tool.pylint.general]
@@ -160,6 +162,7 @@ known-third-party = ["nornir_infrahub"]
 [tool.ruff.lint.per-file-ignores]
 "tasks.py" = ["PLC0415"]  # Allow deferred imports in invoke tasks
 "tests/**" = ["PLC0415", "PLR2004"]  # Allow deferred imports and magic numbers in tests
+"nornir_infrahub/plugins/tasks/**" = ["PLR0913"]  # Nornir task functions require many parameters
 
 [build-system]
 requires = ["hatchling"]

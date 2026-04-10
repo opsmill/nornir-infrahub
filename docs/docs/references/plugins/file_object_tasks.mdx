@@ -1,0 +1,73 @@
+---
+title: CoreFileObject management tasks
+---
+
+
+## `upload_file_object`
+
+Uploads a local file to an Infrahub CoreFileObject node.
+
+Creates the node if it does not exist, or updates it if the file content
+has changed (SHA-1 checksum comparison).  When the local file is identical
+to the one stored on the server the upload is skipped (idempotent).
+
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `task` | `Task` | Yes |  | The Nornir task instance containing host-related data. |
+| `kind` | `str` | Yes |  | The schema kind that inherits from CoreFileObject. |
+| `file_path` | `str` | Yes |  | Local filesystem path to the file to upload. |
+| `data` | `dict` | No |  | Additional node attributes to set on create or update. |
+| `node_id` | `str` | No |  | UUID of an existing node to update. |
+| `hfid` | `list[str]` | No |  | HFID components identifying an existing node. |
+| `branch` | `str` | No | the client's default branch | Target Infrahub branch. Defaults to the client's default branch. |
+
+### Examples
+
+#### Upload a contract PDF to a CoreFileObject node
+
+```python
+from nornir_infrahub.plugins.tasks import upload_file_object
+
+result = nr.run(
+    task=upload_file_object,
+    kind="NetworkCircuitContract",
+    file_path="/path/to/contract.pdf",
+    data={"contract_start": "2026-01-01"},
+)
+```
+
+
+## `download_file_object`
+
+Downloads file content from an Infrahub CoreFileObject node.
+
+Returns the file content as base64-encoded binary data, with a UTF-8
+text representation for text MIME types.  Optionally saves the file
+to a local destination path.
+
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `task` | `Task` | Yes |  | The Nornir task instance containing host-related data. |
+| `kind` | `str` | Yes |  | The schema kind that inherits from CoreFileObject. |
+| `node_id` | `str` | No |  | UUID of the node to download from. |
+| `hfid` | `list[str]` | No |  | HFID components identifying the node. |
+| `dest` | `str` | No |  | Local path to save the downloaded file. Directories get the original file name appended. |
+| `branch` | `str` | No | the client's default branch | Target Infrahub branch. Defaults to the client's default branch. |
+
+### Examples
+
+#### Download a file from a CoreFileObject node
+
+```python
+from nornir_infrahub.plugins.tasks import download_file_object
+
+result = nr.run(
+    task=download_file_object,
+    kind="NetworkCircuitContract",
+    hfid=["contract-2026"],
+)
+```
