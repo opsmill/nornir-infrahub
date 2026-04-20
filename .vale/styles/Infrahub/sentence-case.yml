@@ -53,7 +53,7 @@ exceptions:
   - CoreArtifactTarget
   - CoreFileObject
   - CoreFileObject management tasks
-  - Upload a contract PDF to a CoreFileObject node
+  - Upload a contract PDF to a CoreFileObject object
   - CoreGroup
   - CoreRepository
   - Create an application in Entra ID

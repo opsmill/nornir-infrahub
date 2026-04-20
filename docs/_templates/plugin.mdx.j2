@@ -14,7 +14,7 @@ title: {{ module }}
 | Parameter | Type | Required | Default | Description |
 | --------- | ---- | -------- | ------- | ----------- |
 {%- for param in documentation.params %}
-| `{{ param.arg_name }}` | `{{ param.type_name }}` | {{ "No" if param.is_optional else "Yes" }} | {{ param.default if param.default else "" }} | {{ param.description }} |
+| `{{ param.arg_name }}` | `{{ param.type_name | replace('|', '\\|') }}` | {{ "No" if param.is_optional else "Yes" }} | {{ param.default if param.default else "" }} | {{ param.description | replace('\n', ' ') }} |
 {%- endfor %}
 {%- endif %}
 

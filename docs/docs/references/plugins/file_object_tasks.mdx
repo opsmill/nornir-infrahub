@@ -20,7 +20,7 @@ Provide either ``file_path`` (to upload a file from disk) or ``content`` with
 | --------- | ---- | -------- | ------- | ----------- |
 | `task` | `Task` | Yes |  | The Nornir task instance containing host-related data. |
 | `kind` | `str` | Yes |  | The schema kind that inherits from CoreFileObject. |
-| `file_path` | `str | Path` | No |  | Filesystem path to the file to upload. |
+| `file_path` | `str \| Path` | No |  | Filesystem path to the file to upload. |
 | `content` | `bytes` | No |  | Raw file content to upload. Requires ``file_name``. |
 | `file_name` | `str` | No |  | File name to associate with ``content``. Ignored when ``file_path`` is used. |
 | `data` | `dict` | No |  | Additional object attributes to set on create or update. |
@@ -65,8 +65,7 @@ server-side checksum, the download is skipped and ``changed`` is ``False``
 | `kind` | `str` | Yes |  | The schema kind that inherits from CoreFileObject. |
 | `object_id` | `str` | No |  | UUID of the object to download from. |
 | `hfid` | `list[str]` | No |  | HFID components identifying the object. |
-| `save_to` | `str | Path` | No |  | Local path where the downloaded file should be written.
-A directory receives the original file name; an explicit path is used as-is. |
+| `save_to` | `str \| Path` | No |  | Local path where the downloaded file should be written. A directory receives the original file name; an explicit path is used as-is. |
 | `branch` | `str` | No | the client's default branch | Target Infrahub branch. Defaults to the client's default branch. |
 
 ### Examples
