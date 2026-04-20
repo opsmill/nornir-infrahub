@@ -162,7 +162,10 @@ known-third-party = ["nornir_infrahub"]
 [tool.ruff.lint.per-file-ignores]
 "tasks.py" = ["PLC0415"]  # Allow deferred imports in invoke tasks
 "tests/**" = ["PLC0415", "PLR2004"]  # Allow deferred imports and magic numbers in tests
-"nornir_infrahub/plugins/tasks/**" = ["PLR0913"]  # Nornir task functions require many parameters
+"nornir_infrahub/plugins/tasks/**" = [
+    "PLR0912", # Nornir task functions naturally branch on optional args
+    "PLR0913", # Nornir task functions require many parameters
+]
 
 [build-system]
 requires = ["hatchling"]

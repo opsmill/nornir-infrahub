@@ -5,11 +5,14 @@ title: CoreFileObject management tasks
 
 ## `upload_file_object`
 
-Uploads a local file to an Infrahub CoreFileObject node.
+Uploads a file to an Infrahub CoreFileObject object.
 
-Creates the node if it does not exist, or updates it if the file content
-has changed (SHA-1 checksum comparison).  When the local file is identical
+Creates the object if it does not exist, or updates it if the file content
+has changed (SHA-1 checksum comparison).  When the local content is identical
 to the one stored on the server the upload is skipped (idempotent).
+
+Provide either ``file_path`` (to upload a file from disk) or ``content`` with
+``file_name`` (to upload raw bytes).
 
 ### Parameters
 
@@ -17,15 +20,18 @@ to the one stored on the server the upload is skipped (idempotent).
 | --------- | ---- | -------- | ------- | ----------- |
 | `task` | `Task` | Yes |  | The Nornir task instance containing host-related data. |
 | `kind` | `str` | Yes |  | The schema kind that inherits from CoreFileObject. |
-| `file_path` | `str` | Yes |  | Local filesystem path to the file to upload. |
-| `data` | `dict` | No |  | Additional node attributes to set on create or update. |
-| `node_id` | `str` | No |  | UUID of an existing node to update. |
-| `hfid` | `list[str]` | No |  | HFID components identifying an existing node. |
+| `file_path` | `str | Path` | No |  | Filesystem path to the file to upload. |
+| `content` | `bytes` | No |  | Raw file content to upload. Requires ``file_name``. |
+| `file_name` | `str` | No |  | File name to associate with ``content``. Ignored when ``file_path`` is used. |
+| `data` | `dict` | No |  | Additional object attributes to set on create or update. |
+| `object_id` | `str` | No |  | UUID of an existing object to update. |
+| `hfid` | `list[str]` | No |  | HFID components identifying an existing object. |
 | `branch` | `str` | No | the client's default branch | Target Infrahub branch. Defaults to the client's default branch. |
+| `**kwargs` | `None` | Yes |  | Extra keyword arguments forwarded to ``client.create`` (e.g. ``allow_upsert``, ``timeout``). |
 
 ### Examples
 
-#### Upload a contract PDF to a CoreFileObject node
+#### Upload a contract PDF to a CoreFileObject object
 
 ```python
 from nornir_infrahub.plugins.tasks import upload_file_object
@@ -41,11 +47,15 @@ result = nr.run(
 
 ## `download_file_object`
 
-Downloads file content from an Infrahub CoreFileObject node.
+Downloads file content from an Infrahub CoreFileObject object.
 
 Returns the file content as base64-encoded binary data, with a UTF-8
 text representation for text MIME types.  Optionally saves the file
-to a local destination path.
+to a local path.
+
+When ``save_to`` points to an existing file whose SHA-1 matches the
+server-side checksum, the download is skipped and ``changed`` is ``False``
+(idempotent, similar to ``nornir_utils.plugins.tasks.files.write_file``).
 
 ### Parameters
 
@@ -53,14 +63,15 @@ to a local destination path.
 | --------- | ---- | -------- | ------- | ----------- |
 | `task` | `Task` | Yes |  | The Nornir task instance containing host-related data. |
 | `kind` | `str` | Yes |  | The schema kind that inherits from CoreFileObject. |
-| `node_id` | `str` | No |  | UUID of the node to download from. |
-| `hfid` | `list[str]` | No |  | HFID components identifying the node. |
-| `dest` | `str` | No |  | Local path to save the downloaded file. Directories get the original file name appended. |
+| `object_id` | `str` | No |  | UUID of the object to download from. |
+| `hfid` | `list[str]` | No |  | HFID components identifying the object. |
+| `save_to` | `str | Path` | No |  | Local path where the downloaded file should be written.
+A directory receives the original file name; an explicit path is used as-is. |
 | `branch` | `str` | No | the client's default branch | Target Infrahub branch. Defaults to the client's default branch. |
 
 ### Examples
 
-#### Download a file from a CoreFileObject node
+#### Download a file from a CoreFileObject object
 
 ```python
 from nornir_infrahub.plugins.tasks import download_file_object
