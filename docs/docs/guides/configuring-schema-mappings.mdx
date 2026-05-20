@@ -254,7 +254,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 ```python
 # Add to your script
-print(nr.inventory.hosts["device1"].data["InfrahubNode"]._data)
+print(vars(nr.inventory.hosts["device1"].data["InfrahubNode"]))
 ```
 
 3. Verify relationship cardinality:

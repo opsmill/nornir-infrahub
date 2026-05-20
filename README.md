@@ -29,13 +29,13 @@ Documentation for using Nornir is available in the [Nornir-Infrahub documentatio
 ### Setup
 
 ```console
-poetry install
+uv sync
 ```
 
 ### Linting and Formatting
 
 ```console
-invoke lint          # Run all linters (yaml, ruff, pylint, mypy)
+invoke lint          # Run all linters (yaml, ruff, pylint, ty)
 invoke format        # Auto-format code with ruff
 ```
 

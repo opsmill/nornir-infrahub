@@ -395,6 +395,8 @@ cat configs/router1.cfg
 Target specific devices or groups:
 
 ```python
+from nornir.core.filter import F
+
 # Filter by platform
 junos_devices = nr.filter(platform="juniper_junos")
 results = junos_devices.run(task=retrieve_configuration)
@@ -429,6 +431,8 @@ Create a CI-friendly version:
 import sys
 import os
 
+from nornir.core.filter import F
+
 def ci_workflow():
     # Get parameters from environment
     target_branch = os.getenv("INFRAHUB_BRANCH", "main")
@@ -444,9 +448,9 @@ def ci_workflow():
         }
     )
 
-    # Filter if site specified
+    # Filter by site group if specified (site.name group_mapping creates groups like "site__chicago")
     if target_site:
-        nr = nr.filter(site_name=target_site)
+        nr = nr.filter(F(groups__contains=f"site__{target_site}"))
 
     # Run workflow without prompts
     results = nr.run(task=retrieve_configuration)
