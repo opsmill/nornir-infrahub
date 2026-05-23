@@ -1,33 +1,73 @@
 ---
-title: Nornir plugin
+title: Nornir Integration with Infrahub
 ---
 
-A [Nornir](https://github.com/nornir-automation/nornir) plugin for Infrahub. Infrahub can be used as an inventory source for Nornir.
+This integration bridges [Nornir's](https://github.com/nornir-automation/nornir) powerful automation framework with [Infrahub's](https://github.com/opsmill/infrahub) next-generation infrastructure data management platform.
 
-## Usage
+## Why use this integration?
 
-For an example of how to use this plugin, see the [Simplifying Network Automation Workflows with Infrahub, Nornir, and Jinja2](https://www.opsmill.com/simplifying-network-automation-workflows-with-infrahub-nornir-and-jinja2/) blog post.
+Traditional network automation tools struggle with:
 
-## Installation
+- **Static inventory management**: Manually maintained host files that become outdated
+- **Configuration drift**: No systematic way to track and validate infrastructure state
+- **Environment isolation**: Difficulty managing different configurations across dev/staging/production
+- **Audit trails**: Limited visibility into who changed what and when
+
+The Nornir-Infrahub integration solves these challenges by:
+
+- **Dynamic inventory**: Automatically sync device inventory from Infrahub's graph database
+- **Version control**: Leverage Infrahub's Git-like branching for configuration management
+- **Artifact management**: Generate, validate, and deploy configurations with full traceability
+- **Flexible grouping**: Create dynamic device groups based on any Infrahub attribute or relationship
+
+## Common use cases
+
+- **Multi-environment deployments**: Use Infrahub branches to manage configurations across development, staging, and production environments
+- **Compliance automation**: Generate compliance reports and configuration audits as artifacts
+- **Configuration validation**: Compare intended vs. actual device configurations
+- **Disaster recovery**: Maintain authoritative source of network configurations with full history
+
+## Quick start
+
+### Installation
 
 ```console
-pip install nornir_infrahub
+pip install nornir-infrahub
 ```
 
-## References
+### Next steps
 
-### Inventory
+- [Getting Started](./getting-started.mdx) - Set up your first Nornir-Infrahub integration
+- [Understanding the Integration](./topics/understanding-nornir-infrahub-integration.mdx) - Learn core concepts and architecture
+- [Your First Automation Workflow](./guides/your-first-automation-workflow.mdx) - Build a complete automation workflow
+
+## Documentation
+
+### Topics
+
+- [Understanding Nornir-Infrahub Integration](./topics/understanding-nornir-infrahub-integration.mdx)
+- [Infrahub Inventory Concepts](./topics/infrahub-inventory-concepts.mdx)
+- [Artifact Lifecycle Management](./topics/artifact-lifecycle-management.mdx)
+
+### Guides
+
+- [Your First Automation Workflow](./guides/your-first-automation-workflow.mdx)
+- [Configuring Schema Mappings](./guides/configuring-schema-mappings.mdx)
+
+### References
 
 #### Inventory plugin
 
 - [InfrahubInventory](./references/plugins/infrahub_inventory.mdx#infrahubinventory)
 
-### Tasks
-
-#### Artifact management plugin
+#### Artifact management tasks
 
 - [regenerate_host_artifact](./references/plugins/artifact_tasks.mdx#regenerate_host_artifact)
-
 - [generate_artifacts](./references/plugins/artifact_tasks.mdx#generate_artifacts)
-
 - [get_artifact](./references/plugins/artifact_tasks.mdx#get_artifact)
+
+## Additional resources
+
+- [Blog: Simplifying Network Automation Workflows with Infrahub, Nornir, and Jinja2](https://www.opsmill.com/simplifying-network-automation-workflows-with-infrahub-nornir-and-jinja2/)
+- [Infrahub Documentation](https://docs.infrahub.app/)
+- [Nornir Documentation](https://nornir.readthedocs.io/)

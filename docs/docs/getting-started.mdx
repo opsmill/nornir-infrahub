@@ -1,0 +1,287 @@
+---
+title: Getting Started
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+This guide helps you set up your first integration between Nornir and Infrahub. By the end, you'll have a working automation setup that demonstrates the power of dynamic inventory management.
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- Python 3.10 or higher installed
+- An Infrahub instance running (local or remote)
+    - You can use the [Infrahub sandbox instance](https://sandbox.infrahub.app) for testing
+- Basic familiarity with Nornir concepts
+- At least one device defined in your Infrahub schema
+
+## Installation
+
+Install the Nornir-Infrahub plugin:
+
+<Tabs>
+  <TabItem value="pip" label="pip" default>
+    ```bash
+    pip install nornir-infrahub nornir_netmiko
+    ```
+  </TabItem>
+  <TabItem value="uv" label="uv">
+    ```bash
+    uv add nornir-infrahub nornir_netmiko
+    ```
+  </TabItem>
+</Tabs>
+
+This automatically installs all required dependencies including:
+
+- `nornir` - The automation framework
+- `infrahub-sdk` - Python SDK for Infrahub API
+- `nornir-utils` - Helpful utilities for Nornir
+
+## Setting up your first integration
+
+### Step 1: Obtain your Infrahub API token
+
+:::note
+
+You can skip this step if you will be using the Infrahub Sandbox as the `config.yaml` file below already has the Infrahub Sandbox token!
+
+:::
+
+First, you'll need an API token to authenticate with Infrahub:
+
+1. Log into your Infrahub web interface
+2. Navigate to your user profile settings
+3. Generate or copy your API token
+4. Store it securely (we'll use it in the next step)
+
+### Step 2: Understand your Infrahub schema
+
+Before configuring Nornir, you need to understand your Infrahub schema structure. The sandbox instance at [sandbox.infrahub.app](https://sandbox.infrahub.app) uses a schema similar to this example:
+
+#### Example schema structure
+
+For the examples in this documentation to work, you'll need a schema with at least these node types:
+
+```yaml
+# Device node definition
+nodes:
+  - name: Device
+    namespace: Infra
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+      - name: description
+        kind: Text
+        optional: true
+      - name: type
+        kind: Text
+    relationships:
+      - name: site
+        peer: BuiltinLocation
+        cardinality: one
+      - name: role
+        peer: BuiltinRole
+        cardinality: one
+      - name: primary_address
+        peer: InfraIPAddress
+        cardinality: one
+        optional: true
+      - name: platform
+        peer: InfraPlatform
+        cardinality: one
+        optional: true
+
+  # Supporting nodes
+  - name: IPAddress
+    namespace: Infra
+    attributes:
+      - name: address
+        kind: IPHost
+
+  - name: Platform
+    namespace: Infra
+    attributes:
+      - name: name
+        kind: Text
+      - name: nornir_platform
+        kind: Text
+```
+
+#### Key schema requirements
+
+For Nornir integration, ensure your schema has:
+
+1. **Device node** (`InfraDevice` or similar) representing network devices
+2. **IP Address relationship** for device connectivity (`primary_address`)
+3. **Platform relationship** for device type identification
+4. **Location/Site relationship** for grouping devices by location
+5. **Role relationship** for grouping devices by function
+
+#### Checking your schema
+
+To verify your schema structure:
+
+1. Open your Infrahub web interface
+2. Navigate to the Schema section
+3. Look for device node types and their relationships
+4. Note the exact attribute names and relationship paths for mapping
+
+### Step 3: Create your Nornir configuration
+
+Create a file named `config.yaml` with your Nornir configuration:
+
+```yaml
+---
+inventory:
+  plugin: InfrahubInventory
+  options:
+    address: "https://sandbox.infrahub.app"   # Infrahub instance URL
+    token: "1808d43b-c370-48e8-d0ef-c51781c02ddf"           # Replace with your actual token
+    branch: "main"                         # Infrahub branch to use
+
+    # Define which Infrahub node type represents network devices
+    # Using the schema example above
+    host_node:
+      kind: "InfraDevice"                  # Matches the Device node with Infra namespace
+      include:
+        - "platform"
+
+    # Map Infrahub attributes to Nornir host properties
+    schema_mappings:
+      - name: "hostname"
+        mapping: "name"                    # Use device name as hostname
+      - name: "platform"
+        mapping: "platform.nornir_platform" # Platform attribute for Nornir compatibility
+
+    # Create Nornir groups based on Infrahub attributes
+    # Note: Disabled due to some devices missing site/role in sandbox
+    # group_mappings:
+    #   - "site.name"
+    #   - "role.name"
+
+runner:
+  plugin: threaded
+  options:
+    num_workers: 20
+```
+
+### Step 4: Test your connection
+
+Create a Python script called `test_connection.py` to verify your setup:
+
+```python
+from nornir import InitNornir
+from nornir_utils.plugins.functions import print_result
+
+
+def main():
+    # Initialize Nornir with your configuration
+    nr = InitNornir(config_file="config.yaml")
+
+    # Display discovered inventory
+    print("Discovered hosts:")
+    for host in nr.inventory.hosts.values():
+        print(f"  - {host.name} ({host.hostname})")
+
+    print("\nDiscovered groups:")
+    for group in nr.inventory.groups.values():
+        print(f"  - {group.name}")
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+Run the script:
+
+```bash
+python test_connection.py
+```
+
+You should see a list of hosts and groups discovered from your Infrahub instance.
+
+### Step 5: Run your first task
+
+Now let's run a task against your inventory:
+
+```python
+from nornir import InitNornir
+from nornir.core.task import Result, Task
+from nornir_utils.plugins.functions import print_result
+
+def hello_world(task: Task) -> Result:
+    """A task that returns a greeting."""
+    return Result(
+        host=task.host,
+        result=f"Hello from {task.host.name}!"
+    )
+
+def main():
+    # Initialize Nornir
+    nr = InitNornir(config_file="config.yaml")
+
+    # Run the hello_world task on all hosts
+    results = nr.run(task=hello_world)
+
+    # Display results
+    print_result(results)
+
+    return 0
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+## Verifying your setup
+
+To ensure everything is working correctly:
+
+1. **Check Host Discovery**: Verify that all expected hosts appear in your inventory
+2. **Validate Groups**: Confirm that dynamic groups are created based on your mappings
+3. **Test Connectivity**: Run a task to ensure Nornir can process your inventory
+
+## Common issues and solutions
+
+### Authentication errors
+
+If you see authentication errors:
+
+- Verify your API token is correct
+- Ensure your Infrahub instance is accessible at the specified address
+- Check that your token has appropriate permissions
+
+### Missing hosts
+
+If hosts aren't appearing:
+
+- Verify the `host_node.kind` matches your Infrahub schema
+- Check that devices exist in the specified branch
+- Ensure devices have the required attributes for your schema mappings
+
+### Mapping errors
+
+If you see errors about missing attributes:
+
+- Verify your schema mappings match your Infrahub data model
+- Use the Infrahub GraphQL explorer to check available attributes
+- Ensure related objects (like `primary_address`) are properly defined
+
+## Next steps
+
+Now that you have a working integration:
+
+- Explore [Your First Automation Workflow](./guides/your-first-automation-workflow.mdx) to build a complete automation
+- Learn about [Schema Mappings](./guides/configuring-schema-mappings.mdx) for advanced inventory configuration
+- Understand [Artifact Management](./topics/artifact-lifecycle-management.mdx) for configuration generation
+
+## Getting help
+
+- Check the [Infrahub Documentation](https://docs.infrahub.app/) for schema and API details
+- Review the [Nornir Documentation](https://nornir.readthedocs.io/) for automation concepts
+- Join the Infrahub community for support and best practices

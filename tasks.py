@@ -69,9 +69,44 @@ def lint_all(context: Context):
     lint_ty(context)
 
 
-@task(name="docs")
+@task(name="docs-install")
+def docs_install(context: Context) -> None:
+    """Install documentation dependencies."""
+    node_modules = DOCUMENTATION_DIRECTORY / "node_modules"
+
+    if not node_modules.exists():
+        print("Installing documentation dependencies...")
+        with context.cd(DOCUMENTATION_DIRECTORY):
+            context.run("npm install")
+    else:
+        print("Documentation dependencies already installed.")
+
+
+@task(name="docs-serve")
+def docs_serve(context: Context) -> None:
+    """Start documentation development server."""
+    node_modules = DOCUMENTATION_DIRECTORY / "node_modules"
+
+    if not node_modules.exists():
+        print("Dependencies not installed. Running npm install first...")
+        with context.cd(DOCUMENTATION_DIRECTORY):
+            context.run("npm install")
+
+    print("Starting documentation server at http://localhost:3000")
+    with context.cd(DOCUMENTATION_DIRECTORY):
+        context.run("npm run start")
+
+
+@task(name="docs-build")
 def docs_build(context: Context) -> None:
     """Build documentation website."""
+    node_modules = DOCUMENTATION_DIRECTORY / "node_modules"
+
+    if not node_modules.exists():
+        print("Dependencies not installed. Running npm install first...")
+        with context.cd(DOCUMENTATION_DIRECTORY):
+            context.run("npm install")
+
     exec_cmd = "npm run build"
 
     with context.cd(DOCUMENTATION_DIRECTORY):
@@ -186,10 +221,11 @@ def generate_docs(context: Context, debug: bool = False, plugin_type: str | None
 
                     print(traceback.format_exc())
 
-    # Generate landing page
-    readme_file = NORNIR_DOCUMENTATION_DIRECTORY / "readme.mdx"
-    readme_content = readme_template.render(
+    # Generate plugin reference summary (for maintaining readme.mdx plugin list)
+    plugin_ref_file = NORNIR_DOCUMENTATION_DIRECTORY / "references" / "plugins" / "_plugin_index.mdx"
+    plugin_ref_content = readme_template.render(
         plugins=processed_plugins,
     )
-    readme_file.write_text(readme_content)
-    print(f"✓ {readme_file.name}")
+    plugin_ref_file.write_text(plugin_ref_content)
+    print(f"✓ {plugin_ref_file.name} (plugin index for reference)")
+    print("\nNote: readme.mdx is manually maintained. Update plugin references there if needed.")

@@ -29,6 +29,7 @@ class_name
 CLI
 CLIs
 CloudFormation
+CMDBs
 codespace
 codespaces
 colocation
@@ -40,6 +41,7 @@ Composable
 config
 Config
 configs
+Configs
 containerlab
 Containerlab
 Containerlab's
@@ -56,6 +58,7 @@ Dagster
 datacenter
 dataloader
 datastore
+Deduplication
 Dcim
 debounce
 Debounce
@@ -193,6 +196,7 @@ misconfiguration
 modeline
 modularization
 namespace
+nornir_netmiko
 namespaces
 Nautobot
 Neo4j
@@ -202,6 +206,7 @@ NetPicker
 Netutils
 Newsfragment
 Nornir
+Nornir's
 npm
 NumberPool
 o'brian
@@ -308,6 +313,7 @@ upserting
 Upserting
 userinfo
 uuid
+uv
 UUID
 UUIDs
 uv

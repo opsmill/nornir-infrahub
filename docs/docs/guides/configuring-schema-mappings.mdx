@@ -1,0 +1,282 @@
+---
+title: How to Configure Schema Mappings
+---
+
+This guide shows you how to configure schema mappings to control how Infrahub data translates into Nornir inventory properties. Schema mappings are the bridge between your Infrahub data model and Nornir's expected host attributes.
+
+## What you'll accomplish
+
+By following this guide, you'll be able to:
+
+- Map Infrahub node attributes to Nornir host properties
+- Handle nested relationships and complex data structures
+- Create custom mappings for specialized use cases
+- Debug and troubleshoot mapping issues
+
+## Prerequisites
+
+- Working Nornir-Infrahub installation
+- Infrahub instance with network devices configured
+    - You can use the [Infrahub sandbox instance](https://sandbox.infrahub.app) to follow along
+- Understanding of your Infrahub schema (see example schema in [Getting Started](../getting-started.mdx#example-schema-structure))
+- Access to Infrahub GraphQL explorer (for testing queries)
+    - Sandbox GraphQL explorer: [sandbox.infrahub.app/graphql](https://sandbox.infrahub.app/graphql)
+
+## Understanding schema mappings
+
+Schema mappings define how to extract values from Infrahub nodes and assign them to Nornir host properties. Each mapping consists of:
+
+- `name`: The Nornir property to set (i.e., "hostname", "platform")
+- `mapping`: The path to the value in the Infrahub node (i.e., "primary_address.address")
+
+## Step 1: Identify required Nornir properties
+
+First, determine which Nornir properties your automation tasks need:
+
+| Property | Purpose | Common Mapping Source |
+| -------- | ------- | --------------------- |
+| `hostname` | IP/FQDN for connections | Device primary address |
+| `platform` | Device OS type | Platform or OS attribute |
+| `username` | Authentication user | Credential or static value |
+| `password` | Authentication password | Credential or static value |
+| `port` | Connection port | Interface or static value |
+| `data` | Custom data | Any Infrahub attributes |
+
+## Step 2: Explore your Infrahub schema
+
+Use the Infrahub GraphQL explorer to understand available attributes. For the [Infrahub sandbox](https://sandbox.infrahub.app/graphql), you can query:
+
+```graphql
+query {
+  InfraDevice {
+    edges {
+      node {
+        name {
+          value
+        }
+        primary_address {
+          node {
+            address {
+              value
+            }
+          }
+        }
+        platform {
+          node {
+            name {
+              value
+            }
+            nornir_platform {
+              value
+            }
+          }
+        }
+        site {
+          node {
+            name {
+              value
+            }
+          }
+        }
+        role {
+          value
+        }
+      }
+    }
+  }
+}
+```
+
+:::note
+The query structure depends on your schema. In the sandbox, `role` is a Dropdown attribute (use `value`), while `site` and `platform` are relationships (use `node`). Adapt your queries to match your schema structure.
+:::
+
+This helps you identify the exact paths to your data based on your schema structure.
+
+## Step 3: Configure basic mappings
+
+### Basic attribute mapping
+
+For direct attributes on the node:
+
+```yaml
+schema_mappings:
+  - name: "hostname"
+    mapping: "name"  # Maps device name to hostname
+```
+
+### Nested relationship mapping
+
+For attributes through relationships (based on the example schema):
+
+```yaml
+schema_mappings:
+  - name: "hostname"
+    mapping: "primary_address.address"  # Traverses to InfraIPAddress node
+  - name: "platform"
+    mapping: "platform.nornir_platform" # Traverses to InfraPlatform node
+```
+
+:::important
+
+Every relationship traversed in `schema_mappings` or `group_mappings` must be listed in `host_node.include`. Without this, the related node's attributes are not fetched and mappings will fail.
+
+```yaml
+host_node:
+  kind: "InfraDevice"
+  include:
+    - "primary_address"   # required for primary_address.address
+    - "platform"          # required for platform.nornir_platform
+```
+
+:::
+
+### Multiple level nesting
+
+The plugin supports traversing one relationship level before reaching an attribute. For example, `site.name` follows the `site` relationship then reads its `name` attribute. Deeper chains (e.g., `site.location.name`) are not supported.
+
+## Step 4: Handle complex mappings
+
+### IP address handling
+
+Infrahub stores IP addresses as interface objects. The integration automatically extracts the IP:
+
+```yaml
+schema_mappings:
+  - name: "hostname"
+    mapping: "primary_address.address"  # Automatically converts IPHost to string
+```
+
+### Infrahub Node Object
+
+Along with schema mappings that allow mapping Infrahub inventory data to Nornir host attributes, we also include the Infrahub object that can be used in tasks, etc.
+
+```python
+def example_task(task):
+    # Access the Infrahub node data
+    infrahub_node = task.host.data["InfrahubNode"]
+
+    # Access node attributes directly
+    if hasattr(infrahub_node, 'serial_number'):
+        serial = infrahub_node.serial_number.value
+        print(f"Device {task.host.name} serial: {serial}")
+```
+
+## Step 5: Configure group mappings
+
+Group mappings create dynamic Nornir groups from Infrahub node attributes or relationships:
+
+```yaml
+host_node:
+  kind: "InfraDevice"
+  include:
+    - "site"       # required for site.name group mapping
+    - "platform"   # required for platform.name group mapping
+
+group_mappings:
+  - "site.name"        # Creates groups like "site__chicago"
+  - "platform.name"    # Creates groups like "platform__eos"
+```
+
+Groups are automatically prefixed with the first part of the mapping path to avoid conflicts.
+
+Additionally, the plugin will auto add groups based on each node's groups it is assigned to within Infrahub.
+
+## Step 6: Test your mappings
+
+Create a test script to verify mappings:
+
+```python
+from nornir import InitNornir
+
+def test_mappings():
+    nr = InitNornir(config_file="config.yaml")
+
+    # Check hosts
+    print("Sample hosts:")
+    for host in list(nr.inventory.hosts.values())[:3]:  # First 3 hosts
+        print(f"\n  {host.name}:")
+        print(f"    Hostname: {host.hostname}")
+        print(f"    Platform: {host.platform}")
+        print(f"    Groups: {[g.name for g in host.groups]}")
+
+    # List all groups
+    print("\nAll groups:")
+    for group in nr.inventory.groups:
+        print(f"  - {group}")
+
+if __name__ == "__main__":
+    test_mappings()
+```
+
+## Validation
+
+### Check mapping success
+
+After configuration, verify:
+
+1. All hosts have required properties set
+2. Groups are created as expected
+3. No mapping errors in logs
+
+### Validation Example
+
+```python
+# Check all hosts have hostname
+for host in nr.inventory.hosts.values():
+    assert host.hostname is not None, f"{host.name} missing hostname"
+
+# Verify platform mappings
+platforms = {h.platform for h in nr.inventory.hosts.values()}
+print(f"Discovered platforms: {platforms}")
+
+# Check group membership
+for group in nr.inventory.groups.values():
+    print(f"{group.name}: {len(group.hosts)} hosts")
+```
+
+## Advanced usage
+
+### Using mapping results in tasks
+
+Access mapped data in your tasks:
+
+```python
+def device_info(task):
+    # Access standard properties
+    print(f"Connecting to {task.host.hostname}")
+    print(f"Platform: {task.host.platform}")
+
+    # Access Infrahub node
+    node = task.host.data["InfrahubNode"]
+    print(f"Infrahub ID: {node.id}")
+```
+
+### Troubleshooting mapping failures
+
+If mappings fail silently:
+
+1. Enable debug logging:
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+```
+
+2. Check the Infrahub GraphQL query result for the specific node:
+
+```python
+# Add to your script
+print(vars(nr.inventory.hosts["device1"].data["InfrahubNode"]))
+```
+
+3. Verify relationship cardinality:
+
+- Single relationships: `mapping: "platform.name"`
+- Many relationships not supported directly
+
+## Related resources
+
+- [Understanding Nornir-Infrahub Integration](../topics/understanding-nornir-infrahub-integration.mdx)
+- [Infrahub Inventory Concepts](../topics/infrahub-inventory-concepts.mdx)
+- [Your First Automation Workflow](./your-first-automation-workflow.mdx)

@@ -1,0 +1,160 @@
+---
+title: Understanding Artifact Lifecycle Management
+---
+
+This topic explores how Infrahub's artifact system works with Nornir to enable sophisticated configuration management workflows. Understanding artifact lifecycle management is crucial for implementing robust, auditable network automation.
+
+## Introduction
+
+Artifacts in Infrahub are generated outputs based on your infrastructure data and templates. They represent the "rendered truth" of your infrastructure at any point in time. This document explains:
+
+- What artifacts are and why they matter
+- How artifacts flow through generation, storage, and deployment
+- The relationship between artifacts, templates, and infrastructure data
+- How version control applies to generated configurations
+
+## What are artifacts?
+
+### Definition
+
+An artifact is any generated content that represents infrastructure state:
+
+- Device configurations
+- Compliance reports
+- Documentation
+- API payloads
+- Validation results
+
+### Key characteristics
+
+Artifacts are:
+
+- **Generated**: Created from templates + data, not manually written
+- **Versioned**: Each generation creates a new version
+- **Immutable**: Once generated, artifacts don't change
+- **Traceable**: Linked to the exact data and templates used
+
+### References
+
+For detailed information about artifacts in Infrahub:
+
+- [Artifact Topic](https://docs.infrahub.app/topics/artifact) - How artifacts work in Infrahub
+- [Transformation Topic](https://docs.infrahub.app/topics/transformation) - How transformations generate artifacts
+- [Repository Configuration Reference](https://docs.infrahub.app/reference/dotinfrahub) - `.infrahub.yml` artifact definition syntax
+
+## Artifact management with Nornir
+
+### Task plugin functions
+
+The Nornir-Infrahub plugin provides three key functions:
+
+#### [generate_artifacts()](../references/plugins/artifact_tasks.mdx#generate_artifacts)
+
+Triggers generation for all targets in a definition:
+
+```python
+# Generate configs for all edge devices
+nr.run(task=generate_artifacts, artifact="Startup Config for Edge devices")
+```
+
+This is typically used:
+
+- After template updates
+- On scheduled intervals
+- Before deployment windows
+
+#### [regenerate_host_artifact()](../references/plugins/artifact_tasks.mdx#regenerate_host_artifact)
+
+Regenerates artifact for specific hosts:
+
+```python
+# Regenerate after device-specific change
+changed_devices = nr.filter(name="atl1-edge1")
+changed_devices.run(task=regenerate_host_artifact, artifact="Startup Config for Edge devices")
+```
+
+Use cases:
+
+- After individual device updates
+- Testing template changes
+- Troubleshooting specific devices
+
+#### [get_artifact()](../references/plugins/artifact_tasks.mdx#get_artifact)
+
+Retrieves stored artifact content:
+
+```python
+# Get current config for deployment
+result = nr.run(task=get_artifact, artifact="Startup Config for Edge devices")
+for host, task_result in result.items():
+    config = task_result.result
+    # Deploy config to device
+```
+
+Use cases:
+
+- Deploying configurations to devices
+- Comparing current vs desired state
+- Feeding into validation pipelines
+
+## Version control integration
+
+### Branch-aware artifacts
+
+Artifacts are generated per branch:
+
+```text
+main branch:
+  atl1-edge1 startup-config v3 (current)
+  atl1-edge1 startup-config v2
+  atl1-edge1 startup-config v1
+
+feature branch:
+  atl1-edge1 startup-config v2 (testing changes)
+  atl1-edge1 startup-config v1
+```
+
+This enables:
+
+- Safe testing in feature branches
+- Comparison between branches
+- Controlled promotion to production
+
+## Practical workflows
+
+### Configuration deployment
+
+1. **Generate**: Create new configs from current data
+2. **Validate**: Check configs before deployment
+3. **Deploy**: Push to devices
+4. **Verify**: Confirm successful application
+
+### Compliance auditing
+
+1. **Define**: Create compliance report template
+2. **Generate**: Run against all devices
+3. **Review**: Identify non-compliant devices
+4. **Remediate**: Fix issues and regenerate
+
+### Disaster recovery
+
+1. **Regular Generation**: Keep artifacts current
+2. **Backup Storage**: Replicate artifact store
+3. **Rapid Recovery**: Deploy last-known-good configs
+
+## Advanced concepts
+
+### Conditional generation
+
+Generate only when needed:
+
+```python
+# Check if regeneration needed
+if device.last_modified > artifact.generated_at:
+    nr.run(task=regenerate_host_artifact, artifact="Startup Config for Edge devices")
+```
+
+## Further reading
+
+- [Your First Automation Workflow](../guides/your-first-automation-workflow.mdx) - Implement artifact workflows with Nornir
+- [Artifact Management Plugin Reference](../references/plugins/artifact_tasks.mdx) - Full API documentation for artifact tasks

@@ -14,6 +14,42 @@
 
 A [Nornir](https://github.com/nornir-automation/nornir) plugin for Infrahub. Infrahub can be used as an inventory source for Nornir.
 
-## Using the Nornir plugin
+## Installation
 
-Documentation for using Nornir is available [here](https://docs.infrahub.app/nornir/)
+```console
+pip install nornir-infrahub
+```
+
+## Documentation
+
+Documentation for using Nornir is available in the [Nornir-Infrahub documentation](https://docs.infrahub.app/nornir/).
+
+## Development
+
+### Setup
+
+```console
+uv sync
+```
+
+### Linting and Formatting
+
+```console
+invoke lint          # Run all linters (yaml, ruff, pylint, ty)
+invoke format        # Auto-format code with ruff
+```
+
+### Documentation
+
+```console
+invoke docs-install  # Install npm dependencies for docs
+invoke docs-serve    # Start dev server at http://localhost:3000
+invoke docs-build    # Build production documentation
+invoke generate-docs # Generate plugin reference docs from docstrings
+```
+
+### Testing
+
+```console
+pytest               # Run all tests
+```

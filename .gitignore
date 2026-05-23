@@ -18,3 +18,7 @@ development/docker-compose.override.yml
 .dir-locals.el
 
 dist/*
+
+# Local test/dev scripts
+test_validate.py
+nornir.log

@@ -34,6 +34,8 @@ exceptions:
   - CA certificates
   - CI
   - CI/CD
+  - CMDB
+  - CMDBs
   - Circular Dependencies
   - CLI
   - Codespaces
@@ -67,6 +69,9 @@ exceptions:
   - Document Symbol Provider
   - Document Symbols
   - E2E
+  - generate_artifacts()
+  - Generics
+  - get_artifact()
   - Emma
   - Environment Variable Substitution
   - Environment Variables
@@ -85,7 +90,6 @@ exceptions:
   - Further Information
   - Further Reading
   - Gallery Banner
-  - Generics
   - Getting Help
   - Git
   - GitHub
@@ -102,8 +106,9 @@ exceptions:
   - How-to Guides
   - How-to guides
   - Human Friendly Identifier
-  - IDE
+  - IaC
   - include_in_menu & menu_placement
+  - IDE
   - Incremental Validation
   - Infrahub
   - Infrahub Enterprise
@@ -158,6 +163,7 @@ exceptions:
   - Next steps
   - NGINX
   - Node
+  - Nornir
   - Node.js Runtime
   - NumberPool
   - OAuth 2.0
@@ -186,6 +192,7 @@ exceptions:
   - Quick Start
   - Quick start
   - RabbitMQ
+  - regenerate_host_artifact()
   - Real-Time Validation
   - Real-time Status
   - Real-time status
