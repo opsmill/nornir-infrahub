@@ -169,13 +169,6 @@ def retrieve_configuration(task: Task) -> Result:
             artifact="Startup Config for Edge devices",
         )
 
-        if result.failed:
-            return Result(
-                host=task.host,
-                failed=True,
-                result=f"Failed to retrieve artifact: {result.result}",
-            )
-
         # Check if we got actual content
         if not result.result or result.result.strip() == "":
             return Result(
@@ -228,17 +221,10 @@ def regenerate_configuration(task: Task) -> Result:
     """
     try:
         # Regenerate the artifact in Infrahub
-        result = regenerate_host_artifact(
+        regenerate_host_artifact(
             task,
             artifact="Startup Config for Edge devices",
         )
-
-        if result.failed:
-            return Result(
-                host=task.host,
-                failed=True,
-                result=f"Failed to regenerate artifact: {result.result}",
-            )
 
         return Result(
             host=task.host, result="Configuration regenerated successfully in Infrahub"

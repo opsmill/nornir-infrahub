@@ -117,15 +117,23 @@ schema_mappings:
     mapping: "platform.nornir_platform" # Traverses to InfraPlatform node
 ```
 
-### Multiple level nesting
+:::important
 
-For deeply nested data:
+Every relationship traversed in `schema_mappings` or `group_mappings` must be listed in `host_node.include`. Without this, the related node's attributes are not fetched and mappings will fail.
 
 ```yaml
-schema_mappings:
-  - name: "location"
-    mapping: "site.location.name"  # Multiple relationships
+host_node:
+  kind: "InfraDevice"
+  include:
+    - "primary_address"   # required for primary_address.address
+    - "platform"          # required for platform.nornir_platform
 ```
+
+:::
+
+### Multiple level nesting
+
+The plugin supports traversing one relationship level before reaching an attribute. For example, `site.name` follows the `site` relationship then reads its `name` attribute. Deeper chains (e.g., `site.location.name`) are not supported.
 
 ## Step 4: Handle complex mappings
 
@@ -156,16 +164,21 @@ def example_task(task):
 
 ## Step 5: Configure group mappings
 
-Group mappings create dynamic Nornir groups from Infrahub relationships:
+Group mappings create dynamic Nornir groups from Infrahub node attributes or relationships:
 
 ```yaml
+host_node:
+  kind: "InfraDevice"
+  include:
+    - "site"       # required for site.name group mapping
+    - "platform"   # required for platform.name group mapping
+
 group_mappings:
   - "site.name"        # Creates groups like "site__chicago"
-  - "role.name"        # Creates groups like "role__spine"
   - "platform.name"    # Creates groups like "platform__eos"
 ```
 
-Groups are automatically prefixed with the relationship name to avoid conflicts.
+Groups are automatically prefixed with the first part of the mapping path to avoid conflicts.
 
 Additionally, the plugin will auto add groups based on each node's groups it is assigned to within Infrahub.
 
