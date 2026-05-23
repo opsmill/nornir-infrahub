@@ -92,16 +92,12 @@ class TestGroupMappings(NornirInfrahubIntegration):
         ).load()
 
         chicago_members = {
-            name
-            for name, host in inventory.hosts.items()
-            if any(g.name == "site__chicago" for g in host.groups)
+            name for name, host in inventory.hosts.items() if any(g.name == "site__chicago" for g in host.groups)
         }
         assert chicago_members == {"router-1", "router-2"}
 
         nyc_members = {
-            name
-            for name, host in inventory.hosts.items()
-            if any(g.name == "site__nyc" for g in host.groups)
+            name for name, host in inventory.hosts.items() if any(g.name == "site__nyc" for g in host.groups)
         }
         assert nyc_members == {"switch-1"}
 
