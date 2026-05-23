@@ -45,6 +45,7 @@ dev = [
     "vale>=3.13.0.0,<4",
     "rich>=12,<15",  # Required by infrahub-sdk pytest plugin
     "pyyaml>=6,<7",  # Required by infrahub-sdk pytest plugin
+    "infrahub-testcontainers>=1.9.3",
 ]
 
 [tool.uv]
@@ -61,6 +62,7 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 filterwarnings = ["ignore:pkg_resources is deprecated"]
 addopts = "-vs"
+markers = ["integration: marks tests as integration tests (requires Docker)"]
 
 [tool.ty.rules]
 unresolved-import = "ignore"
