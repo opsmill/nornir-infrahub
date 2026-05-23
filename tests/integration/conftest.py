@@ -59,7 +59,8 @@ class NornirInfrahubIntegration(TestInfrahubDocker):
     @pytest.fixture(scope="class", autouse=True)
     def bootstrap(self, infrahub_address: str) -> None:
         client = InfrahubClientSync(
-            config=Config(address=infrahub_address, api_token=TEST_TOKEN)
+            config=Config(api_token=TEST_TOKEN),
+            address=infrahub_address,
         )
 
         # Load schema
