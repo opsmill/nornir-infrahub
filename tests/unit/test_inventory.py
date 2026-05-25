@@ -361,6 +361,58 @@ def test_infrahub_inventory_client_config_branch_integration(branch, expected, d
         assert call_args[1]["address"] == "http://localhost:8000", f"Failed for {description}"
 
 
+def test_infrahub_inventory_auto_includes_mapped_relationships():
+    """Mapped relationships in schema_mappings/group_mappings are auto-added to host_node.include."""
+    from unittest.mock import Mock, patch
+
+    with patch("nornir_infrahub.plugins.inventory.infrahub.InfrahubClientSync") as mock_client_class:
+        mock_client = Mock()
+        site_rel = Mock()
+        site_rel.name = "site"
+        site_rel.peer = "InfraSite"
+        platform_rel = Mock()
+        platform_rel.name = "platform"
+        platform_rel.peer = "InfraPlatform"
+        mock_schema = Mock()
+        mock_schema.relationships = [site_rel, platform_rel]
+        mock_schema.relationship_names = ["site", "platform"]
+        mock_client.schema.get.return_value = mock_schema
+        mock_client_class.return_value = mock_client
+
+        inventory = InfrahubInventory(
+            host_node={"kind": "InfraDevice"},
+            schema_mappings=[{"name": "platform", "mapping": "platform.nornir_platform"}],
+            group_mappings=["site.name"],
+        )
+
+        assert "site" in inventory.host_node.include
+        assert "platform" in inventory.host_node.include
+        assert "member_of_groups" in inventory.host_node.include
+
+
+def test_infrahub_inventory_no_duplicate_include():
+    """Auto-include does not duplicate relationships the user already provided."""
+    from unittest.mock import Mock, patch
+
+    with patch("nornir_infrahub.plugins.inventory.infrahub.InfrahubClientSync") as mock_client_class:
+        mock_client = Mock()
+        site_rel = Mock()
+        site_rel.name = "site"
+        site_rel.peer = "InfraSite"
+        mock_schema = Mock()
+        mock_schema.relationships = [site_rel]
+        mock_schema.relationship_names = ["site"]
+        mock_client.schema.get.return_value = mock_schema
+        mock_client_class.return_value = mock_client
+
+        inventory = InfrahubInventory(
+            host_node={"kind": "InfraDevice", "include": ["site"]},
+            group_mappings=["site.name"],
+        )
+
+        assert inventory.host_node.include.count("site") == 1
+
+
 def test_infrahub_inventory_branch_used_in_get_resources():
     """Test that the branch parameter is properly used in get_resources method."""
     from unittest.mock import Mock, patch

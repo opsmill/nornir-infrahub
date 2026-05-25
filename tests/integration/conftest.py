@@ -2,9 +2,9 @@
 
 import pytest
 from infrahub_sdk import Config, InfrahubClientSync
-from infrahub_testcontainers.helpers import TestInfrahubDocker
+from infrahub_testcontainers.helpers import PROJECT_ENV_VARIABLES, TestInfrahubDocker
 
-TEST_TOKEN = "06438eb2-8019-4776-878c-0941b1f1d1ec"
+TEST_TOKEN = PROJECT_ENV_VARIABLES["INFRAHUB_TESTING_INITIAL_ADMIN_TOKEN"]
 
 SCHEMA = {
     "version": "1.0",
