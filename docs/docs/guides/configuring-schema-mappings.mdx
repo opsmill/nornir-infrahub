@@ -117,9 +117,17 @@ schema_mappings:
     mapping: "platform.nornir_platform" # Traverses to InfraPlatform node
 ```
 
-:::note
+:::important
 
-Relationships traversed in `schema_mappings` or `group_mappings` are automatically added to `host_node.include`, so you don't need to list them manually. You can still specify `include` explicitly to limit which related fields are fetched (see [Include optimization](../topics/infrahub-inventory-concepts.mdx#include-optimization)).
+Every relationship traversed in `schema_mappings` or `group_mappings` must be listed in `host_node.include`. Without this, the related node's attributes are not fetched and mappings will fail.
+
+```yaml
+host_node:
+  kind: "InfraDevice"
+  include:
+    - "primary_address"   # required for primary_address.address
+    - "platform"          # required for platform.nornir_platform
+```
 
 :::
 
@@ -161,6 +169,9 @@ Group mappings create dynamic Nornir groups from Infrahub node attributes or rel
 ```yaml
 host_node:
   kind: "InfraDevice"
+  include:
+    - "site"       # required for site.name group mapping
+    - "platform"   # required for platform.name group mapping
 
 group_mappings:
   - "site.name"        # Creates groups like "site__chicago"

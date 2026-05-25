@@ -223,10 +223,6 @@ class InfrahubInventory:
         )
         self.extra_nodes = get_related_nodes(host_node_schema, attrs)
 
-        for attr in attrs:
-            if attr in host_node_schema.relationship_names and attr not in self.host_node.include:
-                self.host_node.include.append(attr)
-
     def load(self) -> Inventory:  # noqa: PLR0912
         yml = ruamel.yaml.YAML(typ="safe")
 
