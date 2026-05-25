@@ -94,7 +94,7 @@ InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventor
 - Excluded from the default `pytest` run via `addopts = "-m 'not integration' ..."` in `pyproject.toml`
 - Each test class inherits `NornirInfrahubIntegration` (in `tests/integration/conftest.py`), which spins up a fresh Infrahub container per class via `infrahub-testcontainers` and bootstraps schema + test data
 - The admin token comes from `infrahub_testcontainers.helpers.PROJECT_ENV_VARIABLES["INFRAHUB_TESTING_INITIAL_ADMIN_TOKEN"]` — do not hardcode
-- On macOS/Python 3.13, the `pytest-infrahub-performance-test` plugin crashes via `psutil.cpu_freq()`; it is disabled in `addopts` with `-p no:pytest-infrahub-performance-test`
+- The `pytest-infrahub-performance-test` plugin (shipped with `infrahub-testcontainers`) initializes a host-stats collector that calls `psutil.cpu_freq()`. On Apple Silicon Macs this raises `RuntimeError: invalid CPU frequency data` (known psutil bug on arm64). It is disabled in `addopts` with `-p no:pytest-infrahub-performance-test`
 
 ## Documentation Guidelines
 
