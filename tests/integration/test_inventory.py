@@ -33,7 +33,7 @@ class TestInventoryBasic(NornirInfrahubIntegration):
 class TestSchemaMappings(NornirInfrahubIntegration):
     def test_ip_address_mapping(self, infrahub_address: str) -> None:
         inventory = InfrahubInventory(
-            host_node={"kind": "InfraDevice"},
+            host_node={"kind": "InfraDevice", "include": ["primary_address"]},
             address=infrahub_address,
             token=TEST_TOKEN,
             schema_mappings=[{"name": "hostname", "mapping": "primary_address.address"}],
@@ -45,7 +45,7 @@ class TestSchemaMappings(NornirInfrahubIntegration):
 
     def test_platform_mapping(self, infrahub_address: str) -> None:
         inventory = InfrahubInventory(
-            host_node={"kind": "InfraDevice"},
+            host_node={"kind": "InfraDevice", "include": ["platform"]},
             address=infrahub_address,
             token=TEST_TOKEN,
             schema_mappings=[{"name": "platform", "mapping": "platform.nornir_platform"}],
@@ -57,7 +57,7 @@ class TestSchemaMappings(NornirInfrahubIntegration):
 
     def test_multiple_mappings(self, infrahub_address: str) -> None:
         inventory = InfrahubInventory(
-            host_node={"kind": "InfraDevice"},
+            host_node={"kind": "InfraDevice", "include": ["primary_address", "platform"]},
             address=infrahub_address,
             token=TEST_TOKEN,
             schema_mappings=[
@@ -74,7 +74,7 @@ class TestSchemaMappings(NornirInfrahubIntegration):
 class TestGroupMappings(NornirInfrahubIntegration):
     def test_site_groups_created(self, infrahub_address: str) -> None:
         inventory = InfrahubInventory(
-            host_node={"kind": "InfraDevice"},
+            host_node={"kind": "InfraDevice", "include": ["site"]},
             address=infrahub_address,
             token=TEST_TOKEN,
             group_mappings=["site.name"],
@@ -85,7 +85,7 @@ class TestGroupMappings(NornirInfrahubIntegration):
 
     def test_hosts_in_correct_site_groups(self, infrahub_address: str) -> None:
         inventory = InfrahubInventory(
-            host_node={"kind": "InfraDevice"},
+            host_node={"kind": "InfraDevice", "include": ["site"]},
             address=infrahub_address,
             token=TEST_TOKEN,
             group_mappings=["site.name"],
