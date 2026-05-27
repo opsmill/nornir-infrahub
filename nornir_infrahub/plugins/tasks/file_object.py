@@ -44,8 +44,9 @@ def _resolve_upload_source(
     file_path: str | Path | None,
     content: bytes | None,
     file_name: str | None,
-) -> tuple[bytes, str, Path | None]:
-    # Returns (payload_bytes, upload_name, path_or_none); raises ValueError on bad args.
+) -> tuple[bytes | Path, str]:
+    # Returns (source, upload_name); raises ValueError on bad args.
+    # source is a Path (streamed by the SDK) or raw bytes.
     if (file_path is None) == (content is None):
         raise ValueError("Exactly one of 'file_path' or 'content' must be provided")
 
@@ -53,18 +54,11 @@ def _resolve_upload_source(
         path = Path(file_path)
         if not path.exists():
             raise ValueError(f"file_path '{file_path}' does not exist")
-        return path.read_bytes(), path.name, path
+        return path, path.name
 
     if not file_name:
         raise ValueError("'file_name' is required when using 'content'")
-    return content, file_name, None  # type: ignore[return-value]
-
-
-def _attach_content(obj: Any, path: Path | None, payload: bytes, name: str) -> None:
-    if path is not None:
-        obj.upload_from_path(path)
-    else:
-        obj.upload_from_bytes(content=payload, name=name)
+    return content, file_name  # type: ignore[return-value]
 
 
 def _lookup_existing_object(
@@ -142,7 +136,7 @@ def upload_file_object(
         ```
     """
     try:
-        payload, upload_name, path = _resolve_upload_source(file_path, content, file_name)
+        source, upload_name = _resolve_upload_source(file_path, content, file_name)
     except ValueError as exc:
         return Result(host=task.host, failed=True, result=str(exc))
 
@@ -157,7 +151,16 @@ def upload_file_object(
     existing_obj = _lookup_existing_object(client, kind, object_id, hfid, upload_name, branch)
 
     if existing_obj:
-        if _sha1(payload) == existing_obj.checksum.value:
+        for attr_name, attr_value in data.items():
+            if attr_name in existing_obj._schema.attribute_names:
+                setattr(existing_obj, attr_name, attr_value)
+
+        try:
+            upload_result = existing_obj.upload_if_changed(source, upload_name)
+        except Exception as exc:  # noqa: BLE001
+            return Result(host=task.host, failed=True, result=str(exc))
+
+        if not upload_result.was_uploaded:
             return Result(
                 host=task.host,
                 failed=False,
@@ -165,13 +168,6 @@ def upload_file_object(
                 object_id=str(existing_obj.id),
                 result=f"{kind} '{upload_name}' already up to date (checksum match)",
             )
-
-        for attr_name, attr_value in data.items():
-            if attr_name in existing_obj._schema.attribute_names:
-                setattr(existing_obj, attr_name, attr_value)
-
-        _attach_content(existing_obj, path, payload, upload_name)
-        existing_obj.save()
 
         return Result(
             host=task.host,
@@ -183,8 +179,7 @@ def upload_file_object(
 
     try:
         new_obj = client.create(kind=kind, branch=branch, data=data, **kwargs)
-        _attach_content(new_obj, path, payload, upload_name)
-        new_obj.save()
+        new_obj.upload_if_changed(source, upload_name)
     except Exception as exc:  # noqa: BLE001
         return Result(host=task.host, failed=True, result=str(exc))
 

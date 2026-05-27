@@ -75,8 +75,7 @@ class TestUploadCreateNew:
         assert result.changed is True
         assert "created" in result.result
         client.create.assert_called_once()
-        new_obj.upload_from_path.assert_called_once_with(test_file)
-        new_obj.save.assert_called_once()
+        new_obj.upload_if_changed.assert_called_once_with(test_file, "contract.pdf")
 
     def test_upload_accepts_path_object(self, tmp_path: Path):
         test_file = tmp_path / "contract.pdf"
@@ -94,7 +93,7 @@ class TestUploadCreateNew:
 
         assert result.failed is False
         assert result.changed is True
-        new_obj.upload_from_path.assert_called_once_with(test_file)
+        new_obj.upload_if_changed.assert_called_once_with(test_file, "contract.pdf")
 
 
 class TestUploadFromBytes:
@@ -117,8 +116,7 @@ class TestUploadFromBytes:
 
         assert result.failed is False
         assert result.changed is True
-        new_obj.upload_from_bytes.assert_called_once_with(content=payload, name="inline.txt")
-        new_obj.save.assert_called_once()
+        new_obj.upload_if_changed.assert_called_once_with(payload, "inline.txt")
 
     def test_upload_bytes_requires_file_name(self):
         task = _make_task()
@@ -161,7 +159,8 @@ class TestUploadUpdateChanged:
         client = _get_client_from_task(task)
         client.schema.get.return_value = _make_mock_schema()
 
-        existing_obj = _make_mock_object(checksum="old-checksum-does-not-match")
+        existing_obj = _make_mock_object()
+        existing_obj.upload_if_changed.return_value = MagicMock(was_uploaded=True)
         client.get.return_value = existing_obj
 
         result = upload_file_object(
@@ -174,23 +173,44 @@ class TestUploadUpdateChanged:
         assert result.failed is False
         assert result.changed is True
         assert "updated" in result.result
-        existing_obj.upload_from_path.assert_called_once_with(test_file)
-        existing_obj.save.assert_called_once()
+        existing_obj.upload_if_changed.assert_called_once_with(test_file, "contract.pdf")
 
-
-class TestUploadSkipUnchanged:
-    def test_upload_skips_when_checksums_match(self, tmp_path: Path):
+    def test_upload_applies_data_attrs_on_update(self, tmp_path: Path):
         test_file = tmp_path / "contract.pdf"
-        content = b"unchanged content"
-        test_file.write_bytes(content)
-
-        expected_checksum = hashlib.sha1(content, usedforsecurity=False).hexdigest()
+        test_file.write_bytes(b"updated content")
 
         task = _make_task()
         client = _get_client_from_task(task)
         client.schema.get.return_value = _make_mock_schema()
 
-        existing_obj = _make_mock_object(checksum=expected_checksum)
+        existing_obj = _make_mock_object()
+        existing_obj.upload_if_changed.return_value = MagicMock(was_uploaded=True)
+        client.get.return_value = existing_obj
+
+        result = upload_file_object(
+            task=task,
+            kind="NetworkContract",
+            file_path=str(test_file),
+            object_id="aaaa-bbbb-cccc-dddd",
+            data={"file_type": "text/markdown"},
+        )
+
+        assert result.failed is False
+        assert result.changed is True
+        assert existing_obj.file_type == "text/markdown"
+
+
+class TestUploadSkipUnchanged:
+    def test_upload_skips_when_checksums_match(self, tmp_path: Path):
+        test_file = tmp_path / "contract.pdf"
+        test_file.write_bytes(b"unchanged content")
+
+        task = _make_task()
+        client = _get_client_from_task(task)
+        client.schema.get.return_value = _make_mock_schema()
+
+        existing_obj = _make_mock_object()
+        existing_obj.upload_if_changed.return_value = MagicMock(was_uploaded=False)
         client.get.return_value = existing_obj
 
         result = upload_file_object(
@@ -203,8 +223,7 @@ class TestUploadSkipUnchanged:
         assert result.failed is False
         assert result.changed is False
         assert "up to date" in result.result
-        existing_obj.upload_from_path.assert_not_called()
-        existing_obj.save.assert_not_called()
+        existing_obj.upload_if_changed.assert_called_once_with(test_file, "contract.pdf")
 
 
 class TestUploadInvalidKind:

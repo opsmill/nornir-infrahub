@@ -163,6 +163,7 @@ known-third-party = ["nornir_infrahub"]
 "tasks.py" = ["PLC0415"]  # Allow deferred imports in invoke tasks
 "tests/**" = ["PLC0415", "PLR2004"]  # Allow deferred imports and magic numbers in tests
 "nornir_infrahub/plugins/tasks/**" = [
+    "PLR0911", # Nornir task functions return a failed Result at each guard
     "PLR0912", # Nornir task functions naturally branch on optional args
     "PLR0913", # Nornir task functions require many parameters
 ]
