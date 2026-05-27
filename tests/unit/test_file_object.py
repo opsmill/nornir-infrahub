@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import base64
-import hashlib
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -367,7 +366,6 @@ class TestDownloadSaveTo:
 
     def test_download_skips_write_when_local_matches(self, tmp_path: Path):
         content = b"identical content"
-        checksum = hashlib.sha1(content, usedforsecurity=False).hexdigest()
 
         existing_file = tmp_path / "report.txt"
         existing_file.write_bytes(content)
@@ -376,12 +374,8 @@ class TestDownloadSaveTo:
         client = _get_client_from_task(task)
         client.schema.get.return_value = _make_mock_schema()
 
-        obj = _make_mock_object(
-            file_name="report.txt",
-            file_type="text/plain",
-            file_size=len(content),
-            checksum=checksum,
-        )
+        obj = _make_mock_object(file_name="report.txt", file_type="text/plain", file_size=len(content))
+        obj.matches_local_checksum.return_value = True
         client.get.return_value = obj
 
         result = download_file_object(
@@ -394,11 +388,11 @@ class TestDownloadSaveTo:
         assert result.failed is False
         assert result.changed is False
         assert result.save_to == str(existing_file)
+        obj.matches_local_checksum.assert_called_once_with(existing_file)
         obj.download_file.assert_not_called()
 
     def test_download_overwrites_when_local_differs(self, tmp_path: Path):
         server_content = b"new server content"
-        server_checksum = hashlib.sha1(server_content, usedforsecurity=False).hexdigest()
 
         existing_file = tmp_path / "report.txt"
         existing_file.write_bytes(b"old local content")
@@ -407,12 +401,8 @@ class TestDownloadSaveTo:
         client = _get_client_from_task(task)
         client.schema.get.return_value = _make_mock_schema()
 
-        obj = _make_mock_object(
-            file_name="report.txt",
-            file_type="text/plain",
-            file_size=len(server_content),
-            checksum=server_checksum,
-        )
+        obj = _make_mock_object(file_name="report.txt", file_type="text/plain", file_size=len(server_content))
+        obj.matches_local_checksum.return_value = False
         obj.download_file.return_value = server_content
         client.get.return_value = obj
 
@@ -426,6 +416,7 @@ class TestDownloadSaveTo:
         assert result.failed is False
         assert result.changed is True
         assert existing_file.read_bytes() == server_content
+        obj.matches_local_checksum.assert_called_once_with(existing_file)
 
 
 class TestDownloadNotFound:

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import base64
-import hashlib
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -34,10 +33,6 @@ def _validate_file_object_kind(client: InfrahubClientSync, kind: str, branch: st
     if "CoreFileObject" not in getattr(schema, "inherit_from", []):
         raise ValueError(f"Kind '{kind}' does not inherit from CoreFileObject")
     return schema
-
-
-def _sha1(data: bytes) -> str:
-    return hashlib.sha1(data, usedforsecurity=False).hexdigest()
 
 
 def _resolve_upload_source(
@@ -274,15 +269,14 @@ def download_file_object(
             resolved_save_to = save_to_path
 
     changed = False
-    if resolved_save_to is not None and resolved_save_to.exists() and resolved_save_to.is_file():
-        local_checksum = _sha1(resolved_save_to.read_bytes())
-        if local_checksum == server_checksum:
-            content: bytes = resolved_save_to.read_bytes()
-        else:
-            content = obj.download_file()  # type: ignore[assignment]  # dest=None always returns bytes
-            resolved_save_to.parent.mkdir(parents=True, exist_ok=True)
-            resolved_save_to.write_bytes(content)
-            changed = True
+    if (
+        resolved_save_to is not None
+        and resolved_save_to.exists()
+        and resolved_save_to.is_file()
+        and server_checksum
+        and obj.matches_local_checksum(resolved_save_to)
+    ):
+        content: bytes = resolved_save_to.read_bytes()
     else:
         content = obj.download_file()  # type: ignore[assignment]  # dest=None always returns bytes
         if resolved_save_to is not None:
