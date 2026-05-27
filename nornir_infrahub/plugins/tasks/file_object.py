@@ -6,6 +6,7 @@ import base64
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from infrahub_sdk.exceptions import NodeNotFoundError
 from nornir.core.task import Result, Task
 from nornir_infrahub.utils import get_client
 
@@ -70,7 +71,7 @@ def _lookup_existing_object(
         if hfid:
             return client.get(kind=kind, hfid=hfid, branch=branch)
         return client.get(kind=kind, branch=branch, file_name__value=fallback_file_name)
-    except Exception:  # noqa: BLE001
+    except NodeNotFoundError:
         return None
 
 
@@ -106,7 +107,8 @@ def upload_file_object(
         object_id (str, optional): UUID of an existing object to update.
         hfid (list[str], optional): HFID components identifying an existing object.
         branch (str, optional): Target Infrahub branch. Defaults to the client's default branch.
-        **kwargs: Extra keyword arguments forwarded to ``client.create`` (e.g. ``allow_upsert``, ``timeout``).
+        **kwargs (Any, optional): Extra keyword arguments forwarded to ``client.create``
+            (e.g. ``allow_upsert``, ``timeout``).
 
     Returns:
         Result: A Nornir Result with ``changed`` indicating whether the object was
@@ -146,30 +148,44 @@ def upload_file_object(
     existing_obj = _lookup_existing_object(client, kind, object_id, hfid, upload_name, branch)
 
     if existing_obj:
+        attrs_changed = False
         for attr_name, attr_value in data.items():
             if attr_name in existing_obj._schema.attribute_names:
-                setattr(existing_obj, attr_name, attr_value)
+                current_attr = getattr(existing_obj, attr_name)
+                if getattr(current_attr, "value", current_attr) != attr_value:
+                    setattr(existing_obj, attr_name, attr_value)
+                    attrs_changed = True
 
         try:
             upload_result = existing_obj.upload_if_changed(source, upload_name)
         except Exception as exc:  # noqa: BLE001
             return Result(host=task.host, failed=True, result=str(exc))
 
-        if not upload_result.was_uploaded:
+        if upload_result.was_uploaded:
             return Result(
                 host=task.host,
                 failed=False,
-                changed=False,
+                changed=True,
                 object_id=str(existing_obj.id),
-                result=f"{kind} '{upload_name}' already up to date (checksum match)",
+                result=f"{kind} '{upload_name}' updated (checksum changed)",
+            )
+
+        if attrs_changed:
+            existing_obj.save()
+            return Result(
+                host=task.host,
+                failed=False,
+                changed=True,
+                object_id=str(existing_obj.id),
+                result=f"{kind} '{upload_name}' attributes updated (file unchanged)",
             )
 
         return Result(
             host=task.host,
             failed=False,
-            changed=True,
+            changed=False,
             object_id=str(existing_obj.id),
-            result=f"{kind} '{upload_name}' updated (checksum changed)",
+            result=f"{kind} '{upload_name}' already up to date (checksum match)",
         )
 
     try:

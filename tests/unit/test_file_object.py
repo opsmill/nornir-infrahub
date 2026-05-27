@@ -6,6 +6,7 @@ import base64
 from pathlib import Path
 from unittest.mock import MagicMock
 
+from infrahub_sdk.exceptions import NodeNotFoundError
 from nornir_infrahub.plugins.tasks.file_object import (
     download_file_object,
     upload_file_object,
@@ -63,7 +64,7 @@ class TestUploadCreateNew:
         task = _make_task()
         client = _get_client_from_task(task)
         client.schema.get.return_value = _make_mock_schema()
-        client.get.side_effect = Exception("not found")
+        client.get.side_effect = NodeNotFoundError(identifier={})
 
         new_obj = _make_mock_object()
         client.create.return_value = new_obj
@@ -83,7 +84,7 @@ class TestUploadCreateNew:
         task = _make_task()
         client = _get_client_from_task(task)
         client.schema.get.return_value = _make_mock_schema()
-        client.get.side_effect = Exception("not found")
+        client.get.side_effect = NodeNotFoundError(identifier={})
 
         new_obj = _make_mock_object()
         client.create.return_value = new_obj
@@ -100,7 +101,7 @@ class TestUploadFromBytes:
         task = _make_task()
         client = _get_client_from_task(task)
         client.schema.get.return_value = _make_mock_schema()
-        client.get.side_effect = Exception("not found")
+        client.get.side_effect = NodeNotFoundError(identifier={})
 
         new_obj = _make_mock_object()
         client.create.return_value = new_obj
@@ -225,6 +226,59 @@ class TestUploadSkipUnchanged:
         existing_obj.upload_if_changed.assert_called_once_with(test_file, "contract.pdf")
 
 
+class TestUploadAttrsOnSkip:
+    def test_upload_persists_data_attrs_when_file_unchanged(self, tmp_path: Path):
+        test_file = tmp_path / "contract.pdf"
+        test_file.write_bytes(b"unchanged content")
+
+        task = _make_task()
+        client = _get_client_from_task(task)
+        client.schema.get.return_value = _make_mock_schema()
+
+        existing_obj = _make_mock_object(file_type="application/pdf")
+        existing_obj.upload_if_changed.return_value = MagicMock(was_uploaded=False)
+        client.get.return_value = existing_obj
+
+        result = upload_file_object(
+            task=task,
+            kind="NetworkContract",
+            file_path=str(test_file),
+            object_id="aaaa-bbbb-cccc-dddd",
+            data={"file_type": "text/markdown"},
+        )
+
+        assert result.failed is False
+        assert result.changed is True
+        assert "attributes updated" in result.result
+        existing_obj.save.assert_called_once()
+        assert existing_obj.file_type == "text/markdown"
+
+    def test_upload_skip_no_save_when_data_matches(self, tmp_path: Path):
+        test_file = tmp_path / "contract.pdf"
+        test_file.write_bytes(b"unchanged content")
+
+        task = _make_task()
+        client = _get_client_from_task(task)
+        client.schema.get.return_value = _make_mock_schema()
+
+        existing_obj = _make_mock_object(file_type="application/pdf")
+        existing_obj.upload_if_changed.return_value = MagicMock(was_uploaded=False)
+        client.get.return_value = existing_obj
+
+        result = upload_file_object(
+            task=task,
+            kind="NetworkContract",
+            file_path=str(test_file),
+            object_id="aaaa-bbbb-cccc-dddd",
+            data={"file_type": "application/pdf"},
+        )
+
+        assert result.failed is False
+        assert result.changed is False
+        assert "up to date" in result.result
+        existing_obj.save.assert_not_called()
+
+
 class TestUploadInvalidKind:
     def test_upload_fails_for_non_file_object_kind(self, tmp_path: Path):
         test_file = tmp_path / "data.txt"
@@ -260,7 +314,7 @@ class TestUploadKwargsPassthrough:
         task = _make_task()
         client = _get_client_from_task(task)
         client.schema.get.return_value = _make_mock_schema()
-        client.get.side_effect = Exception("not found")
+        client.get.side_effect = NodeNotFoundError(identifier={})
         client.create.return_value = _make_mock_object()
 
         expected_timeout = 30
