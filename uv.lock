@@ -454,7 +454,7 @@ wheels = [
 
 [[package]]
 name = "infrahub-sdk"
-version = "1.19.0"
+version = "1.20.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dulwich" },
@@ -467,9 +467,9 @@ dependencies = [
     { name = "ujson" },
     { name = "whenever" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e8/43/86aa7711e89e4abea8216b462c43d46d298cb076fc53db1b05a91eabdcc7/infrahub_sdk-1.19.0.tar.gz", hash = "sha256:a397d1ea5c3747cf661cdab99cc4339886458afc246e14e13de72d5bc0dae3bd", size = 874068, upload-time = "2026-03-16T15:27:29.431Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d9/c9/6be3dce3184422f1baa222035998bc9552ed30cdf9a73694c7387db2d6f3/infrahub_sdk-1.20.1.tar.gz", hash = "sha256:5b7134814d8a700bcae9069aeabc4cf0b18d4f7234dd5867c665b26620393d83", size = 1025138, upload-time = "2026-05-20T13:45:30.069Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/17/4d/4302c2cde325fdb486736da3b71b309041c69b23cd9b39707aa4b5bedf02/infrahub_sdk-1.19.0-py3-none-any.whl", hash = "sha256:40f9e31b83a8ed472f5b49f77f7158620f33ee05c74cb0ca29e9397918be7db4", size = 212058, upload-time = "2026-03-16T15:27:27.948Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/4f/0533d93f6805b82bb44e19e76855f6a8e5b4c8810c95d770dfc5abaf10a0/infrahub_sdk-1.20.1-py3-none-any.whl", hash = "sha256:82439aff95408d31dcd00661833804907d952dd7ae7b2cae3be8ed35c7bd85aa", size = 246235, upload-time = "2026-05-20T13:45:28.412Z" },
 ]
 
 [[package]]
@@ -723,7 +723,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "infrahub-sdk", specifier = ">=1.19.0,<2" },
+    { name = "infrahub-sdk", specifier = ">=1.20.1,<2" },
     { name = "nornir", specifier = ">=3.5.0,<4" },
     { name = "nornir-utils", specifier = ">=0.2.0,<0.3" },
     { name = "pydantic", specifier = ">=2.0.0,<3" },
