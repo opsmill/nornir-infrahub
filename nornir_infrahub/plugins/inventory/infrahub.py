@@ -139,8 +139,8 @@ class InfrahubInventory:
         address (str, optional): The Infrahub URL to connect to. Defaults to "http://localhost:8000".
         branch (str, optional): The Infrahub branch to use. Defaults to "main".
         host_node (dict): A dictionary defining the Infrahub Node kind that will be mapped to Nornir Hosts. Example: `{"kind": "InfraDevice"}`
-        schema_mappings (list): A list of mappings that define how Nornir Host properties correspond to attributes or relations from Infrahub Nodes. Example: `[{"name": "hostname", "mapping": "primary_address.address"}]`.
-        group_mappings (list): A list of Infrahub Node attributes or relations used to create Nornir groups. Example: `["site.name"]`.
+        schema_mappings (list, optional): A list of mappings that define how Nornir Host properties correspond to attributes or relations from Infrahub Nodes. Example: `[{"name": "hostname", "mapping": "primary_address.address"}]`.
+        group_mappings (list, optional): A list of Infrahub Node attributes or relations used to create Nornir groups. Example: `["site.name"]`.
         defaults_file (str, optional): Path to the defaults YAML file. Defaults to "defaults.yaml".
         group_file (str, optional): Path to the group YAML file. Defaults to "group.yaml".
 

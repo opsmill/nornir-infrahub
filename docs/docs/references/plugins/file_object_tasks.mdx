@@ -27,7 +27,7 @@ Provide either ``file_path`` (to upload a file from disk) or ``content`` with
 | `object_id` | `str` | No |  | UUID of an existing object to update. |
 | `hfid` | `list[str]` | No |  | HFID components identifying an existing object. |
 | `branch` | `str` | No | the client's default branch | Target Infrahub branch. Defaults to the client's default branch. |
-| `**kwargs` | `None` | Yes |  | Extra keyword arguments forwarded to ``client.create`` (e.g. ``allow_upsert``, ``timeout``). |
+| `**kwargs` | `Any` | No |  | Extra keyword arguments forwarded to ``client.create`` (e.g. ``allow_upsert``, ``timeout``). |
 
 ### Examples
 
