@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -72,7 +73,14 @@ def _lookup_existing_object(
             return client.get(kind=kind, hfid=hfid, branch=branch)
         return client.get(kind=kind, branch=branch, file_name__value=fallback_file_name)
     except NodeNotFoundError:
+        if object_id is not None:
+            raise
         return None
+    except IndexError as exc:
+        raise ValueError(
+            f"Multiple {kind} objects share file_name='{fallback_file_name}'; "
+            "specify object_id or hfid to disambiguate."
+        ) from exc
 
 
 def upload_file_object(
@@ -103,12 +111,16 @@ def upload_file_object(
         file_path (str | Path, optional): Filesystem path to the file to upload.
         content (bytes, optional): Raw file content to upload. Requires ``file_name``.
         file_name (str, optional): File name to associate with ``content``. Ignored when ``file_path`` is used.
-        data (dict, optional): Additional object attributes to set on create or update.
+        data (dict, optional): Additional object fields. On create, this is forwarded to
+            ``client.create`` (attributes and relationships). On update, only attribute
+            keys are applied; passing a relationship or unknown key fails the task.
         object_id (str, optional): UUID of an existing object to update.
         hfid (list[str], optional): HFID components identifying an existing object.
         branch (str, optional): Target Infrahub branch. Defaults to the client's default branch.
         **kwargs (Any, optional): Extra keyword arguments forwarded to ``client.create``
-            (e.g. ``allow_upsert``, ``timeout``).
+            (e.g. ``allow_upsert``, ``timeout``). Applies only on the create path;
+            the update path does not call ``client.create``, so these are not used
+            when updating an existing object.
 
     Returns:
         Result: A Nornir Result with ``changed`` indicating whether the object was
@@ -145,16 +157,41 @@ def upload_file_object(
         return Result(host=task.host, failed=True, result=str(exc))
 
     data = data or {}
-    existing_obj = _lookup_existing_object(client, kind, object_id, hfid, upload_name, branch)
+    try:
+        existing_obj = _lookup_existing_object(client, kind, object_id, hfid, upload_name, branch)
+    except NodeNotFoundError as exc:
+        return Result(
+            host=task.host,
+            failed=True,
+            result=f"{kind} with id={object_id!r} not found: {exc}",
+        )
+    except ValueError as exc:
+        return Result(host=task.host, failed=True, result=str(exc))
 
     if existing_obj:
         attrs_changed = False
-        for attr_name, attr_value in data.items():
-            if attr_name in existing_obj._schema.attribute_names:
-                current_attr = getattr(existing_obj, attr_name)
-                if getattr(current_attr, "value", current_attr) != attr_value:
-                    setattr(existing_obj, attr_name, attr_value)
+        for key, value in data.items():
+            if key in existing_obj._schema.attribute_names:
+                current_attr = getattr(existing_obj, key)
+                if getattr(current_attr, "value", current_attr) != value:
+                    setattr(existing_obj, key, value)
                     attrs_changed = True
+            elif key in existing_obj._schema.relationship_names:
+                return Result(
+                    host=task.host,
+                    failed=True,
+                    result=(
+                        f"Cannot update relationship '{key}' on existing {kind} via `data`; "
+                        "the `data` parameter only updates attributes on existing objects. "
+                        "Use the infrahub-sdk directly to change relationships."
+                    ),
+                )
+            else:
+                return Result(
+                    host=task.host,
+                    failed=True,
+                    result=f"Unknown key '{key}' in `data` for {kind}; not an attribute or relationship.",
+                )
 
         try:
             upload_result = existing_obj.upload_if_changed(source, upload_name)
@@ -222,6 +259,12 @@ def download_file_object(
     server-side checksum, the download is skipped and ``changed`` is ``False``
     (idempotent, similar to ``nornir_utils.plugins.tasks.files.write_file``).
 
+    Note: The downloaded content is held in memory and embedded as base64 in the
+    Nornir ``Result``. Nornir aggregates results across hosts, so downloading
+    large files across many hosts can be heavy. For large payloads, prefer
+    ``save_to`` and ignore the ``binary``/``text`` fields, or call the
+    infrahub-sdk download API directly.
+
     Args:
         task (Task): The Nornir task instance containing host-related data.
         kind (str): The schema kind that inherits from CoreFileObject.
@@ -279,7 +322,8 @@ def download_file_object(
     resolved_save_to: Path | None = None
     if save_to is not None:
         save_to_path = Path(save_to)
-        if str(save_to).endswith("/") or save_to_path.is_dir():
+        save_to_str = str(save_to)
+        if save_to_str.endswith(("/", os.sep)) or save_to_path.is_dir():
             resolved_save_to = save_to_path / obj.file_name.value
         else:
             resolved_save_to = save_to_path

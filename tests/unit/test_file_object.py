@@ -36,6 +36,7 @@ def _make_mock_object(
     obj.file_size = _make_attr(file_size)
     obj._schema = MagicMock()
     obj._schema.attribute_names = ["file_name", "file_type", "file_size", "checksum"]
+    obj._schema.relationship_names = []
     return obj
 
 
@@ -277,6 +278,97 @@ class TestUploadAttrsOnSkip:
         assert result.changed is False
         assert "up to date" in result.result
         existing_obj.save.assert_not_called()
+
+
+class TestUploadDataValidation:
+    def test_upload_fails_on_relationship_key_in_data(self, tmp_path: Path):
+        test_file = tmp_path / "contract.pdf"
+        test_file.write_bytes(b"content")
+
+        task = _make_task()
+        client = _get_client_from_task(task)
+        client.schema.get.return_value = _make_mock_schema()
+
+        existing_obj = _make_mock_object()
+        existing_obj._schema.relationship_names = ["artifact"]
+        client.get.return_value = existing_obj
+
+        result = upload_file_object(
+            task=task,
+            kind="NetworkContract",
+            file_path=str(test_file),
+            object_id="aaaa-bbbb-cccc-dddd",
+            data={"artifact": "rel-id-123"},
+        )
+
+        assert result.failed is True
+        assert "relationship 'artifact'" in result.result
+        existing_obj.upload_if_changed.assert_not_called()
+
+    def test_upload_fails_on_unknown_key_in_data(self, tmp_path: Path):
+        test_file = tmp_path / "contract.pdf"
+        test_file.write_bytes(b"content")
+
+        task = _make_task()
+        client = _get_client_from_task(task)
+        client.schema.get.return_value = _make_mock_schema()
+
+        existing_obj = _make_mock_object()
+        client.get.return_value = existing_obj
+
+        result = upload_file_object(
+            task=task,
+            kind="NetworkContract",
+            file_path=str(test_file),
+            object_id="aaaa-bbbb-cccc-dddd",
+            data={"bogus_key": "x"},
+        )
+
+        assert result.failed is True
+        assert "Unknown key 'bogus_key'" in result.result
+        existing_obj.upload_if_changed.assert_not_called()
+
+
+class TestUploadLookupErrors:
+    def test_upload_fails_when_explicit_object_id_not_found(self, tmp_path: Path):
+        test_file = tmp_path / "contract.pdf"
+        test_file.write_bytes(b"content")
+
+        task = _make_task()
+        client = _get_client_from_task(task)
+        client.schema.get.return_value = _make_mock_schema()
+        client.get.side_effect = NodeNotFoundError(identifier={})
+
+        result = upload_file_object(
+            task=task,
+            kind="NetworkContract",
+            file_path=str(test_file),
+            object_id="nonexistent-uuid",
+        )
+
+        assert result.failed is True
+        assert "not found" in result.result
+        client.create.assert_not_called()
+
+    def test_upload_fails_on_ambiguous_filename_lookup(self, tmp_path: Path):
+        test_file = tmp_path / "contract.pdf"
+        test_file.write_bytes(b"content")
+
+        task = _make_task()
+        client = _get_client_from_task(task)
+        client.schema.get.return_value = _make_mock_schema()
+        client.get.side_effect = IndexError("More than 1 node returned")
+
+        result = upload_file_object(
+            task=task,
+            kind="NetworkContract",
+            file_path=str(test_file),
+        )
+
+        assert result.failed is True
+        assert "Multiple" in result.result
+        assert "contract.pdf" in result.result
+        client.create.assert_not_called()
 
 
 class TestUploadInvalidKind:
