@@ -226,7 +226,14 @@ def upload_file_object(
         )
 
     try:
-        new_obj = client.create(kind=kind, branch=branch, data=data, **kwargs)
+        create_data = dict(data)
+        if not create_data and not kwargs:
+            # client.create requires at least one field or keyword. Seed file_name
+            # from the source so a bare upload (no data, no kwargs) succeeds;
+            # upload_if_changed() refreshes file_name from the actual content
+            # before the node is saved.
+            create_data["file_name"] = {"value": upload_name}
+        new_obj = client.create(kind=kind, branch=branch, data=create_data, **kwargs)
         new_obj.upload_if_changed(source, upload_name)
     except Exception as exc:  # noqa: BLE001
         return Result(host=task.host, failed=True, result=str(exc))
