@@ -30,11 +30,11 @@ TEXT_MIME_TYPES: frozenset[str] = frozenset(
 )
 
 
-def _validate_file_object_kind(client: InfrahubClientSync, kind: str, branch: str | None = None) -> NodeSchemaAPI:  # type: ignore[return-type]  # SDK returns union of schema types
+def _validate_file_object_kind(client: InfrahubClientSync, kind: str, branch: str | None = None) -> NodeSchemaAPI:
     schema = client.schema.get(kind=kind, branch=branch)
     if "CoreFileObject" not in getattr(schema, "inherit_from", []):
         raise ValueError(f"Kind '{kind}' does not inherit from CoreFileObject")
-    return schema
+    return schema  # type: ignore[return-type]  # SDK returns union of schema types
 
 
 def _resolve_upload_source(

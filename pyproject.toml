@@ -71,8 +71,6 @@ markers = ["integration: marks tests as integration tests (requires Docker)"]
 unresolved-import = "ignore"
 # Infrahub SDK uses dynamic types that ty cannot fully understand without plugin support
 invalid-argument-type = "ignore"
-invalid-return-type = "ignore"
-invalid-assignment = "ignore"
 possibly-missing-attribute = "ignore"
 
 [tool.pylint.general]
