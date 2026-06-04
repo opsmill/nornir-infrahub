@@ -45,6 +45,7 @@ dev = [
     "vale>=3.13.0.0,<4",
     "rich>=12,<15",  # Required by infrahub-sdk pytest plugin
     "pyyaml>=6,<7",  # Required by infrahub-sdk pytest plugin
+    "infrahub-testcontainers>=1.9.3",
 ]
 
 [tool.uv]
@@ -60,7 +61,11 @@ exclude_lines = ["if TYPE_CHECKING:", "raise NotImplementedError()"]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 filterwarnings = ["ignore:pkg_resources is deprecated"]
-addopts = "-vs"
+# -p no:pytest-infrahub-performance-test disables a plugin from infrahub-testcontainers
+# that crashes on Apple Silicon via psutil.cpu_freq() (psutil arm64 bug). Safe to remove
+# if infrahub-testcontainers guards the call or psutil ships a fix.
+addopts = "-vs -m 'not integration' -p no:pytest-infrahub-performance-test"
+markers = ["integration: marks tests as integration tests (requires Docker)"]
 
 [tool.ty.rules]
 unresolved-import = "ignore"
@@ -154,7 +159,7 @@ known-third-party = ["nornir_infrahub"]
 
 [tool.ruff.lint.per-file-ignores]
 "tasks.py" = ["PLC0415"]  # Allow deferred imports in invoke tasks
-"tests/**" = ["PLC0415"]  # Allow deferred imports in tests
+"tests/**" = ["PLC0415", "PLR2004"]  # Allow deferred imports and magic numbers in tests
 
 [build-system]
 requires = ["hatchling"]

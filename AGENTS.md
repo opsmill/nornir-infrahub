@@ -10,7 +10,8 @@ This file provides guidance to AI coding assistants working with this repository
 
 - `nornir_infrahub/plugins/inventory/infrahub.py` — `InfrahubInventory` class: connects to Infrahub API, maps nodes to Nornir hosts via configurable schema mappings
 - `nornir_infrahub/plugins/tasks/artifact.py` — `get_artifact()`, `generate_artifacts()`, `regenerate_host_artifact()`
-- `tests/unit/` — unit tests
+- `tests/unit/` — unit tests (no Docker required)
+- `tests/integration/` — integration tests against a live Infrahub stack via `infrahub-testcontainers` (requires Docker)
 - `docs/` — Docusaurus documentation site
 
 ## Quick Reference
@@ -40,9 +41,10 @@ invoke lint-yaml         # Run yamllint only
 ### Run tests
 
 ```bash
-pytest
+pytest                                              # Unit tests only (integration tests excluded by default)
 pytest tests/unit/test_inventory.py                 # Run specific test file
 pytest tests/unit/test_inventory.py::test_function  # Run single test function
+pytest -m integration                               # Integration tests (requires Docker, ~minutes per class)
 ```
 
 ### Documentation
@@ -85,6 +87,13 @@ InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventor
 - The inventory plugin automatically includes `member_of_groups` relation for group membership
 - Artifact tasks use direct HTTP calls with `httpx` rather than the SDK for some operations
 - Error handling uses `RuntimeError` for mapping resolution failures (TODO items exist for improvement)
+
+### Integration tests
+
+- Located in `tests/integration/`, marked with `@pytest.mark.integration`
+- Excluded from the default `pytest` run via `addopts = "-m 'not integration' ..."` in `pyproject.toml`
+- Each test class inherits `NornirInfrahubIntegration` (in `tests/integration/conftest.py`), which spins up a fresh Infrahub container per class via `infrahub-testcontainers` and bootstraps schema + test data
+- The admin token comes from `infrahub_testcontainers.helpers.PROJECT_ENV_VARIABLES["INFRAHUB_TESTING_INITIAL_ADMIN_TOKEN"]` — do not hardcode
 
 ## Documentation Guidelines
 
