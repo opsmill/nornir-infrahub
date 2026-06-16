@@ -20,7 +20,7 @@ pip install nornir_infrahub
 {% for module in plugin %}
 #### {{ module.module }}
 {% for function_name, function in module.functions.items() %}
-- [{{ function_name }}](./references/plugins/{{ module.file_name }}#{{ function_name.lower() }})
+- [{{ function_name }}](./{{ module.file_name }}#{{ function_name.lower() }})
 {% endfor %}
 {%- endfor %}
 {%- endfor %}

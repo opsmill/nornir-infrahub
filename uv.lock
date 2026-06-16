@@ -454,7 +454,7 @@ wheels = [
 
 [[package]]
 name = "infrahub-sdk"
-version = "1.17.0"
+version = "1.20.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dulwich" },
@@ -467,9 +467,9 @@ dependencies = [
     { name = "ujson" },
     { name = "whenever" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/08/60/47f22fea92421085c449be78ad7219c66e2417978cd73a05aeb5c5159562/infrahub_sdk-1.17.0.tar.gz", hash = "sha256:2eca77193a855efe9819374e3d5c53eabcfcf13e3af90cc294d327b3844c41d0", size = 749554, upload-time = "2025-12-11T08:18:04.604Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d9/c9/6be3dce3184422f1baa222035998bc9552ed30cdf9a73694c7387db2d6f3/infrahub_sdk-1.20.1.tar.gz", hash = "sha256:5b7134814d8a700bcae9069aeabc4cf0b18d4f7234dd5867c665b26620393d83", size = 1025138, upload-time = "2026-05-20T13:45:30.069Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6b/66/b95ea7f7e228d62e111ae1b79659a84bc1cfaf61781d3edd6b2194ca8cfc/infrahub_sdk-1.17.0-py3-none-any.whl", hash = "sha256:e5f0d016e7a2276cb87c9268596bfa0e23aa17c3397270c218be30812d4150a9", size = 194423, upload-time = "2025-12-11T08:18:03.077Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/4f/0533d93f6805b82bb44e19e76855f6a8e5b4c8810c95d770dfc5abaf10a0/infrahub_sdk-1.20.1-py3-none-any.whl", hash = "sha256:82439aff95408d31dcd00661833804907d952dd7ae7b2cae3be8ed35c7bd85aa", size = 246235, upload-time = "2026-05-20T13:45:28.412Z" },
 ]
 
 [[package]]
@@ -723,7 +723,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "infrahub-sdk", specifier = ">=1.17.0,<2" },
+    { name = "infrahub-sdk", specifier = ">=1.20.1,<2" },
     { name = "nornir", specifier = ">=3.5.0,<4" },
     { name = "nornir-utils", specifier = ">=0.2.0,<0.3" },
     { name = "pydantic", specifier = ">=2.0.0,<3" },
@@ -733,16 +733,16 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "docstring-parser", specifier = ">=0.17,<0.18" },
+    { name = "docstring-parser", specifier = ">=0.17,<0.19" },
     { name = "infrahub-testcontainers", specifier = ">=1.9.3" },
-    { name = "invoke", specifier = ">=2.2.0,<3" },
+    { name = "invoke", specifier = ">=2.2.0,<4" },
     { name = "jinja2", specifier = ">=3.1.6,<4" },
     { name = "pylint", specifier = ">=3.3.0,<5" },
     { name = "pytest", specifier = ">=9.0.0" },
     { name = "pytest-asyncio", specifier = ">=1.3.0,<2" },
     { name = "pyyaml", specifier = ">=6,<7" },
-    { name = "rich", specifier = ">=12,<15" },
-    { name = "ruff", specifier = ">=0.14.10,<0.15" },
+    { name = "rich", specifier = ">=12,<16" },
+    { name = "ruff", specifier = ">=0.14.10,<0.16" },
     { name = "ty", specifier = ">=0.0.1a11" },
     { name = "vale", specifier = ">=3.13.0.0,<4" },
     { name = "yamllint", specifier = ">=1.37.1" },

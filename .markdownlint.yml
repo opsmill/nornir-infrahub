@@ -14,4 +14,5 @@ MD034: false    # no-bare-urls
 MD045: false    # no alt text around images
 MD047: false    # single trailing newline
 MD014: false    # dollar signs used before commands
+MD012: false    # allows the blank lines emitted between generated plugin doc sections
 MD060: false    # table column alignment — impractical with wide description columns

@@ -2,6 +2,7 @@
 title: Artifact management plugin
 ---
 
+
 ## `regenerate_host_artifact`
 
 Regenerates a host artifact for a given task.
@@ -13,8 +14,8 @@ then sends a request to regenerate the artifact using the Infrahub API.
 
 | Parameter | Type | Required | Default | Description |
 | --------- | ---- | -------- | ------- | ----------- |
-| `task` | `Task` | Yes | - | The task instance containing host-related data. |
-| `artifact` | `str` | Yes | - | The name of the artifact to regenerate. |
+| `task` | `Task` | Yes |  | The task instance containing host-related data. |
+| `artifact` | `str` | Yes |  | The name of the artifact to regenerate. |
 
 ### Examples
 
@@ -45,6 +46,7 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ```
 
+
 ## `generate_artifacts`
 
 Generates an artifact for a given task.
@@ -56,8 +58,8 @@ an API request to generate the specified artifact.
 
 | Parameter | Type | Required | Default | Description |
 | --------- | ---- | -------- | ------- | ----------- |
-| `task` | `Task` | Yes | - | The task instance containing host-related data. |
-| `artifact` | `str` | Yes | - | The name of the artifact to generate. |
+| `task` | `Task` | Yes |  | The task instance containing host-related data. |
+| `artifact` | `str` | Yes |  | The name of the artifact to generate. |
 | `timeout` | `int` | No | 10 | The request timeout in seconds. Defaults to 10. |
 
 ### Examples
@@ -88,6 +90,7 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ```
 
+
 ## `get_artifact`
 
 Retrieves the specified artifact from the Infrahub storage.
@@ -100,9 +103,9 @@ depending on the artifact's content type.
 
 | Parameter | Type | Required | Default | Description |
 | --------- | ---- | -------- | ------- | ----------- |
-| `task` | `Task` | Yes | - | The task instance containing host-related data. |
-| `artifact` | `str` | No | - | The name of the artifact to retrieve. |
-| `artifact_id` | `str` | No | - | The id of the artifact to retrieve. |
+| `task` | `Task` | Yes |  | The task instance containing host-related data. |
+| `artifact` | `str` | No |  | The name of the artifact to retrieve. |
+| `artifact_id` | `str` | No |  | The id of the artifact to retrieve. |
 
 ### Examples
 

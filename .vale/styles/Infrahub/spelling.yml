@@ -5,4 +5,5 @@ level: error
 filters:
   - '[pP]y.*\b'
   - '\bimport_.*\b'    # New filter to ignore variables starting with 'import_'
+  - '\b\w+_\w+\b'      # Ignore snake_case identifiers (function/variable names)
 ignore: spelling-exceptions.txt
