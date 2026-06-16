@@ -34,16 +34,16 @@ InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventor
 [dependency-groups]
 dev = [
     "pytest>=9.0.0",
-    "ruff>=0.14.10,<0.15",
+    "ruff>=0.14.10,<0.16",
     "ty>=0.0.1a11",
     "pytest-asyncio>=1.3.0,<2",
-    "invoke>=2.2.0,<3",
+    "invoke>=2.2.0,<4",
     "yamllint>=1.37.1",
     "pylint>=3.3.0,<5",
-    "docstring-parser>=0.17,<0.18",
+    "docstring-parser>=0.17,<0.19",
     "jinja2>=3.1.6,<4",
     "vale>=3.13.0.0,<4",
-    "rich>=12,<15",  # Required by infrahub-sdk pytest plugin
+    "rich>=12,<16",  # Required by infrahub-sdk pytest plugin
     "pyyaml>=6,<7",  # Required by infrahub-sdk pytest plugin
     "infrahub-testcontainers>=1.9.3",
 ]

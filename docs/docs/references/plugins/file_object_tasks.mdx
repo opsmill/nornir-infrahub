@@ -23,11 +23,11 @@ Provide either ``file_path`` (to upload a file from disk) or ``content`` with
 | `file_path` | `str \| Path` | No |  | Filesystem path to the file to upload. |
 | `content` | `bytes` | No |  | Raw file content to upload. Requires ``file_name``. |
 | `file_name` | `str` | No |  | File name to associate with ``content``. Ignored when ``file_path`` is used. |
-| `data` | `dict` | No |  | Additional object attributes to set on create or update. |
+| `data` | `dict` | No |  | Additional object fields. On create, this is forwarded to ``client.create`` (attributes and relationships). On update, only attribute keys are applied; passing a relationship or unknown key fails the task. |
 | `object_id` | `str` | No |  | UUID of an existing object to update. |
 | `hfid` | `list[str]` | No |  | HFID components identifying an existing object. |
 | `branch` | `str` | No | the client's default branch | Target Infrahub branch. Defaults to the client's default branch. |
-| `**kwargs` | `Any` | No |  | Extra keyword arguments forwarded to ``client.create`` (e.g. ``allow_upsert``, ``timeout``). |
+| `**kwargs` | `Any` | No |  | Extra keyword arguments forwarded to ``client.create`` (e.g. ``allow_upsert``, ``timeout``). Applies only on the create path; the update path does not call ``client.create``, so these are not used when updating an existing object. |
 
 ### Examples
 
@@ -56,6 +56,12 @@ to a local path.
 When ``save_to`` points to an existing file whose SHA-1 matches the
 server-side checksum, the download is skipped and ``changed`` is ``False``
 (idempotent, similar to ``nornir_utils.plugins.tasks.files.write_file``).
+
+Note: The downloaded content is held in memory and embedded as base64 in the
+Nornir ``Result``. Nornir aggregates results across hosts, so downloading
+large files across many hosts can be heavy. For large payloads, prefer
+``save_to`` and ignore the ``binary``/``text`` fields, or call the
+infrahub-sdk download API directly.
 
 ### Parameters
 
