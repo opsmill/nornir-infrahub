@@ -68,8 +68,7 @@ def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result: 
     Args:
         task (Task): The task instance containing host-related data.
         artifact (str): The name of the artifact to generate.
-        timeout (int, optional): Retained for backwards compatibility. The SDK now manages
-            request timeouts via its client configuration, so this argument is ignored.
+        timeout (int, optional): Retained for compatibility; ignored by the SDK path. Defaults to 10.
 
     Returns:
         Result: An object representing the outcome of the operation, indicating success or failure.
