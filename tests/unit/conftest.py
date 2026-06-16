@@ -3,22 +3,22 @@ from unittest.mock import patch
 
 import pytest
 from infrahub_sdk import InfrahubClient, InfrahubClientSync
-from infrahub_sdk.schema import NodeSchema
+from infrahub_sdk.schema import NodeSchemaAPI
 from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
 
 
 @pytest.fixture
 async def client() -> InfrahubClient:
-    return await InfrahubClient.init(address="http://mock")
+    return InfrahubClient(address="http://mock")
 
 
 @pytest.fixture
 async def client_sync() -> InfrahubClientSync:
-    return (InfrahubClientSync.init(address="http://mock"),)
+    return (InfrahubClientSync(address="http://mock"),)
 
 
 @pytest.fixture
-async def location_schema() -> NodeSchema:
+async def location_schema() -> NodeSchemaAPI:
     data = {
         "name": "Location",
         "namespace": "Builtin",
@@ -34,11 +34,11 @@ async def location_schema() -> NodeSchema:
             {"name": "member_of_groups", "peer": "CoreGroup", "optional": True, "cardinality": "many", "kind": "Group"},
         ],
     }
-    return NodeSchema(**data)
+    return NodeSchemaAPI(**data)
 
 
 @pytest.fixture
-async def device_schema() -> NodeSchema:
+async def device_schema() -> NodeSchemaAPI:
     data = {
         "name": "Device",
         "namespace": "Infra",
@@ -68,11 +68,11 @@ async def device_schema() -> NodeSchema:
             },
         ],
     }
-    return NodeSchema(**data)
+    return NodeSchemaAPI(**data)
 
 
 @pytest.fixture
-async def ipaddress_schema() -> NodeSchema:
+async def ipaddress_schema() -> NodeSchemaAPI:
     data = {
         "name": "IPAddress",
         "namespace": "Infra",
@@ -86,7 +86,7 @@ async def ipaddress_schema() -> NodeSchema:
             {"name": "interface", "peer": "InfraInterfaceL3", "optional": True, "cardinality": "one", "kind": "Parent"}
         ],
     }
-    return NodeSchema(**data)
+    return NodeSchemaAPI(**data)
 
 
 @pytest.fixture
@@ -103,12 +103,8 @@ async def ipaddress_data():
 
 @pytest.fixture
 @patch("nornir_infrahub.plugins.inventory.infrahub.InfrahubClientSync")
-@patch("nornir_infrahub.plugins.inventory.infrahub.get_related_nodes")
-async def mock_infrahub_inventory(mock_get_related_nodes, mock_infrahub_client) -> InfrahubInventory:
+async def mock_infrahub_inventory(mock_infrahub_client) -> InfrahubInventory:
     mock_infrahub_client.schema.get.return_value = device_schema
-    mock_get_related_nodes.return_value = {
-        "CoreStandardGroup",
-    }
 
     inventory = InfrahubInventory(
         host_node={"kind": "InfraDevice", "include": ["hostname", "platform"]},  # Adjust the parameters as needed

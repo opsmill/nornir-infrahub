@@ -10,26 +10,46 @@
 - **Version Control**: Natively integrated into the graph database which opens up some new capabilities like branching, diffing, and merging data directly in the database.
 - **Unified Storage**: By combining a graph database and git, Infrahub stores data and code needed to manage the infrastructure.
 
-## Introduction
+## Nornir
 
 A [Nornir](https://github.com/nornir-automation/nornir) plugin for Infrahub. Infrahub can be used as an inventory source for Nornir.
 
 ## Installation
 
-```bash
-pip install nornir_infrahub
+```console
+pip install nornir-infrahub
 ```
 
-## Usage
+## Documentation
 
-An example of this can be found in [./examples/nornir_inventory.py](./examples/nornir_inventory.py)
+Documentation for using Nornir is available in the [Nornir-Infrahub documentation](https://docs.infrahub.app/nornir/).
 
-## Infrahub artifact tasks
+## Development
 
-A set of tasks are provided to operate on Infrahub Artifacts:
+### Setup
 
-- `generate_artifacts`: generates the Artifacts for a Artifact Definition
-- `regenerate_artifact`: re-generates an Artifact for a Nornir Host
-- `get_artifact`: retrieve an Artifact for a Nornir Host
+```console
+uv sync
+```
 
-An example of this can be found in [./examples/nornir_tasks.py](./examples/nornir_tasks.py)
+### Linting and Formatting
+
+```console
+invoke lint          # Run all linters (yaml, ruff, pylint, ty)
+invoke format        # Auto-format code with ruff
+```
+
+### Documentation
+
+```console
+invoke docs-install  # Install npm dependencies for docs
+invoke docs-serve    # Start dev server at http://localhost:3000
+invoke docs-build    # Build production documentation
+invoke generate-docs # Generate plugin reference docs from docstrings
+```
+
+### Testing
+
+```console
+pytest               # Run all tests
+```

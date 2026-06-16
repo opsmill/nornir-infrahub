@@ -1,0 +1,31 @@
+---
+title: {{ module }}
+---
+{% for function_name, documentation in functions.items() %}
+## `{{ function_name }}`
+
+{{ documentation.description }}
+
+{%- if documentation.params is defined %}
+
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+{%- for param in documentation.params %}
+| `{{ param.arg_name }}` | `{{ param.type_name }}` | {{ "No" if param.is_optional else "Yes" }} | {{ param.default if param.default else "" }} | {{ param.description }} |
+{%- endfor %}
+{%- endif %}
+
+### Examples
+
+{%- if documentation.examples is defined and documentation.examples %}
+{%- for example in documentation.examples %}
+
+#### {{ example.description.split("\n", 1)[0] }}
+{{ example.description.split("\n", 1)[1] }}
+{% endfor %}
+{%- else %}
+No example provided.
+{%- endif %}
+{%- endfor %}

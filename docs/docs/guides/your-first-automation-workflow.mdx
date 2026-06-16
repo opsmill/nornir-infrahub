@@ -1,0 +1,454 @@
+---
+title: How to Create Your First Automation Workflow
+---
+
+This guide walks you through building a complete network automation workflow using Infrahub as your inventory source and artifact management system. You'll retrieve device configurations managed by Infrahub.
+
+## What you'll accomplish
+
+By the end of this guide, you'll have:
+
+- Connected Nornir to your Infrahub instance
+- Retrieved device configurations from Infrahub artifacts
+- Used dynamic device groups for targeted operations
+- Understood how to integrate Nornir with Infrahub's artifact system
+
+## Prerequisites
+
+- Infrahub instance with network devices and artifact definitions configured
+    - You can use the [Infrahub sandbox instance](https://sandbox.infrahub.app) to try this workflow
+- Nornir-Infrahub plugin installed (`pip install nornir-infrahub`)
+- Basic Python and Nornir knowledge
+
+## Step 1: Set up your project structure
+
+Create a project directory with the following structure:
+
+```bash
+mkdir network-automation
+cd network-automation
+
+# Create directory structure
+mkdir -p configs
+touch config.yaml
+touch workflow.py
+```
+
+## Step 2: Configure Nornir with Infrahub
+
+Create your `config.yaml` file:
+
+```yaml title="config.yaml"
+---
+inventory:
+  plugin: InfrahubInventory
+  options:
+    address: "https://sandbox.infrahub.app"   # Infrahub instance URL
+    token: "1808d43b-c370-48e8-d0ef-c51781c02ddf"           # Replace with your actual token
+    branch: "main"                         # Infrahub branch to use
+
+    # Define which Infrahub node type represents network devices
+    # Using the schema example above
+    host_node:
+      kind: "InfraDevice"                  # Matches the Device node with Infra namespace
+      include:
+        - "platform"
+
+    # Map Infrahub attributes to Nornir host properties
+    schema_mappings:
+      - name: "hostname"
+        mapping: "name"                    # Use device name as hostname
+      - name: "platform"
+        mapping: "platform.nornir_platform" # Platform attribute for Nornir compatibility
+
+    # Create Nornir groups based on Infrahub attributes
+    # Note: Disabled due to some devices missing site/role in sandbox
+    # group_mappings:
+    #   - "site.name"
+    #   - "role.name"
+
+runner:
+  plugin: threaded
+  options:
+    num_workers: 20
+```
+
+## Step 3: Understand Infrahub artifact system
+
+Before proceeding, ensure your Infrahub instance has artifact definitions configured. In this workflow, we'll use Infrahub's artifact system to retrieve generated configurations rather than creating templates locally.
+
+Infrahub artifacts provide:
+
+- **Centralized Templates**: Jinja2 templates stored in Git repositories
+- **Data-Driven Generation**: Configurations generated from your Infrahub data model
+- **Version Control**: All templates and generated artifacts are versioned
+- **Consistency**: Ensure all network configurations follow organizational standards
+
+The Nornir-Infrahub plugin provides tasks to interact with these artifacts:
+
+- `get_artifact()`: Retrieve generated configuration content
+- `generate_artifacts()`: Trigger artifact generation for targets
+- `regenerate_host_artifact()`: Regenerate configuration for a specific device
+
+## Step 4: Build the workflow script
+
+Create `workflow.py` with your automation workflow:
+
+```python title="workflow.py"
+#!/usr/bin/env python3
+"""Network automation workflow using Nornir and Infrahub artifacts.
+
+This module implements a complete configuration management workflow that:
+1. Connects to Infrahub to load device inventory
+2. Regenerates device configurations using Infrahub's artifact system
+3. Retrieves the generated configurations
+4. Validates the generated configurations
+
+The workflow is designed to work with the Infrahub sandbox environment and
+targets edge devices that have the "Startup Config for Edge devices" artifact
+definition configured.
+
+Requirements:
+    - nornir: Core automation framework
+    - nornir-infrahub: Infrahub inventory and task plugins
+    - nornir-utils: Result printing utilities
+
+Example:
+    Run the workflow from the command line::
+
+        $ python workflow.py
+
+    Or import and customize::
+
+        from workflow import main
+        main()
+
+"""
+
+import logging
+from pathlib import Path
+
+from nornir import InitNornir
+from nornir.core.task import Task, Result
+from nornir_utils.plugins.functions import print_result
+from nornir_infrahub.plugins.tasks import (
+    get_artifact,
+    regenerate_host_artifact,
+)
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+
+def retrieve_configuration(task: Task) -> Result:
+    """Retrieve device configuration from Infrahub artifacts.
+
+    Fetches the generated configuration artifact from Infrahub and saves it
+    locally for validation. The configuration is saved to
+    the `configs/` directory with the filename `{hostname}.cfg`.
+
+    Args:
+        task: Nornir task object containing host information and Infrahub client.
+
+    Returns:
+        Result object with:
+            - On success: Path to saved configuration file
+            - On failure: Error message describing the issue
+
+    Raises:
+        No exceptions are raised; all errors are captured in the Result object.
+    """
+    try:
+        # Get the configuration artifact from Infrahub
+        # Using the artifact name from the sandbox
+        result = get_artifact(
+            task,
+            artifact="Startup Config for Edge devices",
+        )
+
+        # Check if we got actual content
+        if not result.result or result.result.strip() == "":
+            return Result(
+                host=task.host,
+                failed=True,
+                result="Artifact exists but has no content",
+            )
+
+        # Save configuration locally
+        output_dir = Path("configs")
+        output_dir.mkdir(exist_ok=True)
+
+        config_file = output_dir / f"{task.host.name}.cfg"
+        config_file.write_text(result.result)
+
+        return Result(
+            host=task.host,
+            result=f"Configuration retrieved from Infrahub and saved to {config_file}",
+        )
+
+    except Exception as e:
+        error_msg = str(e)
+        if "NodeNotFoundError" in error_msg or "Unable to find" in error_msg:
+            return Result(
+                host=task.host,
+                failed=True,
+                result="No artifact found for this device (may not be configured in Infrahub)",
+            )
+        return Result(
+            host=task.host,
+            failed=True,
+            result=f"Failed to retrieve configuration: {error_msg}",
+        )
+
+
+def regenerate_configuration(task: Task) -> Result:
+    """Trigger regeneration of device configuration in Infrahub.
+
+    Requests Infrahub to regenerate the configuration artifact for the host.
+    This ensures the latest data from Infrahub is used to generate a fresh
+    configuration before retrieval.
+
+    Args:
+        task: Nornir task object containing host information and Infrahub client.
+
+    Returns:
+        Result object with:
+            - On success: Confirmation message
+            - On failure: Error message describing the issue
+    """
+    try:
+        # Regenerate the artifact in Infrahub
+        regenerate_host_artifact(
+            task,
+            artifact="Startup Config for Edge devices",
+        )
+
+        return Result(
+            host=task.host, result="Configuration regenerated successfully in Infrahub"
+        )
+
+    except Exception as e:
+        error_msg = str(e)
+        if "NodeNotFoundError" in error_msg or "Unable to find" in error_msg:
+            return Result(
+                host=task.host,
+                failed=True,
+                result="No artifact definition found for this device",
+            )
+        return Result(
+            host=task.host,
+            failed=True,
+            result=f"Failed to regenerate configuration: {error_msg}",
+        )
+
+
+def validate_configuration(task: Task) -> Result:
+    """Validate the retrieved configuration.
+
+    Performs basic validation checks on the configuration file to ensure
+    it meets basic requirements. Currently validates that the configuration
+    is not empty.
+
+    Args:
+        task: Nornir task object containing host information.
+
+    Returns:
+        Result object with:
+            - On success: Validation passed message with file size
+            - On failure: List of failed validation checks
+    """
+    config_file = Path("configs") / f"{task.host.name}.cfg"
+
+    if not config_file.exists():
+        return Result(
+            host=task.host, failed=True, result="Configuration file not found"
+        )
+
+    config_content = config_file.read_text()
+
+    # Basic validation checks - relaxed for sandbox artifacts
+    validations = {
+        "not_empty": len(config_content.strip()) > 0,
+    }
+
+    failed_checks = [check for check, passed in validations.items() if not passed]
+
+    if failed_checks:
+        return Result(
+            host=task.host,
+            failed=True,
+            result=f"Validation failed: {', '.join(failed_checks)}",
+        )
+
+    return Result(
+        host=task.host,
+        result=f"Configuration validation passed ({len(config_content)} bytes)",
+    )
+
+
+def main() -> int:
+    """Execute the complete network automation workflow.
+
+    Orchestrates the following steps:
+        1. Load device inventory from Infrahub
+        2. Filter to edge devices (which have startup config artifacts)
+        3. Regenerate configurations in Infrahub
+        4. Retrieve configurations to local `configs/` directory
+        5. Validate all retrieved configurations
+
+    The workflow will abort if any validation failures occur.
+
+    Returns:
+        Exit code: 0 for success, 1 for validation failures.
+    """
+    # Initialize Nornir
+    # Step 1: Load devices/init Nornir dynamic inventory from Infrahub
+    nr = InitNornir(config_file="config.yaml")
+
+    logger.info(f"Loaded {len(nr.inventory.hosts)} hosts from Infrahub")
+
+    # Filter to only edge devices (which have the Startup Config artifact)
+    edge_devices = nr.filter(filter_func=lambda h: "edge" in h.name)
+    logger.info(
+        f"Filtered to {len(edge_devices.inventory.hosts)} edge devices with artifacts"
+    )
+
+    # Step 2: Regenerate configurations in Infrahub
+    logger.info("Step 2: Regenerating configurations in Infrahub...")
+    regen_results = edge_devices.run(task=regenerate_configuration)
+    print_result(regen_results)
+
+    # Step 3: Retrieve updated configurations from Infrahub
+    logger.info("Step 3: Retrieving configurations from Infrahub...")
+    retrieve_results = edge_devices.run(task=retrieve_configuration)
+    print_result(retrieve_results)
+
+    # Step 4: Validate configurations
+    logger.info("Step 4: Validating configurations...")
+    validation_results = edge_devices.run(task=validate_configuration)
+    print_result(validation_results)
+
+    # Check for validation failures
+    failed_hosts = [
+        host for host, result in validation_results.items() if result.failed
+    ]
+
+    if failed_hosts:
+        logger.error(f"Validation failed for hosts: {failed_hosts}")
+        logger.info("Aborting due to validation failures")
+        return 1
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+## Step 5: Execute the workflow
+
+Run your automation workflow:
+
+```bash
+python workflow.py
+```
+
+The workflow will:
+
+1. Connect to Infrahub and load device inventory
+2. Regenerate configurations in Infrahub using artifact system
+3. Retrieve updated configurations from Infrahub
+4. Validate the retrieved configurations
+
+## Validation
+
+### Check retrieved configurations
+
+Review the configuration files retrieved from Infrahub in the `configs/` directory:
+
+```bash
+ls -la configs/
+cat configs/router1.cfg
+```
+
+## Advanced usage
+
+### Filtering devices
+
+Target specific devices or groups:
+
+```python
+from nornir.core.filter import F
+
+# Filter by platform
+junos_devices = nr.filter(platform="juniper_junos")
+results = junos_devices.run(task=retrieve_configuration)
+
+# Filter by group
+core_devices = nr.filter(F(groups__contains="core_router"))
+core_results = core_devices.run(task=retrieve_configuration)
+```
+
+Further information on [Nornir filters](https://nornir.readthedocs.io/en/latest/tutorial/inventory.html#Filtering-the-inventory).
+
+### Parallel execution control
+
+Adjust parallelism for different tasks:
+
+```python
+# Fewer workers for controlled execution
+nr.config.runner.options["num_workers"] = 2
+results = nr.run(task=retrieve_configuration)
+
+# More workers for parallel operations
+nr.config.runner.options["num_workers"] = 50
+results = nr.run(task=retrieve_configuration)
+```
+
+### Integration with CI/CD
+
+Create a CI-friendly version:
+
+```python
+# ci_workflow.py
+import sys
+import os
+
+from nornir.core.filter import F
+
+def ci_workflow():
+    # Get parameters from environment
+    target_branch = os.getenv("INFRAHUB_BRANCH", "main")
+    target_site = os.getenv("TARGET_SITE", None)
+
+    # Initialize with CI parameters
+    nr = InitNornir(
+        config_file="config.yaml",
+        inventory={
+            "options": {
+                "branch": target_branch
+            }
+        }
+    )
+
+    # Filter by site group if specified (site.name group_mapping creates groups like "site__chicago")
+    if target_site:
+        nr = nr.filter(F(groups__contains=f"site__{target_site}"))
+
+    # Run workflow without prompts
+    results = nr.run(task=retrieve_configuration)
+
+    # Exit with proper code
+    failed_count = len([r for r in results.values() if r.failed])
+    sys.exit(failed_count)
+```
+
+## Related resources
+
+- [Understanding Nornir-Infrahub Integration](../topics/understanding-nornir-infrahub-integration.mdx)
+- [Configuring Schema Mappings](./configuring-schema-mappings.mdx)
+- [Artifact Lifecycle Management](../topics/artifact-lifecycle-management.mdx)
+- [Nornir Task Documentation](https://nornir.readthedocs.io/)

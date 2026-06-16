@@ -1,0 +1,427 @@
+---
+title: Infrahub Inventory Concepts
+---
+
+This topic provides a deep understanding of how Infrahub's graph database model maps to Nornir's inventory concepts. Understanding these mappings is essential for designing effective automation workflows.
+
+## Introduction
+
+The InfrahubInventory plugin bridges two different paradigms:
+
+- **Infrahub**: Graph database with nodes, relationships, and attributes
+- **Nornir**: Host-centric inventory with groups and connection parameters
+
+This document explores:
+
+- How graph concepts translate to inventory structures
+- The role of schema mappings in this translation
+- Dynamic group generation from relationships
+- Performance considerations and best practices
+
+## Core mapping concepts
+
+### Nodes to hosts
+
+In Infrahub, devices are nodes in the graph. The inventory plugin transforms these into Nornir hosts:
+
+```text
+Infrahub Node                    Nornir Host
+┌─────────────────────┐         ┌─────────────────────┐
+│ InfraDevice         │   ──▶   │ Host                │
+│ - id: abc123        │         │ - name: router1     │
+│ - name: router1     │         │ - hostname: 10.1.1.1│
+│ - primary_address   │         │ - platform: ios     │
+│   └─▶ 10.1.1.1      │         │ - groups: [...]     │
+└─────────────────────┘         └─────────────────────┘
+```
+
+### Attributes to properties
+
+Node attributes become host properties through schema mappings:
+
+| Infrahub Attribute | Mapping Path | Nornir Property |
+| ------------------ | ------------ | --------------- |
+| Direct attribute | `name` | `host.name` |
+| Nested relation | `primary_address.address` | `host.hostname` |
+
+## The inventory loading process
+
+### Step 1: query construction
+
+The plugin builds a GraphQL query based on your configuration:
+
+```graphql
+query {
+  InfraDevice(status__value: "active") {
+    edges {
+      node {
+        id
+        name { value }
+        primary_address {
+          node {
+            address { value }
+          }
+        }
+        site {
+          node {
+            name { value }
+          }
+        }
+        member_of_groups {
+          edges {
+            node {
+              name { value }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Step 2: data transformation
+
+Retrieved data undergoes transformation:
+
+1. **Flatten nested structures**: Navigate relationships to extract values
+2. **Apply type conversions**: Convert IP objects to strings
+3. **Handle missing data**: Use defaults or skip mappings
+4. **Preserve metadata**: Store full node data for tasks
+
+### Step 3: group generation
+
+Groups are created from:
+
+1. **Infrahub group memberships**: Devices assigned to `CoreStandardGroup` in Infrahub
+2. **Dynamic groups**: Generated from `group_mappings` configuration
+3. **Hierarchical groups**: Groups can have parent groups
+
+```yaml title="config.yaml"
+group_mappings:
+  - "site.name"
+  - "role.name"
+```
+
+```python
+# For a device where site.name = "chicago" and role.name = "spine"
+# Results in Nornir groups:
+host.groups = [
+  "core_router", # Infrahub group membership
+  "site__chicago", # dynamic groups from group_mappings
+  "role__spine" # dynamic groups from group_mappings
+]
+```
+
+## Advanced inventory concepts
+
+### Filtering at source
+
+Reduce data transfer by filtering in Infrahub:
+
+```yaml
+host_node:
+  kind: "InfraDevice"
+  filters:
+    status__value: "active"
+    site__name__values: ["chicago", "dallas"]
+    role__value: "spine"
+```
+
+This translates to GraphQL filters, ensuring only relevant nodes are fetched. Use `__value` for single values and `__values` for lists.
+
+### Include optimization
+
+Minimize query complexity with selective includes:
+
+```yaml
+host_node:
+  kind: "InfraDevice"
+  include:
+    - "name"
+    - "primary_address"
+    - "platform"
+    # Only fetch what you need
+```
+
+### Relationship cardinality
+
+Understanding cardinality is crucial:
+
+- **One-to-One**: Device → Primary Address (direct mapping)
+- **One-to-Many**: Device → Interfaces (requires special handling)
+- **Many-to-Many**: Devices ↔ Services (complex relationships)
+
+Currently, the plugin handles one-to-one and many-to-one relationships directly.
+
+## Performance considerations
+
+### Query optimization
+
+Large inventories require optimization:
+
+1. **Pagination**: Automatic handling of large result sets
+2. **Selective fetching**: Only request needed attributes
+3. **Relationship depth**: Limit traversal depth
+
+### Inventory loading
+
+Nornir loads the inventory once during initialization:
+
+```python
+# Inventory is fetched from Infrahub during initialization
+nr = InitNornir(config_file="config.yaml")
+
+# Subsequent operations use the loaded inventory
+nr.filter(platform="ios")  # No new query
+nr.run(task=my_task)       # Uses loaded inventory
+```
+
+### Parallel processing
+
+Inventory loading is optimized for parallel task execution:
+
+- Host data is independent
+- Groups are pre-computed
+- No shared state between hosts
+
+## Dynamic inventory patterns
+
+### Environment-based inventory
+
+Use branches for environments:
+
+```python
+def get_inventory(environment="production"):
+    branch_map = {
+        "production": "main",
+        "staging": "staging",
+        "development": "dev"
+    }
+
+    return InitNornir(
+        inventory={
+            "plugin": "InfrahubInventory",
+            "options": {
+                "host_node": {"kind": "InfraDevice"},
+                "branch": branch_map.get(environment, "main")
+            }
+        }
+    )
+```
+
+### Role-based filtering
+
+Create specialized inventories:
+
+```python
+# Core network devices only
+core_nr = InitNornir(
+    inventory={
+        "plugin": "InfrahubInventory",
+        "options": {
+            "host_node": {
+                "kind": "InfraDevice",
+                "filters": {
+                    "role__values": ["core", "edge"]
+                }
+            }
+        }
+    }
+)
+```
+
+### Multi-platform support
+
+Handle different device platforms:
+
+```yaml title="config.yaml"
+schema_mappings:
+  - name: "hostname"
+    mapping: "primary_address.address"
+  - name: "platform"
+    mapping: "platform.nornir_platform"
+
+# Groups by platform automatically
+group_mappings:
+  - "platform.name"
+```
+
+## Troubleshooting inventory issues
+
+### Debug mode
+
+Enable detailed logging:
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+nr = InitNornir(config_file="config.yaml")
+# Watch for GraphQL queries and responses
+```
+
+### Validation queries
+
+Test your mappings with GraphQL using the Infrahub GraphQL explorer or SDK:
+
+```python
+import asyncio
+from infrahub_sdk import InfrahubClient
+
+async def test_query():
+    client = InfrahubClient(address="http://localhost:8000")
+    query = """
+    query {
+      InfraDevice {
+        edges {
+          node {
+            name { value }
+            primary_address {
+              node {
+                address { value }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    result = await client.execute_graphql(query=query)
+    print(result)
+
+asyncio.run(test_query())
+```
+
+### Common issues
+
+1. **Missing Hosts**: Check filters and node kind
+2. **Empty Groups**: Verify relationship paths exist
+3. **Mapping Errors**: Ensure attributes are populated
+4. **Performance**: Reduce included attributes
+
+## Integration with Nornir ecosystem
+
+### Transform functions
+
+Nornir provides a `transform_function` mechanism to enrich host data during inventory loading. Register a transform function and reference it by name:
+
+```python
+from nornir import InitNornir
+from nornir.core.plugins.inventory import TransformFunctionRegister
+
+def enrich_host(host):
+    """Transform function called for each host during inventory loading."""
+    # Add computed properties based on naming conventions
+    host.data["is_core"] = "core" in host.name
+    host.data["is_edge"] = "edge" in host.name
+
+    # Derive datacenter from hostname prefix
+    if "-" in host.name:
+        host.data["datacenter"] = host.name.split("-")[0]
+
+# Register the transform function
+TransformFunctionRegister.register("enrich_host", enrich_host)
+
+# Use transform_function in InitNornir
+nr = InitNornir(
+    inventory={
+        "plugin": "InfrahubInventory",
+        "options": {
+            "address": "http://localhost:8000",
+            "host_node": {"kind": "InfraDevice"}
+        },
+        "transform_function": "enrich_host"
+    }
+)
+
+# Filter using enriched data
+core_devices = nr.filter(filter_func=lambda h: h.data.get("is_core", False))
+print(f"Found {len(core_devices.inventory.hosts)} core devices")
+```
+
+### Using Infrahub node data in tasks
+
+Access the full Infrahub node object within tasks for attributes not mapped to Nornir properties:
+
+```python
+from nornir.core.task import Task, Result
+
+def device_audit(task: Task) -> Result:
+    """Audit device using both Nornir properties and Infrahub data."""
+    # Access standard Nornir host properties
+    hostname = task.host.hostname
+    platform = task.host.platform
+
+    # Access the full Infrahub node for additional attributes
+    infrahub_node = task.host.data.get("InfrahubNode")
+
+    audit_info = {
+        "name": task.host.name,
+        "hostname": hostname,
+        "platform": platform,
+    }
+
+    # Extract additional Infrahub attributes if available
+    if infrahub_node:
+        if hasattr(infrahub_node, "role") and infrahub_node.role:
+            audit_info["role"] = infrahub_node.role.value
+
+    return Result(host=task.host, result=audit_info)
+
+# Run the audit task
+results = nr.run(task=device_audit)
+```
+
+### Custom inventory plugins
+
+Create a custom inventory class to apply transformations during loading:
+
+```python
+from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
+from nornir.core.plugins.inventory import InventoryPluginRegister
+
+class CustomInfrahubInventory(InfrahubInventory):
+    """Custom inventory with platform name normalization."""
+
+    def load(self):
+        inventory = super().load()
+
+        # Normalize platform names for Nornir/NAPALM compatibility
+        platform_map = {
+            "juniper_junos": "junos",
+            "arista_eos": "eos",
+            "cisco_ios": "ios",
+        }
+
+        for host in inventory.hosts.values():
+            if host.platform in platform_map:
+                host.platform = platform_map[host.platform]
+
+        return inventory
+
+# Register and use the custom plugin
+InventoryPluginRegister.register("CustomInfrahubInventory", CustomInfrahubInventory)
+
+nr = InitNornir(
+    inventory={
+        "plugin": "CustomInfrahubInventory",
+        "options": {
+            "address": "http://localhost:8000",
+            "host_node": {
+                "kind": "InfraDevice",
+                "include": ["platform"]
+            },
+            "schema_mappings": [
+                {"name": "platform", "mapping": "platform.nornir_platform"}
+            ]
+        }
+    }
+)
+```
+
+## Further reading
+
+- [Understanding Nornir-Infrahub Integration](./understanding-nornir-infrahub-integration.mdx) - High-level concepts
+- [Configuring Schema Mappings](../guides/configuring-schema-mappings.mdx) - Practical mapping guide
+- [Infrahub Schema Documentation](https://docs.infrahub.app/topics/schema) - Schema design guide

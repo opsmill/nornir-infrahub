@@ -1,45 +1,55 @@
-[tool.poetry]
+[project]
 name = "nornir-infrahub"
-version = "0.3.2"
+version = "1.1.2"
 description = "Nornir plugin for Infrahub"
-authors = ["OpsMill <info@opsmill.com>"]
+authors = [{ name = "OpsMill", email = "info@opsmill.com" }]
 readme = "README.md"
 license = "Apache-2.0"
-homepage = "https://opsmill.com"
-repository = "https://github.com/opsmill/nornir-infrahub"
-documentation = "https://docs.infrahub.app/"
+requires-python = ">=3.10,<3.14"
 classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "infrahub-sdk>=1.17.0,<2",
+    "ruamel-yaml>=0.18.17,<0.20",
+    "nornir>=3.5.0,<4",
+    "nornir-utils>=0.2.0,<0.3",
+    "python-slugify>=8.0.4,<9",
+    "pydantic>=2.0.0,<3",
 ]
 
-packages = [{ include = "nornir_infrahub" }]
+[project.urls]
+Homepage = "https://opsmill.com"
+Repository = "https://github.com/opsmill/nornir-infrahub"
+Documentation = "https://docs.infrahub.app/"
 
-[tool.poetry.plugins."nornir.plugins.inventory"]
-"InfrahubInventory" = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
+[project.entry-points."nornir.plugins.inventory"]
+InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 
-[tool.poetry.dependencies]
-python = "^3.9, <3.13"
-infrahub-sdk = { version = "^0,>=0.9.1", extras = ["tests"] }
-ruamel-yaml = "^0.18.5"
-nornir = "^3.4.1"
-nornir-utils = "^0.2.0"
-python-slugify = "^8.0.1"
-pydantic = ">=1.7.4,!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0"
+[dependency-groups]
+dev = [
+    "pytest>=9.0.0",
+    "ruff>=0.14.10,<0.16",
+    "ty>=0.0.1a11",
+    "pytest-asyncio>=1.3.0,<2",
+    "invoke>=2.2.0,<4",
+    "yamllint>=1.37.1",
+    "pylint>=3.3.0,<5",
+    "docstring-parser>=0.17,<0.19",
+    "jinja2>=3.1.6,<4",
+    "vale>=3.13.0.0,<4",
+    "rich>=12,<16",  # Required by infrahub-sdk pytest plugin
+    "pyyaml>=6,<7",  # Required by infrahub-sdk pytest plugin
+    "infrahub-testcontainers>=1.9.3",
+]
 
-
-[tool.poetry.group.dev.dependencies]
-pytest = "*"
-ruff = "0.3.3"
-mypy = "*"
-pytest-asyncio = "^0.21.1"
-types-python-slugify = "*"
-invoke = "2.2.0"
-yamllint = "*"
+[tool.uv]
+package = true
 
 [tool.coverage.run]
 branch = true
@@ -51,15 +61,78 @@ exclude_lines = ["if TYPE_CHECKING:", "raise NotImplementedError()"]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 filterwarnings = ["ignore:pkg_resources is deprecated"]
-addopts = "-vs"
+# -p no:pytest-infrahub-performance-test disables a plugin from infrahub-testcontainers
+# that crashes on Apple Silicon via psutil.cpu_freq() (psutil arm64 bug). Safe to remove
+# if infrahub-testcontainers guards the call or psutil ships a fix.
+addopts = "-vs -m 'not integration' -p no:pytest-infrahub-performance-test"
+markers = ["integration: marks tests as integration tests (requires Docker)"]
 
+[tool.ty.rules]
+unresolved-import = "ignore"
+# Infrahub SDK uses dynamic types that ty cannot fully understand without plugin support
+invalid-argument-type = "ignore"
+possibly-missing-attribute = "ignore"
 
-[tool.mypy]
-pretty = true
-ignore_missing_imports = true
+[tool.pylint.general]
+extension-pkg-whitelist = ["pydantic", "ujson"]
+
+[tool.pylint.format]
+disable = "logging-fstring-interpolation"
+
+[tool.pylint.basic]
+# No docstrings required for private methods (Pylint default), or for test_ functions.
+no-docstring-rgx = "^(_|test_)"
+
+[tool.pylint.messages_control]
+# Line length is enforced by Black, so pylint doesn't need to check it.
+# Pylint and Black disagree about how to format multi-line arrays; Black wins.
+# assigning-non-slot,no-member,unsupported-membership-test,unsubscriptable-object,unsupported-assignment-operation,not-an-iterable
+# are disabled because of our move to pydantic 2, pylint does not seem to respect the type hint for pydantic 2 model fields.
+disable = """,
+    line-too-long,
+    missing-module-docstring,
+    missing-function-docstring,
+    missing-class-docstring,
+    consider-using-from-import,
+    invalid-name,
+    too-many-arguments,
+    too-many-locals,
+    keyword-arg-before-vararg,
+    too-few-public-methods,
+    too-many-instance-attributes,
+    fixme,
+    consider-using-f-string,
+    protected-access,
+    import-self,
+    wrong-import-order,
+    assigning-non-slot,
+    no-member,
+    unsupported-membership-test,
+    unsubscriptable-object,
+    unsupported-assignment-operation,
+    not-an-iterable,
+    too-many-return-statements,
+    unnecessary-comprehension,
+    multiple-statements,
+    self-assigning-variable,
+    no-else-return,
+    """
+
+[tool.pylint.miscellaneous]
+notes = """,
+    FIXME,
+    XXX,
+    """
+
+[tool.pylint.similarities]
+min-similarity-lines = 20
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 [tool.ruff.lint]
 select = [
@@ -78,7 +151,6 @@ select = [
     "YTT",   # flake8-2020
 ]
 
-
 [tool.ruff.lint.mccabe]
 max-complexity = 15
 
@@ -86,8 +158,9 @@ max-complexity = 15
 known-third-party = ["nornir_infrahub"]
 
 [tool.ruff.lint.per-file-ignores]
-
+"tasks.py" = ["PLC0415"]  # Allow deferred imports in invoke tasks
+"tests/**" = ["PLC0415", "PLR2004"]  # Allow deferred imports and magic numbers in tests
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,11 +1,13 @@
+"""Inventory plugin"""
+
 import ipaddress
-import itertools
 import logging
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 import ruamel.yaml
-from infrahub_sdk import Config, InfrahubClientSync, InfrahubNodeSync, NodeSchema
+from infrahub_sdk import Config, InfrahubClientSync
+from infrahub_sdk.node import InfrahubNodeSync
 from nornir.core.inventory import (
     ConnectionOptions,
     Defaults,
@@ -21,6 +23,7 @@ from pydantic import BaseModel, Field, model_validator
 from pydantic.dataclasses import dataclass
 from slugify import slugify
 
+MAX_RELATIONSHIP_HOPS: int = 2
 logger = logging.getLogger(__name__)
 
 
@@ -113,28 +116,65 @@ class HostNode(BaseModel):
         return data
 
 
-def get_related_nodes(node_schema: NodeSchema, attrs: Set[str]) -> Set[str]:
-    nodes = {"CoreStandardGroup"}
-    relationship_schemas = {schema.name: schema.peer for schema in node_schema.relationships}
-    for attr in attrs:
-        if attr in relationship_schemas:
-            nodes.add(relationship_schemas[attr])
-    return nodes
-
-
 class InfrahubInventory:
     """
-    Inventory pluging for `Opsmill - Infrahub <https://github.com/opsmill/infrahub>`
+    Nornir inventory plugin for integrating with `Opsmill - Infrahub`
+    (https://github.com/opsmill/infrahub).
 
-    Arguments:
-        address: Infrahub url (defaults to ``http://localhost:8000``)
-        branch: Infrahub branch to use (defaults to ``main``)
-        host_node: Infrahub Node type that will map to a Nornir Host
-        schema_mappings:
-        group_mapping: Definiton of relations and attributes to extract groups from
-        defaults_file: Path to defaults file (defaults to ``defaults.yaml``)
-        group_file: Path to group file (defaults to ``group.yaml``)
-    """
+    This plugin fetches inventory data from Infrahub, maps it to Nornir Hosts,
+    and supports the creation of Nornir groups based on attributes or relations
+    from Infrahub Nodes.
+
+    Args:
+        address (str, optional): The Infrahub URL to connect to. Defaults to "http://localhost:8000".
+        branch (str, optional): The Infrahub branch to use. Defaults to "main".
+        host_node (dict): A dictionary defining the Infrahub Node kind that will be mapped to Nornir Hosts. Example: `{"kind": "InfraDevice"}`
+        schema_mappings (list): A list of mappings that define how Nornir Host properties correspond to attributes or relations from Infrahub Nodes. A mapping with `name: "name"` customizes the Nornir host name (default: the node's `name` attribute). Example: `[{"name": "hostname", "mapping": "primary_address.address"}, {"name": "name", "mapping": "hostname"}]`.
+        group_mappings (list): A list of Infrahub Node attributes or relations used to create Nornir groups. Example: `["site.name"]`.
+        defaults_file (str, optional): Path to the defaults YAML file. Defaults to "defaults.yaml".
+        group_file (str, optional): Path to the group YAML file. Defaults to "group.yaml".
+
+    Example:
+        Basic usage of `InfrahubInventory` with Nornir.
+
+        ```python
+        from nornir import InitNornir
+        from nornir.core.plugins.inventory import InventoryPluginRegister
+        from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
+
+        def main():
+            # Register the custom InfrahubInventory plugin
+            InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)
+
+            # Initialize Nornir with InfrahubInventory as the inventory plugin
+            nr = InitNornir(
+                inventory={
+                    "plugin": "InfrahubInventory",
+                    "options": {
+                        "address": "http://localhost:8000",  # Infrahub API URL
+                        "token": "06438eb2-8019-4776-878c-0941b1f1d1ec",  # Infrahub API token
+                        "host_node": {"kind": "InfraDevice"},  # Infrahub Node kind to map to Nornir Hosts
+                        "schema_mappings": [
+                            {"name": "hostname", "mapping": "primary_address.address"},
+                            {"name": "platform", "mapping": "platform.nornir_platform"},
+                        ],  # Mapping Nornir Host properties to Infrahub Node attributes
+                        "group_mappings": ["site.name"],  # Create Nornir groups from Infrahub Node attributes
+                        "group_file": "dummy.yml",  # Path to the group file
+                    },
+                }
+            )
+
+            # Print Nornir inventory host and group names
+            print(nr.inventory.hosts.keys())
+            print(nr.inventory.groups.keys())
+
+            return 0
+
+        if __name__ == "__main__":
+            raise SystemExit(main())
+        ```
+
+    """  # noqa E501
 
     def __init__(  # noqa: PLR0913
         self,
@@ -155,7 +195,7 @@ class InfrahubInventory:
         self.defaults_file = Path(defaults_file).expanduser()
         self.group_file = Path(group_file).expanduser()
 
-        self.client = InfrahubClientSync.init(config=Config(api_token=token), address=self.address)
+        self.client = InfrahubClientSync(config=Config(api_token=token, default_branch=branch), address=self.address)
 
         schema_mappings = schema_mappings or []
         self.schema_mappings = [SchemaMappingNode(**mapping) for mapping in schema_mappings]
@@ -164,14 +204,31 @@ class InfrahubInventory:
         self.group_mappings = group_mappings
 
         host_node_schema = self.client.schema.get(kind=self.host_node.kind)
+        host_rel_names = set(host_node_schema.relationship_names)
 
-        attrs = set(
-            itertools.chain(
-                [schema_mapping.mapping.split(".")[0] for schema_mapping in self.schema_mappings],
-                [group_mapping.split(".")[0] for group_mapping in self.group_mappings],
-            )
-        )
-        self.extra_nodes = get_related_nodes(host_node_schema, attrs)
+        mapping_relations: set[str] = set()
+        for source, mapping in self._iter_mappings():
+            parts = mapping.split(".")
+            if len(parts) > MAX_RELATIONSHIP_HOPS:
+                raise ValueError(
+                    f"{source} '{mapping}' spans more than one relation hop; "
+                    "only single-hop mappings (e.g. 'primary_address.address') are supported"
+                )
+            if len(parts) == MAX_RELATIONSHIP_HOPS:
+                if parts[0] not in host_rel_names:
+                    raise ValueError(
+                        f"{source} '{mapping}' references '{parts[0]}', "
+                        f"which is not a relationship on {self.host_node.kind}"
+                    )
+                mapping_relations.add(parts[0])
+
+        self.host_node.include = sorted(set(self.host_node.include) | mapping_relations)
+
+    def _iter_mappings(self):
+        for sm in self.schema_mappings:
+            yield "schema_mapping", sm.mapping
+        for gm in self.group_mappings:
+            yield "group_mapping", gm
 
     def load(self) -> Inventory:  # noqa: PLR0912
         yml = ruamel.yaml.YAML(typ="safe")
@@ -197,17 +254,27 @@ class InfrahubInventory:
             groups[n] = _get_inventory_element(Group, g, n, defaults)
 
         for g in groups.values():
-            g.groups = ParentGroups([groups[g] for g in g.groups])
+            g.groups = ParentGroups([groups[g.name] for g in g.groups])
 
         host: Dict[str, Any] = {}
 
-        for extra_node in self.extra_nodes:
-            self.get_resources(kind=extra_node)
-
         host_nodes = self.get_resources(**dict(self.host_node))
 
+        name_mapping = next((m for m in self.schema_mappings if m.name == "name"), None)
+
         for host_node in host_nodes:
-            name = host_node.name.value
+            if name_mapping is not None:
+                try:
+                    name = resolve_node_mapping(host_node, name_mapping.mapping.split("."))
+                except RuntimeError as exc:
+                    raise RuntimeError(
+                        f"Unable to resolve 'name' schema_mapping '{name_mapping.mapping}' "
+                        f"on kind '{self.host_node.kind}'"
+                    ) from exc
+            elif hasattr(host_node, "name"):
+                name = host_node.name.value
+            else:
+                continue
 
             for schema_mapping in self.schema_mappings:
                 attrs = schema_mapping.mapping.split(".")
@@ -249,5 +316,5 @@ class InfrahubInventory:
         if "filters" in kwargs:
             filters = kwargs.pop("filters")
 
-        resources = self.client.all(kind=kind, branch=self.branch, populate_store=True, **kwargs, **filters)
+        resources = self.client.filters(kind=kind, branch=self.branch, populate_store=True, **kwargs, **filters)
         return resources
