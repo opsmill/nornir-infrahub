@@ -135,7 +135,7 @@ class InfrahubInventory:
         group_file (str, optional): Path to the group YAML file. Defaults to "group.yaml".
 
     Example:
-        Basic usage of `InfrahubInventory` with Nornir.
+        Basic usage of `InfrahubInventory` with Nornir
 
         ```python
         from nornir import InitNornir

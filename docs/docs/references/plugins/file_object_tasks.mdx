@@ -1,0 +1,89 @@
+---
+title: CoreFileObject management tasks
+---
+
+
+## `upload_file_object`
+
+Uploads a file to an Infrahub CoreFileObject object.
+
+Creates the object if it does not exist, or updates it if the file content
+has changed (SHA-1 checksum comparison).  When the local content is identical
+to the one stored on the server the upload is skipped (idempotent).
+
+Provide either ``file_path`` (to upload a file from disk) or ``content`` with
+``file_name`` (to upload raw bytes).
+
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `task` | `Task` | Yes |  | The Nornir task instance containing host-related data. |
+| `kind` | `str` | Yes |  | The schema kind that inherits from CoreFileObject. |
+| `file_path` | `str \| Path` | No |  | Filesystem path to the file to upload. |
+| `content` | `bytes` | No |  | Raw file content to upload. Requires ``file_name``. |
+| `file_name` | `str` | No |  | File name to associate with ``content``. Ignored when ``file_path`` is used. |
+| `data` | `dict` | No |  | Additional object fields. On create, this is forwarded to ``client.create`` (attributes and relationships). On update, only attribute keys are applied; passing a relationship or unknown key fails the task. |
+| `object_id` | `str` | No |  | UUID of an existing object to update. |
+| `hfid` | `list[str]` | No |  | HFID components identifying an existing object. |
+| `branch` | `str` | No | the client's default branch | Target Infrahub branch. Defaults to the client's default branch. |
+| `**kwargs` | `Any` | No |  | Extra keyword arguments forwarded to ``client.create`` (e.g. ``allow_upsert``, ``timeout``). Applies only on the create path; the update path does not call ``client.create``, so these are not used when updating an existing object. |
+
+### Examples
+
+#### Upload a contract PDF to a CoreFileObject object
+
+```python
+from nornir_infrahub.plugins.tasks import upload_file_object
+
+result = nr.run(
+    task=upload_file_object,
+    kind="NetworkCircuitContract",
+    file_path="/path/to/contract.pdf",
+    data={"contract_start": "2026-01-01"},
+)
+```
+
+
+## `download_file_object`
+
+Downloads file content from an Infrahub CoreFileObject object.
+
+Returns the file content as base64-encoded binary data, with a UTF-8
+text representation for text MIME types.  Optionally saves the file
+to a local path.
+
+When ``save_to`` points to an existing file whose SHA-1 matches the
+server-side checksum, the download is skipped and ``changed`` is ``False``
+(idempotent, similar to ``nornir_utils.plugins.tasks.files.write_file``).
+
+Note: The downloaded content is held in memory and embedded as base64 in the
+Nornir ``Result``. Nornir aggregates results across hosts, so downloading
+large files across many hosts can be heavy. For large payloads, prefer
+``save_to`` and ignore the ``binary``/``text`` fields, or call the
+infrahub-sdk download API directly.
+
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `task` | `Task` | Yes |  | The Nornir task instance containing host-related data. |
+| `kind` | `str` | Yes |  | The schema kind that inherits from CoreFileObject. |
+| `object_id` | `str` | No |  | UUID of the object to download from. |
+| `hfid` | `list[str]` | No |  | HFID components identifying the object. |
+| `save_to` | `str \| Path` | No |  | Local path where the downloaded file should be written. A directory receives the original file name; an explicit path is used as-is. |
+| `branch` | `str` | No | the client's default branch | Target Infrahub branch. Defaults to the client's default branch. |
+
+### Examples
+
+#### Download a file from a CoreFileObject object
+
+```python
+from nornir_infrahub.plugins.tasks import download_file_object
+
+result = nr.run(
+    task=download_file_object,
+    kind="NetworkCircuitContract",
+    hfid=["contract-2026"],
+)
+```

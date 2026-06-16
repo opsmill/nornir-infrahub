@@ -2,18 +2,19 @@
 title: {{ module }}
 ---
 {% for function_name, documentation in functions.items() %}
+
 ## `{{ function_name }}`
 
 {{ documentation.description }}
 
-{%- if documentation.params is defined %}
+{%- if documentation.params is defined and documentation.params %}
 
 ### Parameters
 
 | Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
+| --------- | ---- | -------- | ------- | ----------- |
 {%- for param in documentation.params %}
-| `{{ param.arg_name }}` | `{{ param.type_name }}` | {{ "No" if param.is_optional else "Yes" }} | {{ param.default if param.default else "" }} | {{ param.description }} |
+| `{{ param.arg_name }}` | `{{ param.type_name | replace('|', '\\|') }}` | {{ "No" if param.is_optional else "Yes" }} | {{ param.default if param.default else "" }} | {{ param.description | replace('\n', ' ') }} |
 {%- endfor %}
 {%- endif %}
 
@@ -26,6 +27,7 @@ title: {{ module }}
 {{ example.description.split("\n", 1)[1] }}
 {% endfor %}
 {%- else %}
+
 No example provided.
 {%- endif %}
 {%- endfor %}

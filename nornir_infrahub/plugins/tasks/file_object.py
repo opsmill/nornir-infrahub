@@ -1,0 +1,369 @@
+"""CoreFileObject management tasks"""
+
+from __future__ import annotations
+
+import base64
+import os
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
+
+from infrahub_sdk.exceptions import NodeNotFoundError
+from nornir.core.task import Result, Task
+from nornir_infrahub.utils import get_client
+
+if TYPE_CHECKING:
+    from infrahub_sdk import InfrahubClientSync
+    from infrahub_sdk.schema import NodeSchemaAPI
+
+TEXT_MIME_TYPES: frozenset[str] = frozenset(
+    {
+        "text/plain",
+        "text/markdown",
+        "text/csv",
+        "application/json",
+        "application/yaml",
+        "application/x-yaml",
+        "application/hcl",
+        "application/graphql",
+        "application/xml",
+    }
+)
+
+
+def _validate_file_object_kind(client: InfrahubClientSync, kind: str, branch: str | None = None) -> NodeSchemaAPI:
+    schema = client.schema.get(kind=kind, branch=branch)
+    if "CoreFileObject" not in getattr(schema, "inherit_from", []):
+        raise ValueError(f"Kind '{kind}' does not inherit from CoreFileObject")
+    return schema  # type: ignore[return-type]  # SDK returns union of schema types
+
+
+def _resolve_upload_source(
+    file_path: str | Path | None,
+    content: bytes | None,
+    file_name: str | None,
+) -> tuple[bytes | Path, str]:
+    # Returns (source, upload_name); raises ValueError on bad args.
+    # source is a Path (streamed by the SDK) or raw bytes.
+    if (file_path is None) == (content is None):
+        raise ValueError("Exactly one of 'file_path' or 'content' must be provided")
+
+    if file_path is not None:
+        path = Path(file_path)
+        if not path.exists():
+            raise ValueError(f"file_path '{file_path}' does not exist")
+        return path, path.name
+
+    if not file_name:
+        raise ValueError("'file_name' is required when using 'content'")
+    return content, file_name  # type: ignore[return-value]
+
+
+def _lookup_existing_object(
+    client: InfrahubClientSync,
+    kind: str,
+    object_id: str | None,
+    hfid: list[str] | None,
+    fallback_file_name: str,
+    branch: str | None,
+) -> Any:
+    try:
+        if object_id:
+            return client.get(kind=kind, id=object_id, branch=branch)
+        if hfid:
+            return client.get(kind=kind, hfid=hfid, branch=branch)
+        return client.get(kind=kind, branch=branch, file_name__value=fallback_file_name)
+    except NodeNotFoundError:
+        if object_id is not None:
+            raise
+        return None
+    except IndexError as exc:
+        raise ValueError(
+            f"Multiple {kind} objects share file_name='{fallback_file_name}'; "
+            "specify object_id or hfid to disambiguate."
+        ) from exc
+
+
+def upload_file_object(
+    task: Task,
+    kind: str,
+    file_path: str | Path | None = None,
+    content: bytes | None = None,
+    file_name: str | None = None,
+    data: dict[str, Any] | None = None,
+    object_id: str | None = None,
+    hfid: list[str] | None = None,
+    branch: str | None = None,
+    **kwargs: Any,
+) -> Result:
+    """
+    Uploads a file to an Infrahub CoreFileObject object.
+
+    Creates the object if it does not exist, or updates it if the file content
+    has changed (SHA-1 checksum comparison).  When the local content is identical
+    to the one stored on the server the upload is skipped (idempotent).
+
+    Provide either ``file_path`` (to upload a file from disk) or ``content`` with
+    ``file_name`` (to upload raw bytes).
+
+    Args:
+        task (Task): The Nornir task instance containing host-related data.
+        kind (str): The schema kind that inherits from CoreFileObject.
+        file_path (str | Path, optional): Filesystem path to the file to upload.
+        content (bytes, optional): Raw file content to upload. Requires ``file_name``.
+        file_name (str, optional): File name to associate with ``content``. Ignored when ``file_path`` is used.
+        data (dict, optional): Additional object fields. On create, this is forwarded to
+            ``client.create`` (attributes and relationships). On update, only attribute
+            keys are applied; passing a relationship or unknown key fails the task.
+        object_id (str, optional): UUID of an existing object to update.
+        hfid (list[str], optional): HFID components identifying an existing object.
+        branch (str, optional): Target Infrahub branch. Defaults to the client's default branch.
+        **kwargs (Any, optional): Extra keyword arguments forwarded to ``client.create``
+            (e.g. ``allow_upsert``, ``timeout``). Applies only on the create path;
+            the update path does not call ``client.create``, so these are not used
+            when updating an existing object.
+
+    Returns:
+        Result: A Nornir Result with ``changed`` indicating whether the object was
+            created or updated, ``object_id`` with the UUID, and a descriptive
+            ``result`` message.
+
+    Raises:
+        ValueError: If *kind* does not inherit from CoreFileObject or arguments are inconsistent.
+
+    Example:
+        Upload a contract PDF to a CoreFileObject object
+
+        ```python
+        from nornir_infrahub.plugins.tasks import upload_file_object
+
+        result = nr.run(
+            task=upload_file_object,
+            kind="NetworkCircuitContract",
+            file_path="/path/to/contract.pdf",
+            data={"contract_start": "2026-01-01"},
+        )
+        ```
+    """
+    try:
+        source, upload_name = _resolve_upload_source(file_path, content, file_name)
+    except ValueError as exc:
+        return Result(host=task.host, failed=True, result=str(exc))
+
+    client = get_client(task)
+
+    try:
+        _validate_file_object_kind(client, kind, branch)
+    except ValueError as exc:
+        return Result(host=task.host, failed=True, result=str(exc))
+
+    data = data or {}
+    try:
+        existing_obj = _lookup_existing_object(client, kind, object_id, hfid, upload_name, branch)
+    except NodeNotFoundError as exc:
+        return Result(
+            host=task.host,
+            failed=True,
+            result=f"{kind} with id={object_id!r} not found: {exc}",
+        )
+    except ValueError as exc:
+        return Result(host=task.host, failed=True, result=str(exc))
+
+    if existing_obj:
+        attrs_changed = False
+        for key, value in data.items():
+            if key in existing_obj._schema.attribute_names:
+                current_attr = getattr(existing_obj, key)
+                if getattr(current_attr, "value", current_attr) != value:
+                    setattr(existing_obj, key, value)
+                    attrs_changed = True
+            elif key in existing_obj._schema.relationship_names:
+                return Result(
+                    host=task.host,
+                    failed=True,
+                    result=(
+                        f"Cannot update relationship '{key}' on existing {kind} via `data`; "
+                        "the `data` parameter only updates attributes on existing objects. "
+                        "Use the infrahub-sdk directly to change relationships."
+                    ),
+                )
+            else:
+                return Result(
+                    host=task.host,
+                    failed=True,
+                    result=f"Unknown key '{key}' in `data` for {kind}; not an attribute or relationship.",
+                )
+
+        try:
+            upload_result = existing_obj.upload_if_changed(source, upload_name)
+        except Exception as exc:  # noqa: BLE001
+            return Result(host=task.host, failed=True, result=str(exc))
+
+        if upload_result.was_uploaded:
+            return Result(
+                host=task.host,
+                failed=False,
+                changed=True,
+                object_id=str(existing_obj.id),
+                result=f"{kind} '{upload_name}' updated (checksum changed)",
+            )
+
+        if attrs_changed:
+            existing_obj.save()
+            return Result(
+                host=task.host,
+                failed=False,
+                changed=True,
+                object_id=str(existing_obj.id),
+                result=f"{kind} '{upload_name}' attributes updated (file unchanged)",
+            )
+
+        return Result(
+            host=task.host,
+            failed=False,
+            changed=False,
+            object_id=str(existing_obj.id),
+            result=f"{kind} '{upload_name}' already up to date (checksum match)",
+        )
+
+    try:
+        create_data = dict(data)
+        if not create_data and not kwargs:
+            # client.create requires at least one field or keyword. Seed file_name
+            # from the source so a bare upload (no data, no kwargs) succeeds;
+            # upload_if_changed() refreshes file_name from the actual content
+            # before the node is saved.
+            create_data["file_name"] = {"value": upload_name}
+        new_obj = client.create(kind=kind, branch=branch, data=create_data, **kwargs)
+        new_obj.upload_if_changed(source, upload_name)
+    except Exception as exc:  # noqa: BLE001
+        return Result(host=task.host, failed=True, result=str(exc))
+
+    return Result(
+        host=task.host,
+        failed=False,
+        changed=True,
+        object_id=str(new_obj.id),
+        result=f"{kind} '{upload_name}' created",
+    )
+
+
+def download_file_object(
+    task: Task,
+    kind: str,
+    object_id: str | None = None,
+    hfid: list[str] | None = None,
+    save_to: str | Path | None = None,
+    branch: str | None = None,
+) -> Result:
+    """
+    Downloads file content from an Infrahub CoreFileObject object.
+
+    Returns the file content as base64-encoded binary data, with a UTF-8
+    text representation for text MIME types.  Optionally saves the file
+    to a local path.
+
+    When ``save_to`` points to an existing file whose SHA-1 matches the
+    server-side checksum, the download is skipped and ``changed`` is ``False``
+    (idempotent, similar to ``nornir_utils.plugins.tasks.files.write_file``).
+
+    Note: The downloaded content is held in memory and embedded as base64 in the
+    Nornir ``Result``. Nornir aggregates results across hosts, so downloading
+    large files across many hosts can be heavy. For large payloads, prefer
+    ``save_to`` and ignore the ``binary``/``text`` fields, or call the
+    infrahub-sdk download API directly.
+
+    Args:
+        task (Task): The Nornir task instance containing host-related data.
+        kind (str): The schema kind that inherits from CoreFileObject.
+        object_id (str, optional): UUID of the object to download from.
+        hfid (list[str], optional): HFID components identifying the object.
+        save_to (str | Path, optional): Local path where the downloaded file should be written.
+            A directory receives the original file name; an explicit path is used as-is.
+        branch (str, optional): Target Infrahub branch. Defaults to the client's default branch.
+
+    Returns:
+        Result: A Nornir Result containing ``binary`` (base64 string),
+            ``text`` (UTF-8 string or None), ``file_name``, ``file_type``,
+            ``file_size``, ``checksum``, ``object_id``, ``save_to``, and
+            ``changed`` (True only when a local file was created or overwritten).
+
+    Raises:
+        ValueError: If *kind* does not inherit from CoreFileObject.
+
+    Example:
+        Download a file from a CoreFileObject object
+
+        ```python
+        from nornir_infrahub.plugins.tasks import download_file_object
+
+        result = nr.run(
+            task=download_file_object,
+            kind="NetworkCircuitContract",
+            hfid=["contract-2026"],
+        )
+        ```
+    """
+    if not object_id and not hfid:
+        return Result(host=task.host, failed=True, result="One of 'object_id' or 'hfid' is required")
+
+    if object_id and hfid:
+        return Result(host=task.host, failed=True, result="'object_id' and 'hfid' are mutually exclusive")
+
+    client = get_client(task)
+
+    try:
+        _validate_file_object_kind(client, kind, branch)
+    except ValueError as exc:
+        return Result(host=task.host, failed=True, result=str(exc))
+
+    try:
+        if object_id:
+            obj = client.get(kind=kind, id=object_id, branch=branch)
+        else:
+            obj = client.get(kind=kind, hfid=hfid, branch=branch)
+    except Exception as exc:  # noqa: BLE001
+        return Result(host=task.host, failed=True, result=f"Object not found: {exc}")
+
+    server_checksum = obj.checksum.value
+
+    resolved_save_to: Path | None = None
+    if save_to is not None:
+        save_to_path = Path(save_to)
+        save_to_str = str(save_to)
+        if save_to_str.endswith(("/", os.sep)) or save_to_path.is_dir():
+            resolved_save_to = save_to_path / obj.file_name.value
+        else:
+            resolved_save_to = save_to_path
+
+    changed = False
+    if (
+        resolved_save_to is not None
+        and resolved_save_to.exists()
+        and resolved_save_to.is_file()
+        and server_checksum
+        and obj.matches_local_checksum(resolved_save_to)
+    ):
+        content: bytes = resolved_save_to.read_bytes()
+    else:
+        content = obj.download_file()  # type: ignore[assignment]  # dest=None always returns bytes
+        if resolved_save_to is not None:
+            resolved_save_to.parent.mkdir(parents=True, exist_ok=True)
+            resolved_save_to.write_bytes(content)
+            changed = True
+
+    file_type = obj.file_type.value
+    is_text = file_type in TEXT_MIME_TYPES
+
+    return Result(
+        host=task.host,
+        failed=False,
+        changed=changed,
+        binary=base64.b64encode(content).decode("ascii"),
+        text=content.decode("utf-8", errors="replace") if is_text else None,
+        file_name=obj.file_name.value,
+        file_type=file_type,
+        file_size=obj.file_size.value,
+        checksum=server_checksum,
+        object_id=str(obj.id),
+        save_to=str(resolved_save_to) if resolved_save_to is not None else None,
+    )

@@ -2,18 +2,20 @@
 title: Artifact management plugin
 ---
 
+
 ## `regenerate_host_artifact`
 
 Regenerates a host artifact for a given task.
 
-This function regenerates the named artifact for the host's InfrahubNode through the Infrahub SDK.
+This function retrieves an artifact node associated with the given artifact name from the InfrahubNode,
+then sends a request to regenerate the artifact using the Infrahub API.
 
 ### Parameters
 
 | Parameter | Type | Required | Default | Description |
 | --------- | ---- | -------- | ------- | ----------- |
-| `task` | `Task` | Yes | - | The task instance containing host-related data. |
-| `artifact` | `str` | Yes | - | The name of the artifact to regenerate. |
+| `task` | `Task` | Yes |  | The task instance containing host-related data. |
+| `artifact` | `str` | Yes |  | The name of the artifact to regenerate. |
 
 ### Examples
 
@@ -44,20 +46,21 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ```
 
+
 ## `generate_artifacts`
 
 Generates an artifact for a given task.
 
-This function retrieves the artifact definition from the InfrahubNode and triggers
-its generation through the Infrahub SDK.
+This function retrieves an artifact definition from the InfrahubNode and triggers
+an API request to generate the specified artifact.
 
 ### Parameters
 
 | Parameter | Type | Required | Default | Description |
 | --------- | ---- | -------- | ------- | ----------- |
-| `task` | `Task` | Yes | - | The task instance containing host-related data. |
-| `artifact` | `str` | Yes | - | The name of the artifact to generate. |
-| `timeout` | `int` | No | 10 | Retained for backwards compatibility. The SDK now manages request timeouts via its client configuration, so this argument is ignored. |
+| `task` | `Task` | Yes |  | The task instance containing host-related data. |
+| `artifact` | `str` | Yes |  | The name of the artifact to generate. |
+| `timeout` | `int` | No | 10 | The request timeout in seconds. Defaults to 10. |
 
 ### Examples
 
@@ -87,6 +90,7 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ```
 
+
 ## `get_artifact`
 
 Retrieves the specified artifact from the Infrahub storage.
@@ -99,9 +103,9 @@ depending on the artifact's content type.
 
 | Parameter | Type | Required | Default | Description |
 | --------- | ---- | -------- | ------- | ----------- |
-| `task` | `Task` | Yes | - | The task instance containing host-related data. |
-| `artifact` | `str` | No | - | The name of the artifact to retrieve. |
-| `artifact_id` | `str` | No | - | The id of the artifact to retrieve. |
+| `task` | `Task` | Yes |  | The task instance containing host-related data. |
+| `artifact` | `str` | No |  | The name of the artifact to retrieve. |
+| `artifact_id` | `str` | No |  | The id of the artifact to retrieve. |
 
 ### Examples
 

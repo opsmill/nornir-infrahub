@@ -2,6 +2,7 @@
 title: Inventory plugin
 ---
 
+
 ## `InfrahubInventory`
 
 Nornir inventory plugin for integrating with `Opsmill - Infrahub`
@@ -15,13 +16,13 @@ from Infrahub Nodes.
 
 | Parameter | Type | Required | Default | Description |
 | --------- | ---- | -------- | ------- | ----------- |
-| `address` | `str` | No | `"http://localhost:8000"` | The Infrahub URL to connect to. |
-| `branch` | `str` | No | `"main"` | The Infrahub branch to use. |
-| `host_node` | `dict` | Yes | - | A dictionary defining the Infrahub Node kind that will be mapped to Nornir Hosts. Example: `{"kind": "InfraDevice"}` |
-| `schema_mappings` | `list` | No | `[]` | A list of mappings that define how Nornir Host properties correspond to attributes or relations from Infrahub Nodes. A mapping with `name: "name"` customizes the Nornir host name (default: the node's `name` attribute). Example: `[{"name": "hostname", "mapping": "primary_address.address"}, {"name": "name", "mapping": "hostname"}]`. |
-| `group_mappings` | `list` | No | `[]` | A list of Infrahub Node attributes or relations used to create Nornir groups. Example: `["site.name"]`. |
-| `defaults_file` | `str` | No | `"defaults.yaml"` | Path to the defaults YAML file. |
-| `group_file` | `str` | No | `"group.yaml"` | Path to the group YAML file. |
+| `address` | `str` | No | "http://localhost:8000" | The Infrahub URL to connect to. Defaults to "http://localhost:8000". |
+| `branch` | `str` | No | "main" | The Infrahub branch to use. Defaults to "main". |
+| `host_node` | `dict` | Yes |  | A dictionary defining the Infrahub Node kind that will be mapped to Nornir Hosts. Example: `{"kind": "InfraDevice"}` |
+| `schema_mappings` | `list` | Yes |  | A list of mappings that define how Nornir Host properties correspond to attributes or relations from Infrahub Nodes. A mapping with `name: "name"` customizes the Nornir host name (default: the node's `name` attribute). Example: `[{"name": "hostname", "mapping": "primary_address.address"}, {"name": "name", "mapping": "hostname"}]`. |
+| `group_mappings` | `list` | Yes |  | A list of Infrahub Node attributes or relations used to create Nornir groups. Example: `["site.name"]`. |
+| `defaults_file` | `str` | No | "defaults.yaml" | Path to the defaults YAML file. Defaults to "defaults.yaml". |
+| `group_file` | `str` | No | "group.yaml" | Path to the group YAML file. Defaults to "group.yaml". |
 
 ### Examples
 
@@ -43,14 +44,12 @@ def main():
             "options": {
                 "address": "http://localhost:8000",  # Infrahub API URL
                 "token": "06438eb2-8019-4776-878c-0941b1f1d1ec",  # Infrahub API token
-                "host_node": {
-                    "kind": "InfraDevice",
-                },
+                "host_node": {"kind": "InfraDevice"},  # Infrahub Node kind to map to Nornir Hosts
                 "schema_mappings": [
                     {"name": "hostname", "mapping": "primary_address.address"},
                     {"name": "platform", "mapping": "platform.nornir_platform"},
-                ],
-                "group_mappings": ["site.name"],
+                ],  # Mapping Nornir Host properties to Infrahub Node attributes
+                "group_mappings": ["site.name"],  # Create Nornir groups from Infrahub Node attributes
                 "group_file": "dummy.yml",  # Path to the group file
             },
         }
