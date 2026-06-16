@@ -211,14 +211,14 @@ class InfrahubInventory:
             parts = mapping.split(".")
             if len(parts) > MAX_RELATIONSHIP_HOPS:
                 raise ValueError(
-                    f"{source} '{mapping}' spans more than one relation hop; ",
-                    "only single-hop mappings (e.g. 'primary_address.address') are supported",
+                    f"{source} '{mapping}' spans more than one relation hop; "
+                    "only single-hop mappings (e.g. 'primary_address.address') are supported"
                 )
             if len(parts) == MAX_RELATIONSHIP_HOPS:
                 if parts[0] not in host_rel_names:
                     raise ValueError(
-                        f"{source} '{mapping}' references '{parts[0]}', ",
-                        f"which is not a relationship on {self.host_node.kind}",
+                        f"{source} '{mapping}' references '{parts[0]}', "
+                        f"which is not a relationship on {self.host_node.kind}"
                     )
                 mapping_relations.add(parts[0])
 
@@ -268,8 +268,8 @@ class InfrahubInventory:
                     name = resolve_node_mapping(host_node, name_mapping.mapping.split("."))
                 except RuntimeError as exc:
                     raise RuntimeError(
-                        f"Unable to resolve 'name' schema_mapping '{name_mapping.mapping}' ",
-                        f"on kind '{self.host_node.kind}'",
+                        f"Unable to resolve 'name' schema_mapping '{name_mapping.mapping}' "
+                        f"on kind '{self.host_node.kind}'"
                     ) from exc
             elif hasattr(host_node, "name"):
                 name = host_node.name.value
