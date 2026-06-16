@@ -103,12 +103,8 @@ async def ipaddress_data():
 
 @pytest.fixture
 @patch("nornir_infrahub.plugins.inventory.infrahub.InfrahubClientSync")
-@patch("nornir_infrahub.plugins.inventory.infrahub.get_related_nodes")
-async def mock_infrahub_inventory(mock_get_related_nodes, mock_infrahub_client) -> InfrahubInventory:
+async def mock_infrahub_inventory(mock_infrahub_client) -> InfrahubInventory:
     mock_infrahub_client.schema.get.return_value = device_schema
-    mock_get_related_nodes.return_value = {
-        "CoreStandardGroup",
-    }
 
     inventory = InfrahubInventory(
         host_node={"kind": "InfraDevice", "include": ["hostname", "platform"]},  # Adjust the parameters as needed
