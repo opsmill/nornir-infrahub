@@ -129,7 +129,7 @@ class InfrahubInventory:
         address (str, optional): The Infrahub URL to connect to. Defaults to "http://localhost:8000".
         branch (str, optional): The Infrahub branch to use. Defaults to "main".
         host_node (dict): A dictionary defining the Infrahub Node kind that will be mapped to Nornir Hosts. Example: `{"kind": "InfraDevice"}`
-        schema_mappings (list): A list of mappings that define how Nornir Host properties correspond to attributes or relations from Infrahub Nodes. Example: `[{"name": "hostname", "mapping": "primary_address.address"}]`.
+        schema_mappings (list): A list of mappings that define how Nornir Host properties correspond to attributes or relations from Infrahub Nodes. A mapping with `name: "name"` customizes the Nornir host name (default: the node's `name` attribute). Example: `[{"name": "hostname", "mapping": "primary_address.address"}, {"name": "name", "mapping": "hostname"}]`.
         group_mappings (list): A list of Infrahub Node attributes or relations used to create Nornir groups. Example: `["site.name"]`.
         defaults_file (str, optional): Path to the defaults YAML file. Defaults to "defaults.yaml".
         group_file (str, optional): Path to the group YAML file. Defaults to "group.yaml".
@@ -260,8 +260,21 @@ class InfrahubInventory:
 
         host_nodes = self.get_resources(**dict(self.host_node))
 
+        name_mapping = next((m for m in self.schema_mappings if m.name == "name"), None)
+
         for host_node in host_nodes:
-            name = host_node.name.value
+            if name_mapping is not None:
+                try:
+                    name = resolve_node_mapping(host_node, name_mapping.mapping.split("."))
+                except RuntimeError as exc:
+                    raise RuntimeError(
+                        f"Unable to resolve 'name' schema_mapping '{name_mapping.mapping}' "
+                        f"on kind '{self.host_node.kind}'"
+                    ) from exc
+            elif hasattr(host_node, "name"):
+                name = host_node.name.value
+            else:
+                continue
 
             for schema_mapping in self.schema_mappings:
                 attrs = schema_mapping.mapping.split(".")

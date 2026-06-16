@@ -131,6 +131,18 @@ host_node:
 
 :::
 
+### Customizing the Nornir host name
+
+By default, the plugin uses the node's `name` attribute as the Nornir host name. If your schema does not define a `name` attribute, or you want a different attribute to drive the host name, add a schema mapping whose `name` is `"name"`:
+
+```yaml
+schema_mappings:
+  - name: "name"
+    mapping: "hostname"  # Use the node's "hostname" attribute as the Nornir host name
+```
+
+The `mapping` follows the same rules as any other mapping, so you can also resolve the name through a single relationship (for example, `primary_address.address`). When no `name` mapping is provided and the node has no `name` attribute, the host is skipped.
+
 ### Multiple level nesting
 
 The plugin supports traversing one relationship level before reaching an attribute. For example, `site.name` follows the `site` relationship then reads its `name` attribute. Deeper chains (e.g., `site.location.name`) are not supported.

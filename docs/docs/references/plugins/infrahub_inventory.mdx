@@ -18,7 +18,7 @@ from Infrahub Nodes.
 | `address` | `str` | No | `"http://localhost:8000"` | The Infrahub URL to connect to. |
 | `branch` | `str` | No | `"main"` | The Infrahub branch to use. |
 | `host_node` | `dict` | Yes | - | A dictionary defining the Infrahub Node kind that will be mapped to Nornir Hosts. Example: `{"kind": "InfraDevice"}` |
-| `schema_mappings` | `list` | No | `[]` | A list of mappings that define how Nornir Host properties correspond to attributes or relations from Infrahub Nodes. Example: `[{"name": "hostname", "mapping": "primary_address.address"}]`. |
+| `schema_mappings` | `list` | No | `[]` | A list of mappings that define how Nornir Host properties correspond to attributes or relations from Infrahub Nodes. A mapping with `name: "name"` customizes the Nornir host name (default: the node's `name` attribute). Example: `[{"name": "hostname", "mapping": "primary_address.address"}, {"name": "name", "mapping": "hostname"}]`. |
 | `group_mappings` | `list` | No | `[]` | A list of Infrahub Node attributes or relations used to create Nornir groups. Example: `["site.name"]`. |
 | `defaults_file` | `str` | No | `"defaults.yaml"` | Path to the defaults YAML file. |
 | `group_file` | `str` | No | `"group.yaml"` | Path to the group YAML file. |
