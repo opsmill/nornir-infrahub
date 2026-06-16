@@ -43,7 +43,7 @@ dev = [
     "docstring-parser>=0.17,<0.18",
     "jinja2>=3.1.6,<4",
     "vale>=3.13.0.0,<4",
-    "rich>=12,<15",  # Required by infrahub-sdk pytest plugin
+    "rich>=12,<16",  # Required by infrahub-sdk pytest plugin
     "pyyaml>=6,<7",  # Required by infrahub-sdk pytest plugin
     "infrahub-testcontainers>=1.9.3",
 ]
