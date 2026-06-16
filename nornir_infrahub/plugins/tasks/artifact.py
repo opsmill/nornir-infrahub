@@ -2,9 +2,9 @@
 Artifact management plugin
 """
 
+import json
 from typing import Optional
 
-import httpx
 from nornir.core.task import Result, Task
 
 
@@ -12,8 +12,7 @@ def regenerate_host_artifact(task: Task, artifact: str) -> Result:
     """
     Regenerates a host artifact for a given task.
 
-    This function retrieves an artifact node associated with the given artifact name from the InfrahubNode,
-    then sends a request to regenerate the artifact using the Infrahub API.
+    This function regenerates the named artifact for the host's InfrahubNode through the Infrahub SDK.
 
     Args:
         task (Task): The task instance containing host-related data.
@@ -23,7 +22,7 @@ def regenerate_host_artifact(task: Task, artifact: str) -> Result:
         Result: An object representing the outcome of the operation, indicating success or failure.
 
     Raises:
-        httpx.HTTPStatusError: If the API request fails.
+        Exception: Propagates any error raised by the Infrahub SDK if the artifact cannot be generated.
 
     Example:
         Regenerate artifact for a given device
@@ -54,39 +53,28 @@ def regenerate_host_artifact(task: Task, artifact: str) -> Result:
         ```
     """
     node = task.host.data["InfrahubNode"]
-    artifact_node = node._client.get(kind="CoreArtifact", name__value=artifact, object__ids=[node.id])
-
-    headers = node._client.headers
-    headers["X-INFRAHUB-KEY"] = f"{node._client.config.api_token}"
-
-    with httpx.Client() as client:
-        resp = client.post(
-            url=f"{node._client.address}/api/artifact/generate/{artifact_node.definition.id}",
-            json={"nodes": [artifact_node.id]},
-            headers=headers,
-        )
-    resp.raise_for_status()
+    node.artifact_generate(name=artifact)
 
     return Result(host=task.host, failed=False)
 
 
-def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result:
+def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result:  # pylint: disable=unused-argument
     """
     Generates an artifact for a given task.
 
-    This function retrieves an artifact definition from the InfrahubNode and triggers
-    an API request to generate the specified artifact.
+    This function retrieves the artifact definition from the InfrahubNode and triggers
+    its generation through the Infrahub SDK.
 
     Args:
         task (Task): The task instance containing host-related data.
         artifact (str): The name of the artifact to generate.
-        timeout (int, optional): The request timeout in seconds. Defaults to 10.
+        timeout (int, optional): Retained for compatibility; ignored by the SDK path. Defaults to 10.
 
     Returns:
         Result: An object representing the outcome of the operation, indicating success or failure.
 
     Raises:
-        httpx.HTTPStatusError: If the API request fails.
+        Exception: Propagates any error raised by the Infrahub SDK if the artifact cannot be generated.
 
     Example:
         Example generating artifacts
@@ -116,14 +104,8 @@ def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result:
         ```
     """
     node = task.host.data["InfrahubNode"]
-    artifact_node = node._client.get(kind="CoreArtifactDefinition", artifact_name__value=artifact)
-
-    headers = node._client.headers
-    headers["X-INFRAHUB-KEY"] = f"{node._client.config.api_token}"
-
-    with httpx.Client(timeout=httpx.Timeout(timeout)) as client:
-        resp = client.post(url=f"{node._client.address}/api/artifact/generate/{artifact_node.id}", headers=headers)
-    resp.raise_for_status()
+    artifact_definition = node._client.get(kind="CoreArtifactDefinition", artifact_name__value=artifact)
+    artifact_definition.generate()
 
     return Result(host=task.host, failed=False)
 
@@ -146,7 +128,8 @@ def get_artifact(task: Task, artifact: Optional[str] = None, artifact_id: Option
                 the success status of the operation.
 
     Raises:
-        httpx.HTTPStatusError: If the API request fails.
+        RuntimeError: If neither or both of `artifact` and `artifact_id` are provided.
+        Exception: Propagates any error raised by the Infrahub SDK if the artifact cannot be retrieved.
 
     Example:
         Example getting artifacts from Infrahub
@@ -188,19 +171,11 @@ def get_artifact(task: Task, artifact: Optional[str] = None, artifact_id: Option
     elif artifact_id:
         artifact_node = client.get(kind="CoreArtifact", ids=[artifact_id])
 
-    headers = client.headers
-    headers["X-INFRAHUB-KEY"] = f"{client.config.api_token}"
-
-    with httpx.Client() as http_client:
-        resp = http_client.get(
-            url=f"{client.address}/api/storage/object/{artifact_node.storage_id.value}",
-            headers=headers,
-        )
-    resp.raise_for_status()
+    content = client.object_store.get(identifier=artifact_node.storage_id.value)
 
     if artifact_node.content_type.value == "application/json":
-        data = resp.json()
+        data = json.loads(content)
     else:
-        data = resp.text
+        data = content
 
     return Result(host=task.host, failed=False, content_type=artifact_node.content_type.value, result=data)

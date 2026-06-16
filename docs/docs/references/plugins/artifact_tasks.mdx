@@ -7,8 +7,7 @@ title: Artifact management plugin
 
 Regenerates a host artifact for a given task.
 
-This function retrieves an artifact node associated with the given artifact name from the InfrahubNode,
-then sends a request to regenerate the artifact using the Infrahub API.
+This function regenerates the named artifact for the host's InfrahubNode through the Infrahub SDK.
 
 ### Parameters
 
@@ -51,8 +50,8 @@ if __name__ == "__main__":
 
 Generates an artifact for a given task.
 
-This function retrieves an artifact definition from the InfrahubNode and triggers
-an API request to generate the specified artifact.
+This function retrieves the artifact definition from the InfrahubNode and triggers
+its generation through the Infrahub SDK.
 
 ### Parameters
 
@@ -60,7 +59,7 @@ an API request to generate the specified artifact.
 | --------- | ---- | -------- | ------- | ----------- |
 | `task` | `Task` | Yes |  | The task instance containing host-related data. |
 | `artifact` | `str` | Yes |  | The name of the artifact to generate. |
-| `timeout` | `int` | No | 10 | The request timeout in seconds. Defaults to 10. |
+| `timeout` | `int` | No | 10 | Retained for compatibility; ignored by the SDK path. Defaults to 10. |
 
 ### Examples
 
