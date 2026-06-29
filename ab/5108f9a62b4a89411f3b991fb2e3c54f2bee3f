@@ -1,0 +1,37 @@
+.agents/skills/quality-gates/gates/_index.md
+  s_39ec35d1cc76ac::t_c08af9395232bc 1-8
+.agents/skills/quality-gates/DECISION.md
+  s_39ec35d1cc76ac::t_c08af9395232bc 1-26
+.agents/skills/quality-gates/gates/primitives/evidence-before-done.md
+  s_39ec35d1cc76ac::t_c08af9395232bc 1-14
+.agents/skills/quality-gates/hooks/ship-gate-check.sh
+  s_39ec35d1cc76ac::t_c08af9395232bc 1-73
+.agents/skills/quality-gates/SKILL.md
+  s_39ec35d1cc76ac::t_c08af9395232bc 1-86
+.agents/skills/quality-gates/gates/primitives/anti-gaming.md
+  s_39ec35d1cc76ac::t_c08af9395232bc 1-29
+skills-lock.json
+  s_39ec35d1cc76ac::t_c08af9395232bc 40-45
+.agents/skills/quality-gates/gates/primitives/independent-judge.md
+  s_39ec35d1cc76ac::t_c08af9395232bc 1-86
+.agents/skills/quality-gates/evals/evals.json
+  s_39ec35d1cc76ac::t_c08af9395232bc 1-50
+.agents/skills/quality-gates/gates/gate-model.md
+  s_39ec35d1cc76ac::t_c08af9395232bc 1-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "ab5108f9a62b4a89411f3b991fb2e3c54f2bee3f",
+  "prompts": {},
+  "sessions": {
+    "s_39ec35d1cc76ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5add2f21-01ee-4d07-9559-2fdb580b4c19",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
