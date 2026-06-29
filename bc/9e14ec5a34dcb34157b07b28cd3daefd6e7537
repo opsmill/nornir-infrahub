@@ -1,0 +1,21 @@
+dev/guides/uploading-files.md
+  s_39ec35d1cc76ac::t_6eff77aa77c84e 1-91
+dev/knowledge/architecture.md
+  s_39ec35d1cc76ac::t_41e4d0017cdb2c 73-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "bc9e14ec5a34dcb34157b07b28cd3daefd6e7537",
+  "prompts": {},
+  "sessions": {
+    "s_39ec35d1cc76ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5add2f21-01ee-4d07-9559-2fdb580b4c19",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
