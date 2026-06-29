@@ -1,0 +1,27 @@
+dev/adr/README.md
+  s_39ec35d1cc76ac::t_1753d52093b3ce 1-11
+dev/guidelines/README.md
+  s_39ec35d1cc76ac::t_d6904374eb8475 1-4
+dev/knowledge/README.md
+  s_39ec35d1cc76ac::t_8ad706ec43e6e5 1-4
+dev/guides/README.md
+  s_39ec35d1cc76ac::t_a167ca6875f483 1-3
+.agents/README.md
+  s_39ec35d1cc76ac::t_8a449b02717243 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "66575ccb6ca6d8599559b3dd0220f74c052b7644",
+  "prompts": {},
+  "sessions": {
+    "s_39ec35d1cc76ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5add2f21-01ee-4d07-9559-2fdb580b4c19",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
