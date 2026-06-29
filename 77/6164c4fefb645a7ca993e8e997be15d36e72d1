@@ -1,0 +1,24 @@
+dev/knowledge/inventory-data-model.md
+  s_39ec35d1cc76ac::t_5cfb10982b729c 1-116
+dev/guides/managing-artifacts.md
+  s_39ec35d1cc76ac::t_739486f4f4e502 1-65
+dev/guidelines/testing.md
+  s_39ec35d1cc76ac::t_275f70c7f78255 1-49,57-85
+  s_39ec35d1cc76ac::t_348ded62e3ab59 50-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "776164c4fefb645a7ca993e8e997be15d36e72d1",
+  "prompts": {},
+  "sessions": {
+    "s_39ec35d1cc76ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5add2f21-01ee-4d07-9559-2fdb580b4c19",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
