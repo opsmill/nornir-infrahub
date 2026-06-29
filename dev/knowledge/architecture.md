@@ -70,6 +70,11 @@ Note: all artifact operations now go through the SDK (`artifact_generate`, `Core
 `object_store`). Historically some used direct `httpx` calls; that was migrated to the SDK-provided
 functions.
 
+Alongside the three artifact tasks, `nornir_infrahub/plugins/tasks/file_object.py` provides
+`upload_file_object` and `download_file_object` for moving file content to/from `CoreFileObject` nodes
+in the object store (both checksum-driven and idempotent). Unlike the artifact tasks, these catch SDK
+errors and return a failed `Result` (`Result(failed=True, ...)`) rather than letting them raise.
+
 ## Entry-point registration
 
 The inventory plugin is registered through `pyproject.toml`:
