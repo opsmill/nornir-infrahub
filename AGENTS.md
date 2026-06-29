@@ -95,6 +95,31 @@ InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventor
 - Each test class inherits `NornirInfrahubIntegration` (in `tests/integration/conftest.py`), which spins up a fresh Infrahub container per class via `infrahub-testcontainers` and bootstraps schema + test data
 - The admin token comes from `infrahub_testcontainers.helpers.PROJECT_ENV_VARIABLES["INFRAHUB_TESTING_INITIAL_ADMIN_TOKEN"]` — do not hardcode
 
+## Boundaries
+
+### Always Do
+
+- Run `invoke format` then `invoke lint` (yamllint, ruff, pylint, ty) before committing — all four gates must pass (Constitution §III).
+- Keep unit tests passing and add unit tests for new plugin functionality (`pytest` runs `tests/unit/` by default; unit tests must not require Docker or network).
+- Keep changes minimal and focused on bridging Nornir and Infrahub — reject scope creep and unused abstractions (Constitution §V, YAGNI).
+- Preserve the task-plugin contract: tasks read the host's `InfrahubNode` from `host.data["InfrahubNode"]`.
+- Carry type annotations on all public function signatures and use Pydantic models for structured config/data (Constitution §II).
+- Pin any dependency with both lower and upper bounds (e.g. `>=1.17.0,<2`).
+
+### Ask First
+
+- Changing the public plugin API or the `nornir.plugins.inventory` entry point (`InfrahubInventory`).
+- Adding, removing, or bumping dependencies in `pyproject.toml` — new deps require justification.
+- Changes that alter inventory mapping semantics (`host_node`, `schema_mappings`, `group_mappings`, defaults/static-group YAML).
+- Upgrading `infrahub-sdk` in a way that changes query behavior or return types — validate against inventory and task functionality first (Constitution §I).
+
+### Never Do
+
+- Push directly to the protected `stable` branch (feature branches target `stable` via PR).
+- Commit secrets or tokens — use the test admin-token fixture (`PROJECT_ENV_VARIABLES["INFRAHUB_TESTING_INITIAL_ADMIN_TOKEN"]`), never hardcode.
+- Weaken or disable lint/type gates to pass CI — disable a rule only with an inline justification in `pyproject.toml` (Constitution §III).
+- Break the Nornir plugin contract (inventory protocol or `Result`-returning tasks) — this is a blocking defect (Constitution §I).
+
 ## Documentation Guidelines
 
 ### Writing guidelines
