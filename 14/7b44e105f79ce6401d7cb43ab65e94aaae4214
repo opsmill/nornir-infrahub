@@ -1,0 +1,27 @@
+dev/guides/local-development-setup.md
+  s_39ec35d1cc76ac::t_e4c06c2d8bea30 1-78
+dev/guides/developing-a-task-plugin.md
+  s_39ec35d1cc76ac::t_34ed9ee019d85b 1-71
+dev/guides/using-the-inventory-plugin.md
+  s_39ec35d1cc76ac::t_7f5b2f4b22805c 1-87
+dev/knowledge/architecture.md
+  s_39ec35d1cc76ac::t_76af63e7e4edee 1-128
+dev/guidelines/python.md
+  s_39ec35d1cc76ac::t_f452918ce5d7fc 1-81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "147b44e105f79ce6401d7cb43ab65e94aaae4214",
+  "prompts": {},
+  "sessions": {
+    "s_39ec35d1cc76ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5add2f21-01ee-4d07-9559-2fdb580b4c19",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
