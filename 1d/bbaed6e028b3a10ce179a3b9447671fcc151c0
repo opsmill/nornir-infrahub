@@ -1,0 +1,33 @@
+.agents/skills/pr/SKILL.md
+  s_39ec35d1cc76ac::t_d05551fa74527a 1-238
+.agents/skills/monitoring-pull-requests/SKILL.md
+  s_39ec35d1cc76ac::t_d05551fa74527a 1-410
+.agents/skills/creating-issues/SKILL.md
+  s_39ec35d1cc76ac::t_d05551fa74527a 1-128
+.agents/skills/commit/SKILL.md
+  s_39ec35d1cc76ac::t_d05551fa74527a 1-172
+.agents/skills/grilling-ideas/SKILL.md
+  s_39ec35d1cc76ac::t_d05551fa74527a 1-261
+.agents/skills/creating-prd/SKILL.md
+  s_39ec35d1cc76ac::t_d05551fa74527a 1-319
+.agents/skills/rebase/SKILL.md
+  s_39ec35d1cc76ac::t_d05551fa74527a 1-204
+skills-lock.json
+  s_39ec35d1cc76ac::t_d05551fa74527a 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "1dbbaed6e028b3a10ce179a3b9447671fcc151c0",
+  "prompts": {},
+  "sessions": {
+    "s_39ec35d1cc76ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5add2f21-01ee-4d07-9559-2fdb580b4c19",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
