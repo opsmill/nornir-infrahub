@@ -1,0 +1,19 @@
+dev/adr/0001-adopt-canonical-agentic-structure.md
+  s_39ec35d1cc76ac::t_5396151f0d91d6 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "0e4781fe98c9f222f33cfb37dad2490d6b6f558b",
+  "prompts": {},
+  "sessions": {
+    "s_39ec35d1cc76ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5add2f21-01ee-4d07-9559-2fdb580b4c19",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
