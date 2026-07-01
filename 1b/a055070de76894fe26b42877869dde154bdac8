@@ -1,0 +1,57 @@
+.github/workflows/ci.yml
+  s_39ec35d1cc76ac::t_d0aac99f6ec16f 86-87,89-93
+dev/knowledge/architecture.md
+  s_39ec35d1cc76ac::t_a5db2a7d5f3231 93
+.specify/memory/constitution.md
+  s_39ec35d1cc76ac::t_a5db2a7d5f3231 48,123,130
+docs/docs/guides/configuring-schema-mappings.mdx
+  s_39ec35d1cc76ac::t_a5db2a7d5f3231 20,23
+dev/guidelines/documentation.md
+  s_39ec35d1cc76ac::t_3bd1e9ab539324 71-73,75
+README.md
+  s_39ec35d1cc76ac::t_83be9c1ed5241f 1,3
+.pre-commit-config.yaml
+  s_39ec35d1cc76ac::t_3d2c361c42bed8 1-26
+docs/docs/guides/your-first-automation-workflow.mdx
+  s_39ec35d1cc76ac::t_a5db2a7d5f3231 19
+  s_39ec35d1cc76ac::t_60cc9caa9ad4c0 454
+pyproject.toml
+  s_39ec35d1cc76ac::t_a32ced110f2800 171-172,174,176,178-179,181,184,196-199,203-211
+  s_39ec35d1cc76ac::t_90ba585d15a68f 43
+  s_39ec35d1cc76ac::t_9be509b5daf7e5 42
+  s_39ec35d1cc76ac::t_16e694f975dc31 173,175,177,180,182-183
+  s_39ec35d1cc76ac::t_62adb2a62f2d2c 185-195
+  s_39ec35d1cc76ac::t_0bba32d2354557 200-202
+AGENTS.md
+  s_39ec35d1cc76ac::t_b1cdd4d21c486e 103
+  s_39ec35d1cc76ac::t_238911643983d3 34,39
+  s_39ec35d1cc76ac::t_4c9e4b9ccafe0f 168
+dev/guidelines/git-workflow.md
+  s_39ec35d1cc76ac::t_a5db2a7d5f3231 52-55,57-58
+  s_39ec35d1cc76ac::t_26236ea7f9433f 56
+  s_39ec35d1cc76ac::t_bd07ebd0a1d1ea 19-20,22-29
+tasks.py
+  s_39ec35d1cc76ac::t_4e956096a6fb71 63-71,79
+  s_39ec35d1cc76ac::t_842a7e4469bbca 18-19,21
+docs/docs/getting-started.mdx
+  s_39ec35d1cc76ac::t_a5db2a7d5f3231 16
+  s_39ec35d1cc76ac::t_60cc9caa9ad4c0 287
+uv.lock
+  s_39ec35d1cc76ac::t_8b2e60b68f5bf0 103-111,248-256,343-351,473-481,717-725,758,765,787,794,986-1001,1288-1300,1719-1733,2011-2026
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "1ba055070de76894fe26b42877869dde154bdac8",
+  "prompts": {},
+  "sessions": {
+    "s_39ec35d1cc76ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5add2f21-01ee-4d07-9559-2fdb580b4c19",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
