@@ -31,7 +31,7 @@ Provide either ``file_path`` (to upload a file from disk) or ``content`` with
 
 ### Returns
 
-A Nornir Result with ``changed`` indicating whether the object was created or updated, ``object_id`` with the UUID, and a descriptive ``result`` message.
+`Result` — A Nornir Result with ``changed`` indicating whether the object was created or updated, ``object_id`` with the UUID, and a descriptive ``result`` message.
 
 ### Raises
 
@@ -86,7 +86,7 @@ infrahub-sdk download API directly.
 
 ### Returns
 
-A Nornir Result containing ``binary`` (base64 string), ``text`` (UTF-8 string or None), ``file_name``, ``file_type``, ``file_size``, ``checksum``, ``object_id``, ``save_to``, and ``changed`` (True only when a local file was created or overwritten).
+`Result` — A Nornir Result containing ``binary`` (base64 string), ``text`` (UTF-8 string or None), ``file_name``, ``file_type``, ``file_size``, ``checksum``, ``object_id``, ``save_to``, and ``changed`` (True only when a local file was created or overwritten).
 
 ### Raises
 

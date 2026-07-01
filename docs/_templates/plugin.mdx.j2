@@ -17,11 +17,11 @@ title: {{ module }}
 | `{{ param.arg_name }}` | `{{ param.type_name | replace('|', '\\|') }}` | {{ "No" if param.is_optional else "Yes" }} | {{ param.default if param.default else "" }} | {{ param.description | replace('\n', ' ') }} |
 {%- endfor %}
 {%- endif %}
-{%- if documentation.returns and documentation.returns.description %}
+{%- if documentation.returns and (documentation.returns.type_name or documentation.returns.description) %}
 
 ### Returns
 
-{{ documentation.returns.description | replace('\n', ' ') }}
+{% if documentation.returns.type_name %}`{{ documentation.returns.type_name | replace('|', '\\|') }}`{% if documentation.returns.description %} — {% endif %}{% endif %}{{ documentation.returns.description | replace('\n', ' ') }}
 {%- endif %}
 {%- if documentation.raises %}
 
@@ -30,7 +30,7 @@ title: {{ module }}
 | Exception | Description |
 | --------- | ----------- |
 {%- for exc in documentation.raises %}
-| `{{ exc.type_name }}` | {{ exc.description | replace('\n', ' ') }} |
+| `{{ exc.type_name | replace('|', '\\|') }}` | {{ exc.description | replace('\n', ' ') }} |
 {%- endfor %}
 {%- endif %}
 
