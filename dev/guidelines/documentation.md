@@ -27,9 +27,8 @@ tutorials as a category — add pages under the directories that exist.
 
 ## Hand-written vs. generated pages
 
-Most pages (`getting-started.mdx`, everything under `guides/` and `topics/`, and
-`references/plugins/readme`/index landing content) are written and maintained by
-hand.
+Most pages (`getting-started.mdx`, the docs-root `readme.mdx`, and everything under
+`guides/` and `topics/`) are written and maintained by hand.
 
 The per-plugin **reference** pages under `docs/docs/references/plugins/` are
 **generated** from the plugin source docstrings by `invoke generate-docs`
@@ -43,8 +42,9 @@ Because the plugin API pages come from docstrings, **do not hand-edit the
 generated `<name>_<type>.mdx` files** — improve the docstring in the plugin source
 and re-run `invoke generate-docs`. Public classes and functions should carry
 docstrings with `Args:`, `Returns:`, `Raises:`, and an `Example:` block (see the
-Python guidelines) so the reference renders completely. `readme.mdx` is
-maintained by hand — the task only regenerates `_plugin_index.mdx`.
+Python guidelines) so the reference renders completely. The docs-root `readme.mdx`
+is maintained by hand; `invoke generate-docs` only writes the generated
+`_plugin_index.mdx` (there is no hand-maintained readme under `references/plugins/`).
 
 ## Preview and build
 
@@ -66,7 +66,7 @@ Per `AGENTS.md`, run both linters whenever a `.md` or `.mdx` file changes:
 - **Vale** — prose style, configured by `.vale.ini`. It applies the `Infrahub`
   style (rules in `.vale/styles/Infrahub/`) with `MinAlertLevel = warning`, maps
   `mdx` to Markdown, and ignores import statements and code blocks under
-  `docs/**/*.md`. Spelling exceptions live in
+  `docs/**` (both `.md` and `.mdx` files). Spelling exceptions live in
   `.vale/styles/spelling-exceptions.txt`.
 - **rumdl** — Markdown structure and formatting, configured by `[tool.rumdl]` in
   `pyproject.toml`. Check with `invoke lint-markdown` (or `rumdl check .`) and auto-fix

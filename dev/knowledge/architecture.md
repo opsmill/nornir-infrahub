@@ -112,15 +112,17 @@ explicitly via `InventoryPluginRegister.register(...)`. The task plugins are pla
                                 | nr.run(task=...)
                                 v
         +-----------------------+------------------------+
-        | Task plugins (artifact.py)                     |
+        | Task plugins (artifact.py, file_object.py)     |
         |   read host.data["InfrahubNode"], node._client |
         |   get_artifact / generate_artifacts /          |
-        |   regenerate_host_artifact                     |
+        |   regenerate_host_artifact /                   |
+        |   upload_file_object / download_file_object    |
         +-----------------------+------------------------+
                                 | SDK: artifact_generate / object_store
                                 v
                      +----------------------+
-                     |  Infrahub artifacts  |
+                     | Infrahub artifacts   |
+                     |  & file objects      |
                      +----------------------+
 ```
 

@@ -101,7 +101,7 @@ InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventor
 ### Always Do
 
 - Run `invoke format` then `invoke lint` (yamllint, ruff, pylint, ty, rumdl) before committing — all gates must pass (Constitution §III).
-- Keep unit tests passing and add unit tests for new plugin functionality (`pytest` runs `tests/unit/` by default; unit tests must not require Docker or network).
+- Keep unit tests passing and add unit tests for new plugin functionality (plain `pytest` runs the unit tests by default — `testpaths = ["tests"]` with integration excluded via the `-m 'not integration'` marker in `pyproject.toml`; unit tests must not require Docker or network).
 - Keep changes minimal and focused on bridging Nornir and Infrahub — reject scope creep and unused abstractions (Constitution §V, YAGNI).
 - Preserve the task-plugin contract: tasks read the host's `InfrahubNode` from `host.data["InfrahubNode"]`.
 - Carry type annotations on all public function signatures and use Pydantic models for structured config/data (Constitution §II).

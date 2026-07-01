@@ -17,6 +17,22 @@ title: {{ module }}
 | `{{ param.arg_name }}` | `{{ param.type_name | replace('|', '\\|') }}` | {{ "No" if param.is_optional else "Yes" }} | {{ param.default if param.default else "" }} | {{ param.description | replace('\n', ' ') }} |
 {%- endfor %}
 {%- endif %}
+{%- if documentation.returns and documentation.returns.description %}
+
+### Returns
+
+{{ documentation.returns.description | replace('\n', ' ') }}
+{%- endif %}
+{%- if documentation.raises %}
+
+### Raises
+
+| Exception | Description |
+| --------- | ----------- |
+{%- for exc in documentation.raises %}
+| `{{ exc.type_name }}` | {{ exc.description | replace('\n', ' ') }} |
+{%- endfor %}
+{%- endif %}
 
 ### Examples
 

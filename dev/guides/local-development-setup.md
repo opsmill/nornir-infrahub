@@ -9,6 +9,7 @@ Install the following before you begin:
 - **Python 3.10–3.13** (`requires-python = ">=3.10,<3.14"`).
 - **[uv](https://docs.astral.sh/uv/)** for dependency and virtual environment management.
 - **Docker** (running) — required only for the integration tests, which spin up a live Infrahub stack.
+- **Node.js and npm** — required only for the documentation site (`invoke docs-install` / `docs-serve` / `docs-build`).
 
 ## Install dependencies
 
@@ -18,7 +19,7 @@ Clone the repository, then sync the environment. `uv sync` creates a virtual env
 uv sync
 ```
 
-Prefix commands with `uv run` to execute them inside the synced environment (for example, `uv run invoke lint`), or activate the environment directly.
+The example commands below run tools inside that environment. Either activate it (`source .venv/bin/activate`) or prefix each command with `uv run` (for example, `uv run invoke lint`); `uv sync` alone does not activate your shell.
 
 ## Format and lint
 

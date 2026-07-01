@@ -51,6 +51,8 @@ Add a test file under `tests/unit/` (for example `tests/unit/test_your_task.py`)
 ```python
 from unittest.mock import MagicMock
 
+from nornir_infrahub.plugins.tasks import get_node_description
+
 
 def _make_task():
     task = MagicMock()

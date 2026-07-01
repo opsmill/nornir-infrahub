@@ -22,3 +22,6 @@ dist/*
 # Local test/dev scripts
 test_validate.py
 nornir.log
+
+# quality-gates ship-gate receipts (written by the Claude hook)
+.claude/quality-gates/receipts/
