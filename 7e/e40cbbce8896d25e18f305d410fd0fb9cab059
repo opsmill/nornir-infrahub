@@ -1,0 +1,44 @@
+docs/docs/references/plugins/file_object_tasks.mdx
+  s_04011de8fed22b::t_b2863c5c981b43 32-41,87-95
+  s_04011de8fed22b::t_53042b56a16a83 96
+dev/guides/developing-a-task-plugin.md
+  s_04011de8fed22b::t_43ce1cf6722876 54-55
+dev/guides/local-development-setup.md
+  s_04011de8fed22b::t_382516d87323d2 22
+  s_04011de8fed22b::t_b0fc7c9ae319ec 12
+AGENTS.md
+  s_04011de8fed22b::t_cc51c4fad8cea3 104
+dev/guides/using-the-inventory-plugin.md
+  s_04011de8fed22b::t_0e35581c2af66e 14
+.gitignore
+  s_04011de8fed22b::t_8fa9e4af67c218 25-27
+dev/guidelines/documentation.md
+  s_04011de8fed22b::t_60239eb9afb77a 45-47
+  s_04011de8fed22b::t_abb4c4a8554f99 30-31
+  s_04011de8fed22b::t_f1cb8b2768919a 69
+dev/knowledge/architecture.md
+  s_04011de8fed22b::t_ff8b93682e5ce2 115,118-119,124-125
+docs/_templates/plugin.mdx.j2
+  s_04011de8fed22b::t_3ff79ea4cc3c09 20-35
+.vale.ini
+  s_04011de8fed22b::t_422a7c83f32827 8
+docs/docs/references/plugins/artifact_tasks.mdx
+  s_04011de8fed22b::t_b2863c5c981b43 19-28,74-83,129-138
+  s_04011de8fed22b::t_921686d837e4f7 139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "7ee40cbbce8896d25e18f305d410fd0fb9cab059",
+  "prompts": {},
+  "sessions": {
+    "s_04011de8fed22b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "143ce318-87ec-48f2-a0df-e603dc4f196a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
