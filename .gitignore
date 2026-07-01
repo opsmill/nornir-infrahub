@@ -25,3 +25,6 @@ nornir.log
 
 # quality-gates ship-gate receipts (written by the Claude hook)
 .claude/quality-gates/receipts/
+
+# spec-kit extension download/catalog cache
+.specify/extensions/.cache/
