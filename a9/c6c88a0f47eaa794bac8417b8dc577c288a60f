@@ -1,0 +1,19 @@
+AGENTS.md
+  s_39ec35d1cc76ac::t_05b50a73cb61c4 89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "a9c6c88a0f47eaa794bac8417b8dc577c288a60f",
+  "prompts": {},
+  "sessions": {
+    "s_39ec35d1cc76ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5add2f21-01ee-4d07-9559-2fdb580b4c19",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
