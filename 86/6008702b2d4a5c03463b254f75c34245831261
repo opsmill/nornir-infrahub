@@ -1,0 +1,93 @@
+.specify/extensions/review/commands/simplify.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-61
+.specify/extensions/critique/LICENSE
+  s_04011de8fed22b::t_82baaa731ac50f 1-21
+.specify/extensions/review/tests/bats/detect-changed-files.bats
+  s_04011de8fed22b::t_82baaa731ac50f 1-650
+.specify/extensions.yml
+  s_04011de8fed22b::t_82baaa731ac50f 3,5,129-135,152-158
+.specify/extensions/review/commands/comments.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-85
+.agents/skills/speckit-critique-run/SKILL.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-241
+.specify/extensions/critique/README.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-44
+.specify/extensions/review/.github/workflows/ci.yml
+  s_04011de8fed22b::t_82baaa731ac50f 1-243
+.specify/extensions/review/LICENSE
+  s_04011de8fed22b::t_82baaa731ac50f 1-21
+.agents/skills/speckit-review-run/SKILL.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-177
+.agents/skills/speckit-review-simplify/SKILL.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-64
+.specify/extensions/critique/CHANGELOG.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-27
+.specify/extensions/review/scripts/bash/detect-changed-files.sh
+  s_04011de8fed22b::t_82baaa731ac50f 1-243
+.specify/extensions/review/config-template.yml
+  s_04011de8fed22b::t_82baaa731ac50f 1-17
+.specify/extensions/review/scripts/powershell/detect-changed-files.ps1
+  s_04011de8fed22b::t_82baaa731ac50f 1-228
+.gitignore
+  s_04011de8fed22b::t_26d7d83e1addf4 28-30
+.specify/extensions/critique/.gitignore
+  s_04011de8fed22b::t_82baaa731ac50f 1-4
+.specify/extensions/review/README.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-185
+.specify/extensions/critique/commands/critique-template.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-135
+.specify/extensions/review/extension.yml
+  s_04011de8fed22b::t_82baaa731ac50f 1-81
+.agents/skills/speckit-review-types/SKILL.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-126
+.specify/extensions/review/CHANGELOG.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-31
+.specify/extensions/review/commands/tests.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-82
+.specify/extensions/review/commands/code.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-56
+.specify/extensions/.registry
+  s_04011de8fed22b::t_82baaa731ac50f 87-144
+.specify/extensions/review/commands/types.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-123
+.specify/extensions/review/tests/bats/test_helper.bash
+  s_04011de8fed22b::t_82baaa731ac50f 1-90
+.agents/skills/speckit-review-code/SKILL.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-59
+.agents/skills/speckit-review-comments/SKILL.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-88
+.specify/extensions/critique/extension.yml
+  s_04011de8fed22b::t_82baaa731ac50f 1-32
+.specify/extensions/review/commands/errors.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-143
+.specify/extensions/review/tests/pester/detect-changed-files.Tests.ps1
+  s_04011de8fed22b::t_82baaa731ac50f 1-740
+.agents/skills/speckit-review-tests/SKILL.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-85
+.agents/skills/speckit-review-errors/SKILL.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-146
+.specify/extensions/review/.gitmodules
+  s_04011de8fed22b::t_82baaa731ac50f 1-9
+.specify/extensions/critique/commands/run.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-238
+.specify/extensions/review/.gitignore
+  s_04011de8fed22b::t_82baaa731ac50f 1-46
+.specify/extensions/review/commands/run.md
+  s_04011de8fed22b::t_82baaa731ac50f 1-174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "866008702b2d4a5c03463b254f75c34245831261",
+  "prompts": {},
+  "sessions": {
+    "s_04011de8fed22b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "143ce318-87ec-48f2-a0df-e603dc4f196a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
