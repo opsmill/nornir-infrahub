@@ -45,6 +45,7 @@ necessary (e.g., dynamic SDK types).
 ### III. Code Quality Gates
 
 Every change MUST pass the full lint suite before merge:
+
 - `ruff check` and `ruff format` for style and import ordering
 - `pylint` for structural and semantic checks
 - `yamllint` for YAML file hygiene
@@ -119,12 +120,14 @@ standards in nornir-infrahub. It supersedes informal conventions
 and ad-hoc decisions.
 
 **Amendment process**:
+
 1. Propose the change with rationale in a pull request.
 2. Update this document with the new version number.
 3. All active contributors MUST be notified.
 4. The Sync Impact Report (HTML comment at top) MUST be updated.
 
 **Versioning**: MAJOR.MINOR.PATCH semantic versioning.
+
 - MAJOR: Principle removed or fundamentally redefined.
 - MINOR: New principle or section added, material expansion.
 - PATCH: Clarifications, wording, typo fixes.

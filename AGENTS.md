@@ -31,11 +31,12 @@ invoke format
 ### Run linting
 
 ```bash
-invoke lint              # Run all linters (yaml, ruff, pylint, ty)
+invoke lint              # Run all linters (yaml, ruff, pylint, ty, rumdl)
 invoke lint-ruff         # Run ruff linter only
 invoke lint-pylint       # Run pylint only
 invoke lint-ty           # Run ty type checking only
 invoke lint-yaml         # Run yamllint only
+invoke lint-markdown     # Run rumdl (Markdown) only
 ```
 
 ### Run tests
@@ -99,7 +100,7 @@ InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventor
 
 ### Always Do
 
-- Run `invoke format` then `invoke lint` (yamllint, ruff, pylint, ty) before committing — all four gates must pass (Constitution §III).
+- Run `invoke format` then `invoke lint` (yamllint, ruff, pylint, ty, rumdl) before committing — all gates must pass (Constitution §III).
 - Keep unit tests passing and add unit tests for new plugin functionality (`pytest` runs `tests/unit/` by default; unit tests must not require Docker or network).
 - Keep changes minimal and focused on bridging Nornir and Infrahub — reject scope creep and unused abstractions (Constitution §V, YAGNI).
 - Preserve the task-plugin contract: tasks read the host's `InfrahubNode` from `host.data["InfrahubNode"]`.
@@ -164,5 +165,5 @@ InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventor
 
 ### Checklist
 
-- Always run markdownlint when `.md` or `.mdx` files change
+- Always run rumdl (`invoke lint-markdown`, or `rumdl check .` / `rumdl fmt .`) when `.md` or `.mdx` files change
 - Always run vale when `.md` or `.mdx` files change

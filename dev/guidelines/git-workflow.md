@@ -16,13 +16,17 @@ you may and may not do.
 
 Run these before pushing, in order:
 
-- `invoke format` — `ruff format .` then `ruff check . --fix`.
-- `invoke lint` — all four linters, in order: yamllint, ruff, pylint, ty.
+- `invoke format` — `ruff format .`, `ruff check . --fix`, then `rumdl fmt .` (Markdown).
+- `invoke lint` — all linters, in order: yamllint, ruff, pylint, ty, and rumdl (Markdown).
 
-All four lint gates must pass. Individual linters are available if you need to isolate
-a failure: `invoke lint-ruff`, `invoke lint-pylint`, `invoke lint-ty`, `invoke lint-yaml`.
-Keep unit tests green too — a bare `pytest` runs the unit suite (integration tests are
-excluded by default).
+All lint gates must pass. Individual linters are available if you need to isolate a
+failure: `invoke lint-ruff`, `invoke lint-pylint`, `invoke lint-ty`, `invoke lint-yaml`,
+`invoke lint-markdown`. Keep unit tests green too — a bare `pytest` runs the unit suite
+(integration tests are excluded by default).
+
+A `.pre-commit-config.yaml` wires the fast checks (ruff, rumdl, whitespace/EOF/YAML/TOML
+hooks) into git. Install once with `uv run pre-commit install`; run on demand with
+`uv run pre-commit run --all-files`.
 
 Do not weaken or disable a lint/type gate to get CI green. If a suppression is truly
 warranted, scope it narrowly with an inline `# noqa: <code>` or
@@ -45,13 +49,13 @@ Write imperative, scoped subjects that describe the change.
 - Target `stable`.
 - CI must be green before merge. The `CI` workflow (`.github/workflows/ci.yml`) runs
   only the jobs whose files changed (via `opsmill/paths-filter`):
-    - `python-lint` (Python 3.12): `ruff check`, `ruff format --check`, `ty check
-      nornir_infrahub`, and `pylint nornir_infrahub *.py` — mirrors `invoke lint`.
-    - `python-tests`: `pytest -v tests/` across Python 3.10, 3.11, 3.12, 3.13.
-    - `yaml-lint`: `yamllint -s .`
-    - `markdown-lint`: `markdownlint` over `**/*.{md,mdx}`.
-    - `documentation` / `validate-documentation-style`: build the docs site and run Vale
-      (only when docs change).
+  - `python-lint` (Python 3.12): `ruff check`, `ruff format --check`, `ty check
+    nornir_infrahub`, and `pylint nornir_infrahub *.py` — mirrors `invoke lint`.
+  - `python-tests`: `pytest -v tests/` across Python 3.10, 3.11, 3.12, 3.13.
+  - `yaml-lint`: `yamllint -s .`
+  - `markdown-lint`: `rumdl check .` over Markdown files.
+  - `documentation` / `validate-documentation-style`: build the docs site and run Vale
+    (only when docs change).
 
 ## Dependencies
 

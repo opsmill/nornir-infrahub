@@ -90,7 +90,7 @@ explicitly via `InventoryPluginRegister.register(...)`. The task plugins are pla
 
 ## Data flow
 
-```
+```text
                      +----------------------+
                      |    Infrahub API      |
                      |  (InfrahubClientSync)|

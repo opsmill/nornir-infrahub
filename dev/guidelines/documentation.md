@@ -68,11 +68,11 @@ Per `AGENTS.md`, run both linters whenever a `.md` or `.mdx` file changes:
   `mdx` to Markdown, and ignores import statements and code blocks under
   `docs/**/*.md`. Spelling exceptions live in
   `.vale/styles/spelling-exceptions.txt`.
-- **markdownlint** — Markdown structure, configured by `.markdownlint.yml` at the
-  repo root.
+- **rumdl** — Markdown structure and formatting, configured by `[tool.rumdl]` in
+  `pyproject.toml`. Check with `invoke lint-markdown` (or `rumdl check .`) and auto-fix
+  with `rumdl fmt .` (also run by `invoke format`).
 
-There is no `invoke` target wrapping the docs linters; run `vale` and
-`markdownlint` directly against the changed files.
+Run `vale` directly against the changed files (there is no `invoke` target wrapping it).
 
 ## Tone and terminology
 
