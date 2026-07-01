@@ -1,0 +1,24 @@
+docs/docs/references/plugins/file_object_tasks.mdx
+  s_04011de8fed22b::t_5dd5c9b937d774 34,89
+docs/_templates/plugin.mdx.j2
+  s_04011de8fed22b::t_b18da7d26773a3 33
+  s_04011de8fed22b::t_b9e18b8faf6692 20,24
+docs/docs/references/plugins/artifact_tasks.mdx
+  s_04011de8fed22b::t_5dd5c9b937d774 21,76,131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "26202f9d64d9a88620983374f70fb0d704077acb",
+  "prompts": {},
+  "sessions": {
+    "s_04011de8fed22b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "143ce318-87ec-48f2-a0df-e603dc4f196a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
