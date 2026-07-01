@@ -86,7 +86,7 @@ InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventor
 
 - All task plugins expect the host to have an `InfrahubNode` in `host.data["InfrahubNode"]`
 - The inventory plugin automatically includes `member_of_groups` relation for group membership
-- Artifact tasks use direct HTTP calls with `httpx` rather than the SDK for some operations
+- All Infrahub access goes through `infrahub-sdk` — there is no raw `httpx`/`requests` usage in the package (artifact tasks were migrated to SDK-provided functions; see `dev/knowledge/infrahub-sdk-integration.md`)
 - Error handling uses `RuntimeError` for mapping resolution failures (TODO items exist for improvement)
 
 ### Integration tests
