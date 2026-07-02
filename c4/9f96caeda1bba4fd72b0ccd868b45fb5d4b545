@@ -1,0 +1,28 @@
+.github/workflows/ci.yml
+  s_e841283d81faae::t_82133154148fc1 86-93,95-101
+tasks.py
+  s_e841283d81faae::t_b17ab7be13b47d 63-71,79
+pyproject.toml
+  s_e841283d81faae::t_f9bc8b2079ea70 171-172,174-184,186-195
+  s_e841283d81faae::t_57316057e0a306 173
+  s_e841283d81faae::t_161841c47484e5 185
+  s_e841283d81faae::t_e363d591cee2d8 50
+uv.lock
+  s_e841283d81faae::t_23dfd220702e96 719,748,1645-1659
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "c49f96caeda1bba4fd72b0ccd868b45fb5d4b545",
+  "prompts": {},
+  "sessions": {
+    "s_e841283d81faae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0cf0b75b-c0f0-4c8f-9fbe-688a3027e7ec",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
