@@ -47,6 +47,7 @@ dev = [
     "pyyaml>=6,<7",  # Required by infrahub-sdk pytest plugin
     "infrahub-testcontainers>=1.9.3",
     "towncrier>=25.8.0",
+    "rumdl>=0.2.27",
 ]
 
 [tool.uv]
@@ -166,6 +167,31 @@ known-third-party = ["nornir_infrahub"]
     "PLR0912", # Nornir task functions naturally branch on optional args
     "PLR0913", # Nornir task functions require many parameters
 ]
+
+[tool.rumdl]
+# Markdown linting — migrated from markdownlint-cli (.markdownlint.yml).
+exclude = [".venv", "node_modules", "docs/node_modules", "docs/build", "dist", ".claude", ".specify", ".agents"]
+disable = [
+    "MD012",  # multiple consecutive blank lines (blank lines in generated plugin doc sections)
+    "MD013",  # line length
+    "MD014",  # dollar signs used before commands without showing output
+    "MD024",  # duplicate headings (reused across instruction tabs)
+    "MD029",  # ordered list item prefix (manually numbered lists)
+    "MD033",  # inline HTML (used to override markdown styles)
+    "MD034",  # bare URLs
+    "MD045",  # images without alt text
+    "MD047",  # single trailing newline
+    "MD060",  # table column alignment (impractical with wide description columns)
+    "MD064",  # consecutive spaces (two-space sentence spacing in generated plugin docs; not a markdownlint rule)
+]
+
+# MD007: unordered list indentation of 4 spaces
+[tool.rumdl.MD007]
+indent = 4
+
+# MD025: don't treat the frontmatter title as an H1 (avoids collisions)
+[tool.rumdl.MD025]
+front-matter-title = ""
 
 [tool.towncrier]
 package = "nornir_infrahub"

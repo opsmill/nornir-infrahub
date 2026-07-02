@@ -83,14 +83,22 @@ jobs:
     steps:
       - name: "Check out repository code"
         uses: "actions/checkout@v7"
-      - name: "Install NodeJS"
-        uses: "actions/setup-node@v6"
+
+      - name: "Set up Python"
+        uses: "actions/setup-python@v6"
         with:
-          node-version: 20
-      - name: "Install markdownlint-cli"
-        run: "npm install -g markdownlint-cli"
-      - name: "Run markdownlint"
-        run: 'markdownlint "**/*.{md,mdx}" --ignore node_modules --ignore docs/node_modules'
+          python-version: "3.12"
+
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v7"
+        with:
+          version: "0.9.18"
+
+      - name: "Install dependencies"
+        run: "uv sync --group dev"
+
+      - name: "Linting: rumdl"
+        run: "uv run rumdl check ."
 
   yaml-lint:
     if: needs.files-changed.outputs.yaml == 'true'

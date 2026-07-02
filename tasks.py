@@ -60,6 +60,15 @@ def lint_pylint(context: Context):
         context.run(exec_cmd)
 
 
+@task
+def lint_markdown(context: Context):
+    """Run Linter to check all Markdown files."""
+    print(" - Check code with rumdl")
+    exec_cmd = "rumdl check ."
+    with context.cd(MAIN_DIRECTORY_PATH):
+        context.run(exec_cmd)
+
+
 @task(name="lint")
 def lint_all(context: Context):
     """Run all linters."""
@@ -67,6 +76,7 @@ def lint_all(context: Context):
     lint_ruff(context)
     lint_pylint(context)
     lint_ty(context)
+    lint_markdown(context)
 
 
 @task(name="docs-install")
