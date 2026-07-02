@@ -139,5 +139,5 @@ InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventor
 
 ### Checklist
 
-- Always run markdownlint when `.md` or `.mdx` files change
+- Always run rumdl (`invoke lint-markdown`) when `.md` or `.mdx` files change
 - Always run vale when `.md` or `.mdx` files change
