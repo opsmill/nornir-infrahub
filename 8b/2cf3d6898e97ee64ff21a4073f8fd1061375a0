@@ -1,0 +1,32 @@
+.github/workflows/update-infrahub-sdk.yml
+  s_e841283d81faae::t_c01e655ea1f14b 1-85
+changelog/.gitignore
+  s_e841283d81faae::t_fdfdd9e007c95d 1
+.github/workflows/update-infrahub.yml
+  s_e841283d81faae::t_990530f707db8f 1-85
+.gitignore
+  s_e841283d81faae::t_544c695abf0406 25-38
+changelog/towncrier.md.template
+  s_e841283d81faae::t_8b09b540ee5593 1-53
+pyproject.toml
+  s_e841283d81faae::t_4a36ceea524087 170-215
+  s_e841283d81faae::t_ee2a3806925c39 49
+uv.lock
+  s_e841283d81faae::t_c2a56d53a3bebd 719,747,1758-1771
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "8b2cf3d6898e97ee64ff21a4073f8fd1061375a0",
+  "prompts": {},
+  "sessions": {
+    "s_e841283d81faae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0cf0b75b-c0f0-4c8f-9fbe-688a3027e7ec",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
