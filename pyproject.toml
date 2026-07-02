@@ -46,6 +46,7 @@ dev = [
     "rich>=12,<16",  # Required by infrahub-sdk pytest plugin
     "pyyaml>=6,<7",  # Required by infrahub-sdk pytest plugin
     "infrahub-testcontainers>=1.9.3",
+    "towncrier>=25.8.0",
 ]
 
 [tool.uv]
@@ -165,6 +166,52 @@ known-third-party = ["nornir_infrahub"]
     "PLR0912", # Nornir task functions naturally branch on optional args
     "PLR0913", # Nornir task functions require many parameters
 ]
+
+[tool.towncrier]
+package = "nornir_infrahub"
+directory = "changelog"
+filename = "CHANGELOG.md"
+start_string = "<!-- towncrier release notes start -->\n"
+underlines = ["", "", ""]
+title_format = "## [nornir-infrahub - v{version}](https://github.com/opsmill/nornir-infrahub/tree/v{version}) - {project_date}"
+issue_format = "[#{issue}](https://github.com/opsmill/nornir-infrahub/issues/{issue})"
+orphan_prefix = "+"
+template = "changelog/towncrier.md.template"
+
+[[tool.towncrier.type]]
+directory = "security"
+name = "Security"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "removed"
+name = "Removed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "deprecated"
+name = "Deprecated"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "added"
+name = "Added"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "changed"
+name = "Changed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fixed"
+name = "Fixed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "housekeeping"
+name = "Housekeeping"
+showcontent = true
 
 [build-system]
 requires = ["hatchling"]

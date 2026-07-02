@@ -22,3 +22,17 @@ dist/*
 # Local test/dev scripts
 test_validate.py
 nornir.log
+
+# Python caches
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+
+# IDE
+.idea/
+
+# Secrets / credentials
+*.pem
+*.key
+credentials.json
+secrets.yaml
