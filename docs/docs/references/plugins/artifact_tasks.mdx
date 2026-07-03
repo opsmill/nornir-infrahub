@@ -16,6 +16,16 @@ This function regenerates the named artifact for the host's InfrahubNode through
 | `task` | `Task` | Yes |  | The task instance containing host-related data. |
 | `artifact` | `str` | Yes |  | The name of the artifact to regenerate. |
 
+### Returns
+
+`Result` — An object representing the outcome of the operation, indicating success or failure.
+
+### Raises
+
+| Exception | Description |
+| --------- | ----------- |
+| `Exception` | Propagates any error raised by the Infrahub SDK if the artifact cannot be generated. |
+
 ### Examples
 
 #### Regenerate artifact for a given device
@@ -61,6 +71,16 @@ its generation through the Infrahub SDK.
 | `artifact` | `str` | Yes |  | The name of the artifact to generate. |
 | `timeout` | `int` | No | 10 | Retained for compatibility; ignored by the SDK path. Defaults to 10. |
 
+### Returns
+
+`Result` — An object representing the outcome of the operation, indicating success or failure.
+
+### Raises
+
+| Exception | Description |
+| --------- | ----------- |
+| `Exception` | Propagates any error raised by the Infrahub SDK if the artifact cannot be generated. |
+
 ### Examples
 
 #### Example generating artifacts
@@ -105,6 +125,17 @@ depending on the artifact's content type.
 | `task` | `Task` | Yes |  | The task instance containing host-related data. |
 | `artifact` | `str` | No |  | The name of the artifact to retrieve. |
 | `artifact_id` | `str` | No |  | The id of the artifact to retrieve. |
+
+### Returns
+
+`Result` — An object containing the retrieved artifact data, its content type, and the success status of the operation.
+
+### Raises
+
+| Exception | Description |
+| --------- | ----------- |
+| `RuntimeError` | If neither or both of `artifact` and `artifact_id` are provided. |
+| `Exception` | Propagates any error raised by the Infrahub SDK if the artifact cannot be retrieved. |
 
 ### Examples
 

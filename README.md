@@ -1,6 +1,6 @@
-<!-- markdownlint-disable -->
+<!-- rumdl-disable -->
 ![Infrahub Logo](https://assets-global.website-files.com/657aff4a26dd8afbab24944b/657b0e0678f7fd35ce130776_Logo%20INFRAHUB.svg)
-<!-- markdownlint-restore -->
+<!-- rumdl-enable -->
 
 # Nornir plugin for Infrahub
 
