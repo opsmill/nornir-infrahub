@@ -1,0 +1,314 @@
+.gitignore
+  s_c057a5cb42d657::t_493f0ee02a019f 39
+  s_c057a5cb42d657::t_e0a44d6a923901 40-42
+  s_c057a5cb42d657::t_3ffcfd6d499abe 43-44
+pyproject.toml
+  s_c057a5cb42d657::t_816a4ac00fc13f 174-175,177-186,188-205,207-209,211
+  s_c057a5cb42d657::t_c14dc0f799b0b5 42-43
+.agents/README.md
+  s_ab9946ebf2d41a::t_402dfe3ea4935d 1-18
+.agents/skills/commit/SKILL.md
+  s_ab9946ebf2d41a::t_ba85954f904b50 1-172
+.agents/skills/creating-issues/SKILL.md
+  s_ab9946ebf2d41a::t_26bd32735b6a7e 1-128
+.agents/skills/creating-prd/SKILL.md
+  s_ab9946ebf2d41a::t_0130858545a6ef 1-319
+.agents/skills/grilling-ideas/SKILL.md
+  s_ab9946ebf2d41a::t_1b4594f431e7e2 1-261
+.agents/skills/monitoring-pull-requests/SKILL.md
+  s_ab9946ebf2d41a::t_55a288db860da5 1-410
+.agents/skills/pr/SKILL.md
+  s_ab9946ebf2d41a::t_13ae2852f81006 1-238
+.agents/skills/quality-gates/DECISION.md
+  s_ab9946ebf2d41a::t_acaf2b78455b70 1-26
+.agents/skills/quality-gates/SKILL.md
+  s_ab9946ebf2d41a::t_55525c3fce8489 1-86
+.agents/skills/quality-gates/evals/evals.json
+  s_ab9946ebf2d41a::t_9f4e82a2e1636d 1-50
+.agents/skills/quality-gates/gates/_index.md
+  s_ab9946ebf2d41a::t_8a024bd5d65200 1-8
+.agents/skills/quality-gates/gates/gate-model.md
+  s_ab9946ebf2d41a::t_e940bc83ea1ce0 1-57
+.agents/skills/quality-gates/gates/primitives/anti-gaming.md
+  s_ab9946ebf2d41a::t_08009b0cd58dd7 1-29
+.agents/skills/quality-gates/gates/primitives/evidence-before-done.md
+  s_ab9946ebf2d41a::t_3087bee447cca9 1-14
+.agents/skills/quality-gates/gates/primitives/independent-judge.md
+  s_ab9946ebf2d41a::t_e38b9748e35ddf 1-86
+.agents/skills/quality-gates/hooks/ship-gate-check.sh
+  s_ab9946ebf2d41a::t_9037c4c7761f68 1-73
+.agents/skills/rebase/SKILL.md
+  s_ab9946ebf2d41a::t_b665d21770927a 1-204
+.agents/skills/speckit-agent-context-update/SKILL.md
+  s_ab9946ebf2d41a::t_0d232b2b212ac7 1-32
+.agents/skills/speckit-analyze/SKILL.md
+  s_ab9946ebf2d41a::t_c632e6506eef4b 10,32,55,60,66,202,204,219,240
+.agents/skills/speckit-checklist/SKILL.md
+  s_ab9946ebf2d41a::t_94e2ff7b182c92 10,53,76,85-87,119,125,136,254,256,262,354,375
+.agents/skills/speckit-clarify/SKILL.md
+  s_ab9946ebf2d41a::t_7bf20ec3ae45f2 10,32,55,62,70,73-75,131,142,178,196,204-223,228,237-239,242-244,249,251-259,272-288
+.agents/skills/speckit-constitution/SKILL.md
+  s_ab9946ebf2d41a::t_004fcbe45c7fcc 10,32,55,137,158
+.agents/skills/speckit-converge/SKILL.md
+  s_ab9946ebf2d41a::t_c49d36fc5c7760 1-279
+.agents/skills/speckit-critique-run/SKILL.md
+  s_ab9946ebf2d41a::t_a3f52eb837a1fc 1-241
+.agents/skills/speckit-implement/SKILL.md
+  s_ab9946ebf2d41a::t_959a0eb85acefd 10,32,55,99,179-226
+.agents/skills/speckit-opsmill-auto/SKILL.md
+  s_ab9946ebf2d41a::t_3cdaa6312da572 1-78
+.agents/skills/speckit-opsmill-extract/SKILL.md
+  s_ab9946ebf2d41a::t_5487f2d5a20f3f 1-346
+.agents/skills/speckit-opsmill-implement/SKILL.md
+  s_ab9946ebf2d41a::t_39215db789e760 1-132
+.agents/skills/speckit-opsmill-prep/SKILL.md
+  s_ab9946ebf2d41a::t_68f4f7074480be 1-156
+.agents/skills/speckit-opsmill-retrospect/SKILL.md
+  s_ab9946ebf2d41a::t_337796baf14f89 1-181
+.agents/skills/speckit-opsmill-summary/SKILL.md
+  s_ab9946ebf2d41a::t_d6167f9ef1c49f 1-143
+.agents/skills/speckit-plan/SKILL.md
+  s_ab9946ebf2d41a::t_b85a170b64f08c 10,32,55,73-110,152-157,159-162,166,168-173
+.agents/skills/speckit-review-code/SKILL.md
+  s_ab9946ebf2d41a::t_aac2146291bf58 1-59
+.agents/skills/speckit-review-comments/SKILL.md
+  s_ab9946ebf2d41a::t_2a6b61afca1065 1-88
+.agents/skills/speckit-review-errors/SKILL.md
+  s_ab9946ebf2d41a::t_ef599aa15ae49b 1-146
+.agents/skills/speckit-review-run/SKILL.md
+  s_ab9946ebf2d41a::t_36ddb6f2c49a5c 1-177
+.agents/skills/speckit-review-simplify/SKILL.md
+  s_ab9946ebf2d41a::t_3473465b735970 1-64
+.agents/skills/speckit-review-tests/SKILL.md
+  s_ab9946ebf2d41a::t_39ec23389277c6 1-85
+.agents/skills/speckit-review-types/SKILL.md
+  s_ab9946ebf2d41a::t_05bbe4cebbbebd 1-126
+.agents/skills/speckit-specify/SKILL.md
+  s_ab9946ebf2d41a::t_1cd80efb4fb0d2 10,32,55,60,89,94,98-99,108,111,115,117-119,184,193,238-279,343-348
+.agents/skills/speckit-tasks/SKILL.md
+  s_ab9946ebf2d41a::t_902a3e7e765c37 10,32,55,60,65,79,92-135,212-217
+.agents/skills/speckit-taskstoissues/SKILL.md
+  s_ab9946ebf2d41a::t_ed581a6f6a6f58 10,32,55,61,72-75,90,111
+.claude/skills
+  s_ab9946ebf2d41a::t_20216fa55b572f 1
+.pre-commit-config.yaml
+  s_ab9946ebf2d41a::t_8d6c79e7135da8 1-26
+.specify/extensions.yml
+  s_ab9946ebf2d41a::t_0217b5733afe4a 1-5,97-104,121-135,152-158,183-191
+.specify/extensions/.registry
+  s_ab9946ebf2d41a::t_2f8199ba1347d7 21-144
+.specify/extensions/agent-context/README.md
+  s_ab9946ebf2d41a::t_31019c2ff7584a 1-66
+.specify/extensions/agent-context/agent-context-config.yml
+  s_ab9946ebf2d41a::t_c2f7565206c3e1 1-5
+.specify/extensions/agent-context/commands/speckit.agent-context.update.md
+  s_ab9946ebf2d41a::t_68332831682745 1-27
+.specify/extensions/agent-context/extension.yml
+  s_ab9946ebf2d41a::t_b71935b074cf1d 1-34
+.specify/extensions/agent-context/scripts/bash/update-agent-context.sh
+  s_ab9946ebf2d41a::t_d0d4066bf03be8 1-337
+.specify/extensions/agent-context/scripts/powershell/update-agent-context.ps1
+  s_ab9946ebf2d41a::t_903f747b003be3 1-417
+.specify/extensions/critique/.gitignore
+  s_ab9946ebf2d41a::t_62dc3ecf2bfea1 1-4
+.specify/extensions/critique/CHANGELOG.md
+  s_ab9946ebf2d41a::t_9d5e36031bd7fd 1-27
+.specify/extensions/critique/LICENSE
+  s_ab9946ebf2d41a::t_e2ca94778334fe 1-21
+.specify/extensions/critique/README.md
+  s_ab9946ebf2d41a::t_acfd083030fa45 1-44
+.specify/extensions/critique/commands/critique-template.md
+  s_ab9946ebf2d41a::t_a8411f8e4ac19c 1-135
+.specify/extensions/critique/commands/run.md
+  s_ab9946ebf2d41a::t_fd5a6edb4f5923 1-238
+.specify/extensions/critique/extension.yml
+  s_ab9946ebf2d41a::t_40200619392d65 1-32
+.specify/extensions/opsmill/CHANGELOG.md
+  s_ab9946ebf2d41a::t_a9b41c48656199 1-74
+.specify/extensions/opsmill/LICENSE
+  s_ab9946ebf2d41a::t_27069343564b1c 1-201
+.specify/extensions/opsmill/README.md
+  s_ab9946ebf2d41a::t_a182281d3d8558 1-170
+.specify/extensions/opsmill/commands/auto.md
+  s_ab9946ebf2d41a::t_24227b30e5ee38 1-71
+.specify/extensions/opsmill/commands/extract.md
+  s_ab9946ebf2d41a::t_f6110361fbf9ef 1-340
+.specify/extensions/opsmill/commands/implement.md
+  s_ab9946ebf2d41a::t_2e44fff3419658 1-126
+.specify/extensions/opsmill/commands/prep.md
+  s_ab9946ebf2d41a::t_75de0173810bdf 1-150
+.specify/extensions/opsmill/commands/retrospect.md
+  s_ab9946ebf2d41a::t_525275815a2fa0 1-175
+.specify/extensions/opsmill/commands/summary.md
+  s_ab9946ebf2d41a::t_9b0bfb9b8d3af1 1-139
+.specify/extensions/opsmill/extension.yml
+  s_ab9946ebf2d41a::t_83dae36f864758 1-55
+.specify/extensions/opsmill/presets/CHANGELOG.md
+  s_ab9946ebf2d41a::t_32e2fccd7b0e63 1-46
+.specify/extensions/opsmill/presets/taskstoissues-jira/README.md
+  s_ab9946ebf2d41a::t_003d88ba1c8c46 1-57
+.specify/extensions/opsmill/presets/taskstoissues-jira/commands/speckit.taskstoissues.md
+  s_ab9946ebf2d41a::t_ce87dc46ccc929 1-190
+.specify/extensions/opsmill/presets/taskstoissues-jira/preset.yml
+  s_ab9946ebf2d41a::t_04c250c95353aa 1-28
+.specify/extensions/opsmill/presets/taskstoissues-jira/templates/jira.example.yml
+  s_ab9946ebf2d41a::t_5e938ae18954f6 1-38
+.specify/extensions/review/.github/workflows/ci.yml
+  s_ab9946ebf2d41a::t_26d4723009c645 1-243
+.specify/extensions/review/.gitignore
+  s_ab9946ebf2d41a::t_2e475a3b59c03c 1-46
+.specify/extensions/review/.gitmodules
+  s_ab9946ebf2d41a::t_9c715cbb14aa25 1-9
+.specify/extensions/review/CHANGELOG.md
+  s_ab9946ebf2d41a::t_b66f35cc1636f3 1-31
+.specify/extensions/review/LICENSE
+  s_ab9946ebf2d41a::t_2009a691546639 1-21
+.specify/extensions/review/README.md
+  s_ab9946ebf2d41a::t_72aaffab96c756 1-185
+.specify/extensions/review/commands/code.md
+  s_ab9946ebf2d41a::t_4e60c065e61adc 1-56
+.specify/extensions/review/commands/comments.md
+  s_ab9946ebf2d41a::t_e6ede30a7d6516 1-85
+.specify/extensions/review/commands/errors.md
+  s_ab9946ebf2d41a::t_d53c8829e0415e 1-143
+.specify/extensions/review/commands/run.md
+  s_ab9946ebf2d41a::t_f9af038b4d78a9 1-174
+.specify/extensions/review/commands/simplify.md
+  s_ab9946ebf2d41a::t_3de17e2d1535ba 1-61
+.specify/extensions/review/commands/tests.md
+  s_ab9946ebf2d41a::t_e52afb1525b57c 1-82
+.specify/extensions/review/commands/types.md
+  s_ab9946ebf2d41a::t_b6d37c3e4d5093 1-123
+.specify/extensions/review/config-template.yml
+  s_ab9946ebf2d41a::t_fafd782e1faff7 1-17
+.specify/extensions/review/extension.yml
+  s_ab9946ebf2d41a::t_d6403eb9347028 1-81
+.specify/extensions/review/scripts/bash/detect-changed-files.sh
+  s_ab9946ebf2d41a::t_ae4bec45ee25e9 1-243
+.specify/extensions/review/scripts/powershell/detect-changed-files.ps1
+  s_ab9946ebf2d41a::t_c06bf7c7e462cc 1-228
+.specify/extensions/review/tests/bats/detect-changed-files.bats
+  s_ab9946ebf2d41a::t_a304ab0638aa3e 1-650
+.specify/extensions/review/tests/bats/test_helper.bash
+  s_ab9946ebf2d41a::t_e2e622edabedf5 1-90
+.specify/extensions/review/tests/pester/detect-changed-files.Tests.ps1
+  s_ab9946ebf2d41a::t_48be22313c92c6 1-740
+.specify/init-options.json
+  s_ab9946ebf2d41a::t_459e5f2f8ed5ec 4,8
+.specify/integration.json
+  s_ab9946ebf2d41a::t_90750ca71276b6 2-12,14
+.specify/integrations/claude.manifest.json
+  s_ab9946ebf2d41a::t_f180aba17aa454 3-4,6-15
+.specify/integrations/speckit.manifest.json
+  s_ab9946ebf2d41a::t_d3c66b8aa5a505 3,6-9,12-16
+.specify/memory/constitution.md
+  s_ab9946ebf2d41a::t_b1cca3a86ae605 48,123,130
+.specify/scripts/bash/check-prerequisites.sh
+  s_ab9946ebf2d41a::t_3e24177cbc46d9 81,86,117,123,130
+.specify/scripts/bash/common.sh
+  s_ab9946ebf2d41a::t_bdfbe978841ea0 27-55,57-62,70,75-78,85-87,90-98,100-115,118,122-126,128-133,136-140,143-148,150,155-160,164-165,171-172,175,180-181,184-185,208-284,345-347,399-619
+.specify/scripts/bash/create-new-feature.sh
+  s_ab9946ebf2d41a::t_b60b22d46254c8 60-62,87,122,126,203,205-206,240-244,246,261-264,266,297
+.specify/scripts/bash/setup-plan.sh
+  s_ab9946ebf2d41a::t_de56d5e8f917ab 38-44,46-62,73,75-76
+.specify/scripts/bash/setup-tasks.sh
+  s_ab9946ebf2d41a::t_d2fb503fe3ca7a 5-6,8-19,21,25,30-35,37-41,43-58,60-64,66,68-72,74-75,77-78,80-90
+.specify/templates/checklist-template.md
+  s_ab9946ebf2d41a::t_8e8023eba278b8 7,13
+.specify/templates/plan-template.md
+  s_ab9946ebf2d41a::t_1913be7f80ac7c 4,7,21-28,30-36,51-56
+.specify/templates/spec-template.md
+  s_ab9946ebf2d41a::t_79bbf40e091238 3-8,17,91
+.specify/templates/tasks-template.md
+  s_ab9946ebf2d41a::t_8155a50ceca325 9,29,32-33,38,43
+.specify/workflows/speckit/workflow.yml
+  s_ab9946ebf2d41a::t_7d15a4e178f3ac 1-77
+.specify/workflows/workflow-registry.json
+  s_ab9946ebf2d41a::t_ec92a4c1e2ce04 1-13
+.vale.ini
+  s_ab9946ebf2d41a::t_4637e0c4ce26e8 8
+CLAUDE.md
+  s_ab9946ebf2d41a::t_9650065f158a59 4-8
+README.md
+  s_ab9946ebf2d41a::t_20f3139fca2aff 1,3
+dev/adr/0001-adopt-canonical-agentic-structure.md
+  s_ab9946ebf2d41a::t_3573a92bfc0d8e 1-41
+dev/adr/README.md
+  s_ab9946ebf2d41a::t_0dc3539745c579 1-11
+dev/guidelines/README.md
+  s_ab9946ebf2d41a::t_839aa601e108ef 1-4
+dev/guidelines/documentation.md
+  s_ab9946ebf2d41a::t_04c41c475650dd 1-95
+dev/guidelines/git-workflow.md
+  s_ab9946ebf2d41a::t_960e2d777d7c71 1-82
+dev/guidelines/python.md
+  s_ab9946ebf2d41a::t_2dec0b2acacb03 1-81
+dev/guidelines/testing.md
+  s_ab9946ebf2d41a::t_a8f688be7294a4 1-85
+dev/guides/README.md
+  s_ab9946ebf2d41a::t_dd7af7dc97aba7 1-3
+dev/guides/developing-a-task-plugin.md
+  s_ab9946ebf2d41a::t_9b87ad0a4c7c9a 1-73
+dev/guides/local-development-setup.md
+  s_ab9946ebf2d41a::t_fda4a9f2fa5a95 1-79
+dev/guides/managing-artifacts.md
+  s_ab9946ebf2d41a::t_663322504bc59a 1-65
+dev/guides/running-integration-tests.md
+  s_ab9946ebf2d41a::t_71f3582c862dda 1-73
+dev/guides/uploading-files.md
+  s_ab9946ebf2d41a::t_e8ae5ee337511a 1-91
+dev/guides/using-the-inventory-plugin.md
+  s_ab9946ebf2d41a::t_535041d0cbbddd 1-87
+dev/knowledge/README.md
+  s_ab9946ebf2d41a::t_268e7a7c7f48ed 1-4
+dev/knowledge/architecture.md
+  s_ab9946ebf2d41a::t_d1c58354672bb0 1-135
+dev/knowledge/infrahub-sdk-integration.md
+  s_ab9946ebf2d41a::t_0958fd2f5ad1a6 1-128
+dev/knowledge/inventory-data-model.md
+  s_ab9946ebf2d41a::t_76429578ec2697 1-116
+docs/_templates/plugin.mdx.j2
+  s_ab9946ebf2d41a::t_3db3e0824b9fdd 20-35
+docs/docs/getting-started.mdx
+  s_ab9946ebf2d41a::t_21bce25c101dc6 16,287
+docs/docs/guides/configuring-schema-mappings.mdx
+  s_ab9946ebf2d41a::t_f22f6706d1631e 20,23
+docs/docs/guides/your-first-automation-workflow.mdx
+  s_ab9946ebf2d41a::t_a75a74a7446648 19,454
+docs/docs/references/plugins/artifact_tasks.mdx
+  s_ab9946ebf2d41a::t_ec95159f2974aa 19-28,74-83,129-139
+docs/docs/references/plugins/file_object_tasks.mdx
+  s_ab9946ebf2d41a::t_56bafd6032a3c7 32-41,87-96
+skills-lock.json
+  s_ab9946ebf2d41a::t_73af81b3da3ff2 1-53
+uv.lock
+  s_c057a5cb42d657::t_c8e6b5506f8376 103-111,248-256,343-351,473-481,717-725,758,788,795,989-1004,1291-1303,2028-2043
+AGENTS.md
+  s_c057a5cb42d657::t_16391378cf9185 34,39,89,99-123,168
+tasks.py
+  s_c057a5cb42d657::t_64ee6f6affe4f5 18-19,21,65-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "eb0f867d4444ed6366699e888935c3a0b306a034",
+  "prompts": {},
+  "sessions": {
+    "s_ab9946ebf2d41a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aef1f010-5798-4b84-a980-39b19b4ccddd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    },
+    "s_c057a5cb42d657": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9add42e7-3682-44bb-9e21-6b2b2377c634",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
