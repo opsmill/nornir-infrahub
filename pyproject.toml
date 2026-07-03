@@ -39,6 +39,8 @@ dev = [
     "pytest-asyncio>=1.3.0,<2",
     "invoke>=2.2.0,<4",
     "yamllint>=1.37.1",
+    "rumdl>=0.1.68,<1",
+    "pre-commit>=4.0.0,<5",
     "pylint>=3.3.0,<5",
     "docstring-parser>=0.17,<0.19",
     "jinja2>=3.1.6,<4",
@@ -169,27 +171,44 @@ known-third-party = ["nornir_infrahub"]
 ]
 
 [tool.rumdl]
-# Markdown linting — migrated from markdownlint-cli (.markdownlint.yml).
-exclude = [".venv", "node_modules", "docs/node_modules", "docs/build", "dist", ".claude", ".specify", ".agents"]
+# Markdown linter/formatter (replaces markdownlint). Rule numbers are rumdl's own.
+# The disable set carries over the rules the previous .markdownlint.yml turned off.
 disable = [
-    "MD012",  # multiple consecutive blank lines (blank lines in generated plugin doc sections)
-    "MD013",  # line length
-    "MD014",  # dollar signs used before commands without showing output
-    "MD024",  # duplicate headings (reused across instruction tabs)
-    "MD029",  # ordered list item prefix (manually numbered lists)
-    "MD033",  # inline HTML (used to override markdown styles)
-    "MD034",  # bare URLs
-    "MD045",  # images without alt text
-    "MD047",  # single trailing newline
-    "MD060",  # table column alignment (impractical with wide description columns)
-    "MD064",  # consecutive spaces (two-space sentence spacing in generated plugin docs; not a markdownlint rule)
+    "MD012",  # Multiple blank lines — generated plugin reference docs emit them
+    "MD013",  # Line length — long lines are fine in dev/ references and tables
+    "MD014",  # Dollar signs before shell commands
+    "MD029",  # Ordered-list prefix — allow manual numbering
+    "MD033",  # Inline HTML — Docusaurus/MDX pages use it
+    "MD034",  # Bare URLs — docstrings and READMEs contain them
+    "MD041",  # First line need not be a top-level heading (MDX frontmatter/imports)
+    "MD045",  # Image alt text
+    "MD047",  # Single trailing newline
+    "MD060",  # Table column alignment — impractical with wide description columns
+]
+# Vendored/generated trees are pinned elsewhere (skills-lock.json, spec-kit) and must
+# not be rewritten locally — exclude them like styrmin does.
+exclude = [
+    "node_modules",
+    "docs/node_modules",
+    ".venv",
+    ".agents",               # vendored skills (spec-kit + opsmill-dev), pinned by skills-lock.json
+    ".claude",               # symlink views of .agents
+    ".specify/extensions",   # vendored spec-kit extensions
+    ".specify/templates",    # vendored spec-kit templates
 ]
 
-# MD007: unordered list indentation of 4 spaces
-[tool.rumdl.MD007]
-indent = 4
+[tool.rumdl.per-file-ignores]
+# AGENTS.md / CLAUDE.md are agent-instruction files, not published docs.
+"**/AGENTS.md" = ["MD013", "MD024", "MD025", "MD029", "MD033", "MD041"]
+# Plugin reference pages are generated from docstrings by `invoke generate-docs`;
+# don't fight the renderer's alignment spacing.
+"docs/docs/references/plugins/**" = ["MD064"]
 
-# MD025: don't treat the frontmatter title as an H1 (avoids collisions)
+# MD024: allow duplicate headings among siblings (e.g. repeated step headings in tabs)
+[tool.rumdl.MD024]
+siblings-only = true
+
+# MD025: don't treat a frontmatter title as a competing H1
 [tool.rumdl.MD025]
 front-matter-title = ""
 

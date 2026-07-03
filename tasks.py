@@ -15,10 +15,10 @@ PLUGINS_DIRECTORY = Path("nornir_infrahub/plugins")
 
 
 @task(name="format")
-def ruff_format(context: Context):
-    """Run RUFF to format all Python files."""
+def format_all(context: Context):
+    """Format Python files with ruff and Markdown files with rumdl."""
 
-    exec_cmds = ["ruff format .", "ruff check . --fix"]
+    exec_cmds = ["ruff format .", "ruff check . --fix", "rumdl fmt ."]
     with context.cd(MAIN_DIRECTORY_PATH):
         for cmd in exec_cmds:
             context.run(cmd)
@@ -62,8 +62,8 @@ def lint_pylint(context: Context):
 
 @task
 def lint_markdown(context: Context):
-    """Run Linter to check all Markdown files."""
-    print(" - Check code with rumdl")
+    """Run rumdl to check all Markdown files."""
+    print(" - Check Markdown with rumdl")
     exec_cmd = "rumdl check ."
     with context.cd(MAIN_DIRECTORY_PATH):
         context.run(exec_cmd)
