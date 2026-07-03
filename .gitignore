@@ -23,6 +23,20 @@ dist/*
 test_validate.py
 nornir.log
 
+# Python caches
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+
+# IDE
+.idea/
+
+# Secrets / credentials
+*.pem
+*.key
+credentials.json
+secrets.yaml
+
 # quality-gates ship-gate receipts (written by the Claude hook)
 .claude/quality-gates/receipts/
 
