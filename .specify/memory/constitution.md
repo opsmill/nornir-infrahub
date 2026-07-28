@@ -1,7 +1,7 @@
 <!--
 Sync Impact Report
 ===================
-Version change: 1.0.0 → 1.0.1 (Python support range widened to <3.15)
+Version change: 1.0.0 → 1.1.0 (Python support range widened to <3.15)
 Modified principles:
   - Technology Constraints — Python range >=3.10,<3.14 → >=3.10,<3.15
 Added sections:
@@ -137,4 +137,4 @@ and ad-hoc decisions.
 adherence to these principles. Violations MUST be flagged and
 resolved before merge.
 
-**Version**: 1.0.1 | **Ratified**: 2026-04-10 | **Last Amended**: 2026-07-28
+**Version**: 1.1.0 | **Ratified**: 2026-04-10 | **Last Amended**: 2026-07-28
