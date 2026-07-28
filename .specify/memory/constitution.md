@@ -1,8 +1,9 @@
 <!--
 Sync Impact Report
 ===================
-Version change: N/A → 1.0.0 (initial ratification)
-Modified principles: N/A (first version)
+Version change: 1.0.0 → 1.0.1 (Python support range widened to <3.15)
+Modified principles:
+  - Technology Constraints — Python range >=3.10,<3.14 → >=3.10,<3.15
 Added sections:
   - Core Principles (5 principles)
   - Technology Constraints
@@ -85,7 +86,7 @@ hypothetical future use.
 
 ## Technology Constraints
 
-- **Python**: >=3.10, <3.14. All code MUST work across this range.
+- **Python**: >=3.10, <3.15. All code MUST work across this range.
 - **Package manager**: uv (with `hatchling` build backend).
 - **Core dependencies**: infrahub-sdk, nornir, pydantic, ruamel-yaml,
   nornir-utils, python-slugify. Bounds defined in `pyproject.toml`.
@@ -136,4 +137,4 @@ and ad-hoc decisions.
 adherence to these principles. Violations MUST be flagged and
 resolved before merge.
 
-**Version**: 1.0.0 | **Ratified**: 2026-04-10 | **Last Amended**: 2026-04-10
+**Version**: 1.0.1 | **Ratified**: 2026-04-10 | **Last Amended**: 2026-07-28
