@@ -17,6 +17,9 @@ uv_all: &uv_all
 
 python_all: &python_all
   - "**/*.py"
+  # Lint results depend on these too: ruff/pylint/ty settings live in
+  # pyproject.toml, and uv.lock pins the linter versions.
+  - *uv_all
 
 yaml_all: &yaml_all
   - "**/*.{yml,yaml}"

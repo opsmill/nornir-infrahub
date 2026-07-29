@@ -1,7 +1,7 @@
 # Python Guidelines
 
 Conventions for Python code in `nornir-infrahub`. The package targets Python
-`>=3.10,<3.14` and ships a Nornir inventory plugin plus artifact task plugins.
+`>=3.10,<3.15` and ships a Nornir inventory plugin plus artifact task plugins.
 
 ## Tooling
 

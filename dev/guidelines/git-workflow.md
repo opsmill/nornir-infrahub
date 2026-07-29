@@ -49,9 +49,9 @@ Write imperative, scoped subjects that describe the change.
 - Target `stable`.
 - CI must be green before merge. The `CI` workflow (`.github/workflows/ci.yml`) runs
   only the jobs whose files changed (via `opsmill/paths-filter`):
-  - `python-lint` (Python 3.12): `ruff check`, `ruff format --check`, `ty check
+  - `python-lint` (Python 3.14): `ruff check`, `ruff format --check`, `ty check
     nornir_infrahub`, and `pylint nornir_infrahub *.py` — mirrors `invoke lint`.
-  - `python-tests`: `pytest -v tests/` across Python 3.10, 3.11, 3.12, 3.13.
+  - `python-tests`: `pytest -v tests/` across Python 3.10, 3.11, 3.12, 3.13, 3.14.
   - `yaml-lint`: `yamllint -s .`
   - `markdown-lint`: `rumdl check .` over Markdown files.
   - `documentation` / `validate-documentation-style`: build the docs site and run Vale

@@ -5,7 +5,7 @@ description = "Nornir plugin for Infrahub"
 authors = [{ name = "OpsMill", email = "info@opsmill.com" }]
 readme = "README.md"
 license = "Apache-2.0"
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.10,<3.15"
 classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
@@ -13,6 +13,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
     "infrahub-sdk>=1.20.1,<2",

@@ -6,7 +6,7 @@ This guide walks you through setting up a local development environment for `nor
 
 Install the following before you begin:
 
-- **Python 3.10–3.13** (`requires-python = ">=3.10,<3.14"`).
+- **Python 3.10–3.14** (`requires-python = ">=3.10,<3.15"`).
 - **[uv](https://docs.astral.sh/uv/)** for dependency and virtual environment management.
 - **Docker** (running) — required only for the integration tests, which spin up a live Infrahub stack.
 - **Node.js and npm** — required only for the documentation site (`invoke docs-install` / `docs-serve` / `docs-build`).
