@@ -1,13 +1,11 @@
-# Changelog
+# nornir-infrahub changelog
 
-All notable changes to this project are documented in this file.
+This is the changelog for nornir-infrahub.
+All notable changes to this project will be documented in this file.
 
-This file is generated with [towncrier](https://towncrier.readthedocs.io/) from the
-change fragments in the `changelog/` directory. Do not edit the released sections by
-hand — add a fragment instead.
+Issue tracking is located in [GitHub](https://github.com/opsmill/nornir-infrahub/issues).
 
-Releases before v1.2.0 predate this file; see the
-[GitHub releases](https://github.com/opsmill/nornir-infrahub/releases) for their notes.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- towncrier release notes start -->
 
