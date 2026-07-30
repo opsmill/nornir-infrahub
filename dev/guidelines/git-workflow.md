@@ -9,8 +9,8 @@ you may and may not do.
 - `stable` is the default and protected branch — all work targets it.
 - Never push directly to `stable`. Create a feature branch and open a pull request
   against `stable`.
-- `origin/HEAD` still points at `main`, but `main` is a stale ref (untouched for
-  years); `stable` is the branch that receives merges. Ignore `main` and `develop`.
+- `origin/HEAD` resolves to `origin/stable`. `main` and `develop` are stale refs
+  (untouched for years) — ignore them.
 
 ## Pre-commit gate (local)
 
@@ -43,6 +43,34 @@ No enforced convention, but follow what the recent history uses:
   `Migrate artifact tasks to SDK provided artifact functions (#29)`.
 
 Write imperative, scoped subjects that describe the change.
+
+## Changelog
+
+Changes are recorded with [towncrier](https://towncrier.readthedocs.io/). `CHANGELOG.md`
+is generated — never edit a released section by hand.
+
+Add a fragment under `changelog/`, named `<issue-or-pr>.<type>.md`, or
+`+<slug>.<type>.md` when there is no issue or pull request to reference:
+
+- Available types: `security`, `removed`, `deprecated`, `added`, `changed`, `fixed`,
+  and `housekeeping`.
+- Write a complete sentence describing the change from the reader's perspective. The
+  fragment is the changelog entry, so avoid internal shorthand.
+- One change may warrant several fragments when it spans types — a fix that also adds
+  a capability gets both a `fixed` and an `added` fragment.
+
+Preview the rendered entry without consuming the fragments:
+
+```bash
+uv run towncrier build --draft --version <next-version>
+```
+
+At release time, bump `version` in `pyproject.toml`, run `uv lock` to sync
+`uv.lock`, then build the entry — this deletes the fragments, so commit it in one go:
+
+```bash
+uv run towncrier build --version <next-version>
+```
 
 ## Pull requests
 
