@@ -35,7 +35,7 @@ InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventor
 [dependency-groups]
 dev = [
     "pytest>=9.0.0",
-    "ruff>=0.14.10,<0.16",
+    "ruff>=0.14.10,<0.17",
     "ty>=0.0.1a11",
     "pytest-asyncio>=1.3.0,<2",
     "invoke>=2.2.0,<4",
