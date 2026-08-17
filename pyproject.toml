@@ -19,7 +19,7 @@ dependencies = [
     "infrahub-sdk>=1.20.1,<2",
     "ruamel-yaml>=0.18.17,<0.20",
     "nornir>=3.5.0,<4",
-    "nornir-utils>=0.2.0,<0.3",
+    "nornir-utils>=0.2.0,<0.4",
     "python-slugify>=8.0.4,<9",
     "pydantic>=2.0.0,<3",
 ]
