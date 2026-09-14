@@ -85,9 +85,14 @@ jobs:
           # returns only the first page, so a fragment in a large pull
           # request would go unseen and the check would fail a PR that has
           # one. Note the REST field is `.filename`, not `.path`.
+          #
+          # The filter keys on `.status`, not on `.additions`: a `modified`
+          # file also reports `additions > 0`, so counting additions would
+          # let a pull request pass by editing someone else's existing
+          # fragment instead of contributing one of its own.
           ADDED=$(gh api --paginate \
             "repos/${GITHUB_REPOSITORY}/pulls/${PR}/files?per_page=100" \
-            --jq '.[] | select(.additions > 0) | .filename' \
+            --jq '.[] | select(.status == "added") | .filename' \
             | { grep -E "${FRAGMENT}" || true; } \
             | { grep -v '^changelog/towncrier\.md\.template$' || true; })
 
