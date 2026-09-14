@@ -28,8 +28,6 @@ jobs:
     name: News fragment present
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-
       - name: Require a news fragment
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,7 +54,8 @@ jobs:
           # well. Compared as a string, not as a `case` pattern: `[bot]` in a
           # glob is a character class and would not match the literal login.
           # Only this one bot is exempt — humans still need a fragment, and
-          # update-infrahub-sdk.yml labels its own pull requests at creation.
+          # the update-infrahub.yml and update-infrahub-sdk.yml workflows
+          # label their own pull requests at creation.
           if [ "${AUTHOR}" = "dependabot[bot]" ]; then
             echo "Opened by ${AUTHOR} — dependency update, no fragment required."
             exit 0
