@@ -1,0 +1,1 @@
+Pull requests that change behaviour now fail unless they carry a news fragment, so the changelog is written while the author still has the context instead of being reconstructed when the release is cut.
