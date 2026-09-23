@@ -48,7 +48,7 @@ dev = [
     "vale>=3.13.0.0,<4",
     "rich>=12,<16",  # Required by infrahub-sdk pytest plugin
     "pyyaml>=6,<7",  # Required by infrahub-sdk pytest plugin
-    "infrahub-testcontainers==1.11.3",
+    "infrahub-testcontainers>=1.11.3,<2",
     "towncrier>=25.8.0",
     "rumdl>=0.2.27",
 ]
