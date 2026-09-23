@@ -9,6 +9,15 @@ resolution-markers = [
 ]
 
 [[package]]
+name = "amplitude-analytics"
+version = "1.2.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6e/f7/b23d28b1c405c22a25375e2c638c8cdcd054cbc4b43b76cf77bd358a0540/amplitude_analytics-1.2.3.tar.gz", hash = "sha256:4c9525847c391c19675d6e026f4601c27204ffeec71cb92252770d84d4538404", size = 22413, upload-time = "2026-03-31T18:33:20.291Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3f/56/83af6ef6a8bac9fdf2059de0276008e9eab40a315b8b732eba466bf6cc74/amplitude_analytics-1.2.3-py3-none-any.whl", hash = "sha256:ba2092c1d37ce8a2e3f69d023da145f4e322d02429e20436a5227178b1e594e9", size = 24762, upload-time = "2026-03-31T18:33:19.032Z" },
+]
+
+[[package]]
 name = "annotated-doc"
 version = "0.0.4"
 source = { registry = "https://pypi.org/simple" }
@@ -360,7 +369,7 @@ wheels = [
 
 [[package]]
 name = "fastapi"
-version = "0.136.1"
+version = "0.141.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
@@ -369,9 +378,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "typing-inspection" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/45/c130091c2dfa061bbfe3150f2a5091ef1adf149f2a8d2ae769ecaf6e99a2/fastapi-0.136.1.tar.gz", hash = "sha256:7af665ad7acfa0a3baf8983d393b6b471b9da10ede59c60045f49fbc89a0fa7f", size = 397448, upload-time = "2026-04-23T16:49:44.046Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8a/02/91e3416a8fdd715abb903a952a6bec7cdd8d14eed55d415fc8595524c319/fastapi-0.141.1.tar.gz", hash = "sha256:e8822fc40db1e1858054d7a949a888695bc9bdce70139178e33bd2871a453ca1", size = 425799, upload-time = "2026-07-29T17:18:05.568Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5a/ff/2e4eca3ade2c22fe1dea7043b8ee9dabe47753349eb1b56a202de8af6349/fastapi-0.136.1-py3-none-any.whl", hash = "sha256:a6e9d7eeada96c93a4d69cb03836b44fa34e2854accb7244a1ece36cd4781c3f", size = 117683, upload-time = "2026-04-23T16:49:42.437Z" },
+    { url = "https://files.pythonhosted.org/packages/cb/03/10388a42375ee7e4ac9b94eb2c5c569c8b5795e377e701c9ac3ad63de890/fastapi-0.141.1-py3-none-any.whl", hash = "sha256:bfb91aa2d334c61cb35ba9a116fc123b3d3df31640b801cf57a7a78ec3f603b3", size = 131954, upload-time = "2026-07-29T17:18:04.364Z" },
 ]
 
 [[package]]
@@ -544,7 +553,7 @@ wheels = [
 
 [[package]]
 name = "infrahub-testcontainers"
-version = "1.9.6"
+version = "1.11.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
@@ -554,9 +563,9 @@ dependencies = [
     { name = "pytest" },
     { name = "testcontainers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/08/25/0e56af611410a79ab242dea99a1892af8840524c58870b3050e59a4f99b1/infrahub_testcontainers-1.9.6.tar.gz", hash = "sha256:c75015a166d05aaa00804bf5be42f041e10745a7fa4c6ac13713febc60ae617f", size = 17365, upload-time = "2026-05-20T19:42:41.342Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fc/20/0388d0e3e29217376b59cb06e11fe5ee8d35181b38b31cbbcfda6ddfa4e3/infrahub_testcontainers-1.11.3.tar.gz", hash = "sha256:1f4ca6ba3a570f5624b88b160f25dd7a1f9f189a5837acb800588e52ac5c5b07", size = 20670, upload-time = "2026-09-23T09:59:16.431Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/18/25/284135f880d60d1c912a269c88a048a420a691b5b337d05027d269803d48/infrahub_testcontainers-1.9.6-py3-none-any.whl", hash = "sha256:6a2d185513b56071e0235ec71d8ac33be1e29dc2c6815b1ec5ce1d9994cc4e74", size = 23197, upload-time = "2026-05-20T19:42:40.398Z" },
+    { url = "https://files.pythonhosted.org/packages/2a/57/9a8e83162fdcd0bcdbcf76214353854e4d047c51538d5cdb51fe34431a13/infrahub_testcontainers-1.11.3-py3-none-any.whl", hash = "sha256:01cc5682137a6904fd61e5ae2f0e4a23fcbec7717bf23a2c218f34c69a8e7d61", size = 27058, upload-time = "2026-09-23T09:59:15.469Z" },
 ]
 
 [[package]]
@@ -829,7 +838,7 @@ dev = [
 requires-dist = [
     { name = "infrahub-sdk", specifier = ">=1.20.1,<2" },
     { name = "nornir", specifier = ">=3.5.0,<4" },
-    { name = "nornir-utils", specifier = ">=0.2.0,<0.3" },
+    { name = "nornir-utils", specifier = ">=0.2.0,<0.4" },
     { name = "pydantic", specifier = ">=2.0.0,<3" },
     { name = "python-slugify", specifier = ">=8.0.4,<9" },
     { name = "ruamel-yaml", specifier = ">=0.18.17,<0.20" },
@@ -838,7 +847,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "docstring-parser", specifier = ">=0.17,<0.19" },
-    { name = "infrahub-testcontainers", specifier = ">=1.9.3" },
+    { name = "infrahub-testcontainers", specifier = "==1.11.3" },
     { name = "invoke", specifier = ">=2.2.0,<4" },
     { name = "jinja2", specifier = ">=3.1.6,<4" },
     { name = "pre-commit", specifier = ">=4.0.0,<5" },
@@ -847,7 +856,7 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1.3.0,<2" },
     { name = "pyyaml", specifier = ">=6,<7" },
     { name = "rich", specifier = ">=12,<16" },
-    { name = "ruff", specifier = ">=0.14.10,<0.16" },
+    { name = "ruff", specifier = ">=0.14.10,<0.17" },
     { name = "rumdl", specifier = ">=0.1.68,<1" },
     { name = "rumdl", specifier = ">=0.2.27" },
     { name = "towncrier", specifier = ">=25.8.0" },
@@ -985,8 +994,8 @@ name = "pendulum"
 version = "3.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "python-dateutil", marker = "python_full_version < '3.13'" },
-    { name = "tzdata", marker = "python_full_version < '3.13'" },
+    { name = "python-dateutil" },
+    { name = "tzdata" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cb/72/9a51afa0a822b09e286c4cb827ed7b00bc818dac7bd11a5f161e493a217d/pendulum-3.2.0.tar.gz", hash = "sha256:e80feda2d10fa3ff8b1526715f7d33dcb7e08494b3088f2c8a3ac92d4a4331ce", size = 86912, upload-time = "2026-01-30T11:22:24.093Z" }
 wheels = [
@@ -1085,9 +1094,10 @@ wheels = [
 
 [[package]]
 name = "prefect-client"
-version = "3.6.13"
+version = "3.8.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "amplitude-analytics" },
     { name = "anyio" },
     { name = "asgi-lifespan" },
     { name = "cachetools" },
@@ -1123,15 +1133,16 @@ dependencies = [
     { name = "ruamel-yaml" },
     { name = "ruamel-yaml-clib", marker = "platform_python_implementation == 'CPython'" },
     { name = "sniffio" },
+    { name = "starlette" },
     { name = "toml" },
     { name = "typing-extensions" },
     { name = "uvicorn" },
     { name = "websockets" },
     { name = "whenever", marker = "python_full_version >= '3.13'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/dd/a9/5bfc95aee6ca8e202b7f4235e7e2dcb61a29e62e4b1e2f9eef3163883e6e/prefect_client-3.6.13.tar.gz", hash = "sha256:9f3ceb2771c9f6bffa7c8ec01f625ed27c2c7743e69b42d845311a55da8b3d60", size = 728904, upload-time = "2026-01-23T04:17:50.173Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3a/ff/38a8c1121da48475fb514111bb9b3aa34ddb4e7f3930b1c2cec743259557/prefect_client-3.8.6.tar.gz", hash = "sha256:8dab799dfa038e32c75578eae3a73a46722cd72a0bdc6f32a04151c50d7552f4", size = 939865, upload-time = "2026-09-14T14:38:42.549Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c8/51/0216ef9c7ca6002e7b5ae92cdb2858e4f8c5d69c7f2a4a9050afc1086934/prefect_client-3.6.13-py3-none-any.whl", hash = "sha256:3076194ec12b3770e53b1cb8f1d68a7628b8658912e183431a398d7e1617570d", size = 899733, upload-time = "2026-01-23T04:17:47.825Z" },
+    { url = "https://files.pythonhosted.org/packages/ff/e9/7bf15991b7419286cbba9425c6ec916da6572742d0d946a1a2d8803e8d26/prefect_client-3.8.6-py3-none-any.whl", hash = "sha256:641d878d0a51c94e7de8a38576e9f7a115759f699ae2731c2b83152e21665955", size = 1160105, upload-time = "2026-09-14T14:38:40.523Z" },
 ]
 
 [[package]]
