@@ -1,0 +1,19 @@
+dev/guides/running-integration-tests.md
+  s_03cb999cd4b66b::t_95398a0c0d826a 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e498846bea3b5f209e7c720d4d848c786166bf9d",
+  "prompts": {},
+  "sessions": {
+    "s_03cb999cd4b66b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c298441e-199b-4b26-a274-db99161d2155",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Benoit Kohler <Kohler.benoit@bearchitek.com>"
+    }
+  }
+}
