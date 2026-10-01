@@ -1,0 +1,21 @@
+changelog/+pr-merge-ci-rerun.housekeeping.md
+  s_7b740b0a09bab8::t_83cec5b9c3e348 1
+.gitignore
+  s_7b740b0a09bab8::t_03b39b855c3e1c 45-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "aaaa9341449b7027cf52191f37894bd1ac634303",
+  "prompts": {},
+  "sessions": {
+    "s_7b740b0a09bab8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0f3cf-b8e2-7472-8987-ae8cafa06948",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
