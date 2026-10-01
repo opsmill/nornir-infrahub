@@ -1,0 +1,21 @@
+.github/workflows/update-infrahub.yml
+  s_94947103c94bcb::t_75983d8e89963e 51-54
+changelog/+update-infrahub-bounded-pin.housekeeping.md
+  s_94947103c94bcb::t_f156c55f41db73 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "bb2837164461d58491aeb2218e6990c60e947e05",
+  "prompts": {},
+  "sessions": {
+    "s_94947103c94bcb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-apin-fix-1e57544715e1ec01",
+        "model": "unknown"
+      },
+      "human_author": "Benoit Kohler <Kohler.benoit@bearchitek.com>"
+    }
+  }
+}
