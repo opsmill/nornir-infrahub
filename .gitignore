@@ -42,3 +42,5 @@ secrets.yaml
 
 # spec-kit extension download/catalog cache
 .specify/extensions/.cache/
+# Local bug-analysis handoffs
+.bug-analysis-*.md
