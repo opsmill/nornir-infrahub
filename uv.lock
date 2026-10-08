@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.10, <3.15"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -553,7 +553,7 @@ wheels = [
 
 [[package]]
 name = "infrahub-testcontainers"
-version = "1.11.3"
+version = "1.11.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
@@ -563,9 +563,9 @@ dependencies = [
     { name = "pytest" },
     { name = "testcontainers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fc/20/0388d0e3e29217376b59cb06e11fe5ee8d35181b38b31cbbcfda6ddfa4e3/infrahub_testcontainers-1.11.3.tar.gz", hash = "sha256:1f4ca6ba3a570f5624b88b160f25dd7a1f9f189a5837acb800588e52ac5c5b07", size = 20670, upload-time = "2026-09-23T09:59:16.431Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2f/e7/adbfe0423834ec631c22ac27f3e4cd01cc022fa754314925e030929231b7/infrahub_testcontainers-1.11.5.tar.gz", hash = "sha256:fe63659d1ab2e19ff5e8988cc15e6ae769ab4f601469d325eceece1e04594fe0", size = 20670, upload-time = "2026-10-08T06:53:00.133Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/57/9a8e83162fdcd0bcdbcf76214353854e4d047c51538d5cdb51fe34431a13/infrahub_testcontainers-1.11.3-py3-none-any.whl", hash = "sha256:01cc5682137a6904fd61e5ae2f0e4a23fcbec7717bf23a2c218f34c69a8e7d61", size = 27058, upload-time = "2026-09-23T09:59:15.469Z" },
+    { url = "https://files.pythonhosted.org/packages/a6/e8/8dde970163c452f6837c830cfcda2785ada2e3df7ec134195790a6b4cdfe/infrahub_testcontainers-1.11.5-py3-none-any.whl", hash = "sha256:08a741d172c152150642ef64c218ab461e101b7b53257599e22a4b9bb980398f", size = 27056, upload-time = "2026-10-08T06:53:01.06Z" },
 ]
 
 [[package]]
@@ -847,7 +847,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "docstring-parser", specifier = ">=0.17,<0.19" },
-    { name = "infrahub-testcontainers", specifier = ">=1.11.3,<2" },
+    { name = "infrahub-testcontainers", specifier = "==1.11.5" },
     { name = "invoke", specifier = ">=2.2.0,<4" },
     { name = "jinja2", specifier = ">=3.1.6,<4" },
     { name = "pre-commit", specifier = ">=4.0.0,<5" },
