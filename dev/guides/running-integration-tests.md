@@ -5,7 +5,7 @@ Integration tests exercise the plugin against a live Infrahub stack. Each test c
 ## Prerequisites
 
 - **Docker** must be running. `infrahub-testcontainers` starts a real Infrahub server per test class.
-- Dependencies synced with `uv sync` — the `dev` group pins `infrahub-testcontainers>=1.9.3` (see `pyproject.toml`).
+- Dependencies synced with `uv sync` — the `dev` group pulls in `infrahub-testcontainers` (see `pyproject.toml` for the current bounds; the Update Infrahub Version workflow moves them on every Infrahub release).
 - Expect **~minutes per test class**: each class boots its own container and re-bootstraps schema and data.
 
 ## 1. Run the integration suite
