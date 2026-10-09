@@ -29,7 +29,12 @@ const sidebars: SidebarsConfig = {
         'references/plugins/artifact_tasks',
         'references/plugins/file_object_tasks',
       ],
-    }
+    },
+    {
+      type: 'category',
+      label: 'Release notes',
+      items: ['release-notes/index'],
+    },
   ]
 };
 

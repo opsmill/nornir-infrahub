@@ -65,12 +65,12 @@ Preview the rendered entry without consuming the fragments:
 uv run towncrier build --draft --version <next-version>
 ```
 
-At release time, bump `version` in `pyproject.toml`, run `uv lock` to sync
-`uv.lock`, then build the entry — this deletes the fragments, so commit it in one go:
-
-```bash
-uv run towncrier build --version <next-version>
-```
+At release time, dispatch `auto-bump.yml` on `stable`. It calculates a version
+from the merged PR labels (or accepts an explicit `version`), updates
+`pyproject.toml` and `uv.lock`, builds the Towncrier changelog, and opens a
+reviewable release PR. Add the release-notes page to that PR. Merging the PR
+creates the `v<version>` tag and GitHub Release; the tag triggers PyPI
+publication. Do not bump or tag the release directly on `stable`.
 
 ## Pull requests
 
