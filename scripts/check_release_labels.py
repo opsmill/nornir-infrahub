@@ -12,6 +12,7 @@ from typing import cast
 
 BUMP_LABELS = frozenset({"changes/major", "changes/minor", "changes/patch"})
 RELEASE_PR_PREFIX = "chore(release):"
+RELEASE_PR_AUTHOR = "opsmill-bot"
 # The `release/v<version>` branch auto-bump.yml opens: a normalised three-part
 # PEP 440 version, optionally with a pre-, post- or dev-release segment.
 RELEASE_BRANCH = re.compile(r"release/v\d+\.\d+\.\d+(?:(?:a|b|rc)\d+)?(?:\.post\d+)?(?:\.dev\d+)?")
@@ -33,11 +34,14 @@ def main() -> int:
     """Validate that a normal pull request has exactly one release label."""
     args = build_parser().parse_args()
 
-    # Head repository and branch identify a generated release PR; the
-    # title is matched by prefix only, so a maintainer editing it (re-running
-    # this check on `edited`) does not drop the exemption.
+    # The release automation's account, head repository, and branch identify
+    # a generated release PR. A same-repository PR from another author must
+    # still select a bump label, even if its branch and title look like a
+    # generated release PR. The title is matched by prefix so editing it
+    # (re-running this check on `edited`) does not drop the exemption.
     if (
-        args.head_repository == args.repository
+        args.author_login == RELEASE_PR_AUTHOR
+        and args.head_repository == args.repository
         and RELEASE_BRANCH.fullmatch(args.head_ref)
         and args.title.startswith(RELEASE_PR_PREFIX)
     ):
