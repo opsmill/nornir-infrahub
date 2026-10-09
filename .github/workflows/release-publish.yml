@@ -12,7 +12,9 @@ on:
     branches: [stable]
 
 concurrency:
-  group: release-publish
+  # Serialize retries for one commit without replacing a pending run for a
+  # different stable push. Each release merge must get its own publish attempt.
+  group: release-publish-${{ github.sha }}
   cancel-in-progress: false
 
 permissions:
