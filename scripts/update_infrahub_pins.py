@@ -66,9 +66,7 @@ def bump_requirement(text: str, package: str, version: str) -> tuple[str, str | 
     Returns the new text and the previous version, or `None` when the package
     is not declared.
     """
-    pattern = re.compile(
-        rf"(\"{re.escape(package)}(?:\[[^\]]*\])?[ \t]*(?:===|==|>=|~=|>)[ \t]*)({VERSION_PATTERN})"
-    )
+    pattern = re.compile(rf"(\"{re.escape(package)}(?:\[[^\]]*\])?[ \t]*(?:===|==|>=|~=|>)[ \t]*)({VERSION_PATTERN})")
     matches = list(pattern.finditer(text))
     if not matches:
         return text, None
@@ -133,21 +131,15 @@ def bump_listed_image_file(name: str, text: str, version: str) -> str:
     return text
 
 
-def update_pins(
-    root: Path, infrahub_version: str, sdk_version: str, image_files: list[str]
-) -> list[str]:
+def update_pins(root: Path, infrahub_version: str, sdk_version: str, image_files: list[str]) -> list[str]:
     """Apply every requested bump under `root` and return the files it changed.
 
     Every file is checked before any is written, so a refused bump leaves the
     working tree untouched.
     """
     check_arguments(infrahub_version, sdk_version, image_files)
-    originals = {
-        name: (root / name).read_text(encoding="utf-8") for name in ["pyproject.toml", *image_files]
-    }
-    updated = {
-        "pyproject.toml": bump_pyproject(originals["pyproject.toml"], infrahub_version, sdk_version)
-    }
+    originals = {name: (root / name).read_text(encoding="utf-8") for name in ["pyproject.toml", *image_files]}
+    updated = {"pyproject.toml": bump_pyproject(originals["pyproject.toml"], infrahub_version, sdk_version)}
     for name in image_files:
         updated[name] = bump_listed_image_file(name, originals[name], infrahub_version)
 
