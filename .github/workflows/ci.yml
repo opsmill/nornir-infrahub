@@ -146,6 +146,41 @@ jobs:
       - name: "Pytest Tests"
         run: "uv run pytest -v tests/"
 
+  # Integration tests start an Infrahub stack in Docker, so they run only on the
+  # pull requests update-infrahub.yml opens for a new Infrahub version. Those
+  # tests are the only check of the bump, and auto-merge-testcontainers.yml
+  # merges the pull request only when this job passed. infrahub-sdk bumps
+  # (update-infrahub-sdk-* and update-infrahub-<v>-sdk-<s>) do not run them.
+  integration-test:
+    if: >-
+      github.event_name == 'pull_request' &&
+      startsWith(github.head_ref, 'update-infrahub-') &&
+      !startsWith(github.head_ref, 'update-infrahub-sdk-') &&
+      !contains(github.head_ref, '-sdk-')
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 60
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v7"
+
+      - name: "Set up Python"
+        uses: "actions/setup-python@v7"
+        with:
+          python-version: "3.14"
+
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v7"
+        with:
+          version: "0.9.18"
+
+      - name: "Install dependencies"
+        run: "uv sync --group dev"
+
+      # `-m integration` on the command line replaces the `-m 'not integration'`
+      # default from addopts in pyproject.toml.
+      - name: "Integration tests"
+        run: "uv run pytest -v -m integration tests/integration"
+
   # coverall-report:
   #   needs: ["python-tests"]
   #   if: |

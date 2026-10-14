@@ -1,0 +1,1 @@
+One workflow, `update-infrahub.yml`, now opens the pull requests for both Infrahub and infrahub-sdk releases, moves the pins in place with `scripts/update_infrahub_pins.py`, and CI runs the integration tests on Infrahub bump pull requests before `auto-merge-testcontainers.yml` merges them.

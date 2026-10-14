@@ -91,6 +91,10 @@
   description: "Don't include this PR in the changelog"
   color: "c30664"
 
+- name: "dependencies"
+  description: "Pull requests that update a dependency file"
+  color: "0366d6"
+
 # Release Drafter uses exactly one of these labels on each change PR. A PR
 # labelled ci/skip-changelog may carry none, and then does not change the version.
 - name: "changes/major"

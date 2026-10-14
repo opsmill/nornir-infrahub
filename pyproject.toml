@@ -138,6 +138,9 @@ line-length = 120
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+# Shared byte for byte with other OpsMill repositories. Reformatting it at this
+# repository's line length would make the copies differ. ruff check still lints it.
+exclude = ["scripts/update_infrahub_pins.py"]
 
 [tool.ruff.lint]
 select = [

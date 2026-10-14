@@ -59,8 +59,8 @@ jobs:
           # well. Compared as a string, not as a `case` pattern: `[bot]` in a
           # glob is a character class and would not match the literal login.
           # Only this one bot is exempt — humans still need a fragment, and
-          # the update-infrahub.yml and update-infrahub-sdk.yml workflows
-          # label their own pull requests at creation.
+          # the update-infrahub.yml workflow labels its own pull requests at
+          # creation.
           if [ "${AUTHOR}" = "dependabot[bot]" ]; then
             echo "Opened by ${AUTHOR} — dependency update, no fragment required."
             exit 0
