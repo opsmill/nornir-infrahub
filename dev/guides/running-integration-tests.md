@@ -70,4 +70,4 @@ The client is built as `InfrahubClientSync(config=Config(api_token=TEST_TOKEN), 
 
 ## CI note
 
-CI does **not** run the integration tests. The `python-tests` job in `.github/workflows/ci.yml` runs `uv run pytest -v tests/`, which inherits the `-m 'not integration'` default from `pyproject.toml`. Run `pytest -m integration` locally (with Docker) to exercise them.
+CI runs the integration tests only on pull requests that bump the Infrahub version, opened by `.github/workflows/update-infrahub.yml` from an `update-infrahub-<version>` branch. The `integration-test` job in `.github/workflows/ci.yml` runs `uv run pytest -v -m integration tests/integration` on those pull requests, and `.github/workflows/auto-merge-testcontainers.yml` merges a bump only when that job passed. On every other pull request, the `python-tests` job runs `uv run pytest -v tests/`, which inherits the `-m 'not integration'` default from `pyproject.toml`. Run `pytest -m integration` locally (with Docker) to exercise them.
