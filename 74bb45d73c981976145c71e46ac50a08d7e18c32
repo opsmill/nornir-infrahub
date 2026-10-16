@@ -1,0 +1,19 @@
+docs/docs/release-notes/index.mdx
+  s_fd6e06864286e5::t_764df755ffcd19 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "74bb45d73c981976145c71e46ac50a08d7e18c32",
+  "prompts": {},
+  "sessions": {
+    "s_fd6e06864286e5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11d36-3189-79e1-b04c-e17dd51f4320",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Benoit Kohler <Kohler.benoit@bearchitek.com>"
+    }
+  }
+}
