@@ -1,0 +1,49 @@
+.agents/skills/opsmill-dev-grilling-ideas/SKILL.md
+  s_2fae1787d146ee::t_69963e9da074ed 2,8,148,152,154,157,159,163,168,172,176,180,184,193,197,201
+.agents/skills/opsmill-dev-pr/SKILL.md
+  s_2fae1787d146ee::t_0536a107dfde02 2,6-9,11,30,46,59,68,106,119,123,128,130,135,140,145,162,164,166,169-170,173,181,192,210,236
+.agents/skills/opsmill-dev-rebase/SKILL.md
+  s_2fae1787d146ee::t_15b391282e4cfa 2,5-6,9,65,68,71-72,127,174-178,193
+skills-lock.json
+  s_2fae1787d146ee::t_decbd0b402781f 4,8,10,14,16,20,22,26,28-34,38,40,44,46,49-50,52,55-56
+.agents/skills/opsmill-dev-commit/SKILL.md
+  s_2fae1787d146ee::t_ee0f9204253682 2,6
+.agents/skills/opsmill-dev-creating-issues/SKILL.md
+  s_2fae1787d146ee::t_4c65ef03b0c949 2,8,13,43,45,51-91,107,123,128,133,138-159,163,177
+.agents/skills/opsmill-dev-creating-prd/SKILL.md
+  s_2fae1787d146ee::t_c342b643629eb3 2,8-9,36,42,46-47,149,154,158,242,259,300,322
+.agents/skills/opsmill-dev-judging-changes/DECISION.md
+  s_2fae1787d146ee::t_f5f6ec1907f3a5 1-4,12-13,25-62,64,66-70
+.agents/skills/opsmill-dev-judging-changes/SKILL.md
+  s_2fae1787d146ee::t_0f249d09e0d5c6 1-176
+.agents/skills/opsmill-dev-judging-changes/evals/evals.json
+  s_2fae1787d146ee::t_aaed0aa0ea163d 1-60
+.agents/skills/opsmill-dev-judging-changes/hooks/ship-gate-check.sh
+  s_2fae1787d146ee::t_ca313181774e83 2,4-5,11,72,74
+.agents/skills/opsmill-dev-judging-changes/references/anti-gaming.md
+  s_2fae1787d146ee::t_27271a38a9fa05 1,3-4,9-11,15-34
+.agents/skills/opsmill-dev-judging-changes/references/gate-model.md
+  s_2fae1787d146ee::t_643d949c4ae8af 3-6,8-12,14,19,22,24,26-30,32,34-40,42-44,46,48-53
+.agents/skills/opsmill-dev-monitoring-pull-requests/SKILL.md
+  s_2fae1787d146ee::t_7a73eb2d6a2f5d 2,6-8,31,40,79,107,115-117,138,263,278,284,334-335,359,369,373,378,380-381,386,403
+.agents/skills/opsmill-dev-verifying-changes/SKILL.md
+  s_2fae1787d146ee::t_00dc02749c90b9 2,4-13,19,21-24,26-28,30,32-33,35,37-44,46,48-50,52-80
+.agents/skills/opsmill-dev-verifying-changes/evals/evals.json
+  s_2fae1787d146ee::t_de35a363c21067 2-3,7-16,20-29,33-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1e2ccd2fb800aec744a1496e8f0db12dabfa34ce",
+  "prompts": {},
+  "sessions": {
+    "s_2fae1787d146ee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c38a01a-cf7a-4707-9e40-59d796ec98f5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
