@@ -29,7 +29,7 @@ Homepage = "https://opsmill.com"
 Repository = "https://github.com/opsmill/nornir-infrahub"
 Documentation = "https://docs.infrahub.app/"
 
-[project.entry-points."nornir.plugins.inventory"]
+[project.entry-points."nornir.plugins.capability_inventory"]
 InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 
 [dependency-groups]
@@ -55,6 +55,12 @@ dev = [
 
 [tool.uv]
 package = true
+
+# AInitNornir, Nornir.arun and the capability-aware inventory registry are only on this
+# nornir branch. Remove this source once they are in a nornir release, and raise the
+# nornir lower bound to that release.
+[tool.uv.sources]
+nornir = { git = "https://github.com/nornir-automation/nornir.git", branch = "dga/feat-async-inventory-o5wf5" }
 
 [tool.coverage.run]
 branch = true

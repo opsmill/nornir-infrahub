@@ -3,6 +3,21 @@ title: CoreFileObject management tasks
 ---
 
 
+## `_apply_update_data`
+
+Set the attributes in ``data`` on an existing object and return whether one changed.
+
+
+### Raises
+
+| Exception | Description |
+| --------- | ----------- |
+| `ValueError` | A key of ``data`` is a relationship or not part of the schema. |
+
+### Examples
+
+No example provided.
+
 ## `upload_file_object`
 
 Uploads a file to an Infrahub CoreFileObject object.
@@ -55,6 +70,48 @@ result = nr.run(
 ```
 
 
+## `aupload_file_object`
+
+Uploads a file to an Infrahub CoreFileObject object, without blocking the event loop.
+
+Asynchronous variant of `upload_file_object`, for an inventory loaded with
+`AInitNornir` and run with `Nornir.arun`. It takes the same arguments and returns
+the same `Result`.
+
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `task` | `Task` | Yes |  | The Nornir task instance containing host-related data. |
+| `kind` | `str` | Yes |  | The schema kind that inherits from CoreFileObject. |
+| `file_path` | `str \| Path` | No |  | Filesystem path to the file to upload. |
+| `content` | `bytes` | No |  | Raw file content to upload. Requires ``file_name``. |
+| `file_name` | `str` | No |  | File name to associate with ``content``. Ignored when ``file_path`` is used. |
+| `data` | `dict` | No |  | Additional object fields. On create, this is forwarded to ``client.create`` (attributes and relationships). On update, only attribute keys are applied; passing a relationship or unknown key fails the task. |
+| `object_id` | `str` | No |  | UUID of an existing object to update. |
+| `hfid` | `list[str]` | No |  | HFID components identifying an existing object. |
+| `branch` | `str` | No | the client's default branch | Target Infrahub branch. Defaults to the client's default branch. |
+| `**kwargs` | `Any` | No |  | Extra keyword arguments forwarded to ``client.create`` on the create path only. |
+
+### Returns
+
+`Result` — A Nornir Result with ``changed`` indicating whether the object was created or updated, ``object_id`` with the UUID, and a descriptive ``result`` message.
+
+### Examples
+
+#### Upload a contract PDF to a CoreFileObject object from a running event loop
+
+```python
+from nornir_infrahub.plugins.tasks import aupload_file_object
+
+result = await nr.arun(
+    task=aupload_file_object,
+    kind="NetworkCircuitContract",
+    file_path="/path/to/contract.pdf",
+)
+```
+
+
 ## `download_file_object`
 
 Downloads file content from an Infrahub CoreFileObject object.
@@ -103,6 +160,44 @@ from nornir_infrahub.plugins.tasks import download_file_object
 
 result = nr.run(
     task=download_file_object,
+    kind="NetworkCircuitContract",
+    hfid=["contract-2026"],
+)
+```
+
+
+## `adownload_file_object`
+
+Downloads file content from an Infrahub CoreFileObject object, without blocking the event loop.
+
+Asynchronous variant of `download_file_object`, for an inventory loaded with
+`AInitNornir` and run with `Nornir.arun`. It takes the same arguments and returns
+the same `Result`. Local file reads and writes run in a worker thread.
+
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `task` | `Task` | Yes |  | The Nornir task instance containing host-related data. |
+| `kind` | `str` | Yes |  | The schema kind that inherits from CoreFileObject. |
+| `object_id` | `str` | No |  | UUID of the object to download from. |
+| `hfid` | `list[str]` | No |  | HFID components identifying the object. |
+| `save_to` | `str \| Path` | No |  | Local path where the downloaded file should be written. A directory receives the original file name; an explicit path is used as-is. |
+| `branch` | `str` | No | the client's default branch | Target Infrahub branch. Defaults to the client's default branch. |
+
+### Returns
+
+`Result` — A Nornir Result containing ``binary`` (base64 string), ``text`` (UTF-8 string or None), ``file_name``, ``file_type``, ``file_size``, ``checksum``, ``object_id``, ``save_to``, and ``changed`` (True only when a local file was created or overwritten).
+
+### Examples
+
+#### Download a file from a CoreFileObject object from a running event loop
+
+```python
+from nornir_infrahub.plugins.tasks import adownload_file_object
+
+result = await nr.arun(
+    task=adownload_file_object,
     kind="NetworkCircuitContract",
     hfid=["contract-2026"],
 )

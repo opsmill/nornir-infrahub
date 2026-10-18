@@ -7,11 +7,11 @@ The `InfrahubInventory` plugin sources Nornir hosts and groups directly from Inf
 The plugin is registered as a Nornir entry point in `pyproject.toml`:
 
 ```toml
-[project.entry-points."nornir.plugins.inventory"]
+[project.entry-points."nornir.plugins.capability_inventory"]
 InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 ```
 
-Because it is an entry point, `InitNornir` resolves `InfrahubInventory` by name once `nornir-infrahub` is installed — no manual registration is needed, whether you use a `config.yaml` or initialize Nornir purely in Python. (Only register it explicitly with `InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)` if the plugin is not discoverable as an installed entry point.)
+Because it is an entry point, `InitNornir` resolves `InfrahubInventory` by name once `nornir-infrahub` is installed — no manual registration is needed, whether you use a `config.yaml` or initialize Nornir purely in Python. `await AInitNornir(...)` resolves the same name and loads the inventory with the asynchronous client. Do not also register the name with `InventoryPluginRegister.register(...)`: Nornir raises `InventoryPluginAmbiguousError` when one name is in both registries. If the plugin is not discoverable as an installed entry point, register it with `CapabilityInventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)`.
 
 ## Configure it in `config.yaml`
 
