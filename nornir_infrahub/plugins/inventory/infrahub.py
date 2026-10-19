@@ -127,10 +127,11 @@ class InfrahubInventory:
     and supports the creation of Nornir groups based on attributes or relations
     from Infrahub Nodes.
 
-    The plugin loads the inventory synchronously with `InitNornir` and asynchronously
-    with `await AInitNornir(...)`. With `InitNornir`, `host.data["InfrahubNode"]` holds an
-    `InfrahubNodeSync` for the synchronous tasks (`get_artifact`, ...). With `AInitNornir`,
-    it holds an `InfrahubNode` for the asynchronous tasks (`aget_artifact`, ...), which run
+    The plugin is registered under two names. Select `InfrahubInventory` to load the
+    inventory synchronously; `host.data["InfrahubNode"]` then holds an `InfrahubNodeSync`
+    for the synchronous tasks (`get_artifact`, ...). Select `InfrahubAsyncInventory` with
+    `await AInitNornir(...)` to load it with the asynchronous client; `host.data["InfrahubNode"]`
+    then holds an `InfrahubNode` for the asynchronous tasks (`aget_artifact`, ...), which run
     with `Nornir.arun` and the `asyncio` runner.
 
     Args:
@@ -193,7 +194,7 @@ class InfrahubInventory:
             nr = await AInitNornir(
                 runner={"plugin": "asyncio", "options": {"num_workers": 20}},
                 inventory={
-                    "plugin": "InfrahubInventory",
+                    "plugin": "InfrahubAsyncInventory",
                     "options": {
                         "address": "http://localhost:8000",
                         "token": "06438eb2-8019-4776-878c-0941b1f1d1ec",
@@ -242,7 +243,7 @@ class InfrahubInventory:
         self.group_mappings = group_mappings
 
     def get_capabilities(self) -> frozenset[InventoryCapability]:
-        """Return the loading modes of the plugin: `load` for InitNornir and `aload` for AInitNornir."""
+        """Return the loading modes used under the `InfrahubAsyncInventory` name: `load` and `aload`."""
         capabilities: set[InventoryCapability] = {"sync", "asyncio"}
         return frozenset(capabilities)
 

@@ -96,7 +96,9 @@ hypothetical future use.
   SDK interactions use `async`/`await`. Tests use `pytest-asyncio`.
 - **License**: Apache-2.0. All contributions MUST be compatible.
 - **Entry point**: Nornir discovers the plugin via the
-  `nornir.plugins.capability_inventory` entry point in `pyproject.toml`.
+  `nornir.plugins.inventory` entry point (`InfrahubInventory`) and, for
+  `AInitNornir`, the `nornir.plugins.capability_inventory` entry point
+  (`InfrahubAsyncInventory`) in `pyproject.toml`.
 
 ## Development Workflow
 

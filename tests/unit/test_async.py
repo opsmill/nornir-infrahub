@@ -160,7 +160,7 @@ async def test_ainitnornir_loads_with_aload_and_runs_async_tasks(tmp_path: Path,
     with patch(f"{INVENTORY_MODULE}.InfrahubClient", return_value=_async_client(host_schema, ["edge1"])):
         nr = await AInitNornir(
             runner={"plugin": "asyncio"},
-            inventory={"plugin": "InfrahubInventory", "options": _inventory_options(tmp_path)},
+            inventory={"plugin": "InfrahubAsyncInventory", "options": _inventory_options(tmp_path)},
             logging={"enabled": False},
         )
 
@@ -169,6 +169,16 @@ async def test_ainitnornir_loads_with_aload_and_runs_async_tasks(tmp_path: Path,
 
     result = await nr.arun(task=node_type)
     assert result["edge1"].result == "InfrahubNode"
+
+
+async def test_ainitnornir_loads_the_legacy_name_with_load(tmp_path: Path, host_schema: NodeSchemaAPI):
+    with patch(f"{INVENTORY_MODULE}.InfrahubClientSync", return_value=_sync_client(host_schema, ["edge1"])):
+        nr = await AInitNornir(
+            inventory={"plugin": "InfrahubInventory", "options": _inventory_options(tmp_path)},
+            logging={"enabled": False},
+        )
+
+    assert isinstance(nr.inventory.hosts["edge1"].data["InfrahubNode"], InfrahubNodeSync)
 
 
 def test_initnornir_loads_with_load(tmp_path: Path, host_schema: NodeSchemaAPI):
@@ -253,13 +263,13 @@ async def test_aget_artifact_requires_exactly_one_identifier():
 
 async def test_async_task_rejects_a_host_loaded_with_initnornir(host_schema: NodeSchemaAPI):
     node = InfrahubNodeSync(client=InfrahubClientSync(address="http://mock"), schema=host_schema, data=_node_data("r"))
-    with pytest.raises(TypeError, match="loaded with InitNornir"):
+    with pytest.raises(TypeError, match="holds a synchronous InfrahubNodeSync"):
         await aregenerate_host_artifact(_async_task(node), artifact="startup-config")
 
 
 def test_sync_task_rejects_a_host_loaded_with_ainitnornir(host_schema: NodeSchemaAPI):
     node = InfrahubNode(client=InfrahubClient(address="http://mock"), schema=host_schema, data=_node_data("r"))
-    with pytest.raises(TypeError, match="loaded with AInitNornir"):
+    with pytest.raises(TypeError, match="loaded by InfrahubAsyncInventory"):
         get_artifact(_async_task(node), artifact="startup-config")
 
 

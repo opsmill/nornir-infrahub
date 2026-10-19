@@ -96,7 +96,7 @@ publication. Do not bump or tag the release directly on `stable`.
 
 Per `AGENTS.md`, these changes require sign-off before they land:
 
-- Changing the public plugin API or the `nornir.plugins.capability_inventory` entry point
+- Changing the public plugin API or the `nornir.plugins.inventory` and `nornir.plugins.capability_inventory` entry points
   (`InfrahubInventory`).
 - Altering inventory mapping semantics (`host_node`, `schema_mappings`,
   `group_mappings`, defaults/static-group YAML).

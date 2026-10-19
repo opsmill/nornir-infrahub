@@ -18,7 +18,7 @@ async def _ainit(infrahub_address: str, **options: Any) -> Nornir:
     return await AInitNornir(
         runner={"plugin": "asyncio", "options": {"num_workers": 5}},
         inventory={
-            "plugin": "InfrahubInventory",
+            "plugin": "InfrahubAsyncInventory",
             "options": {"address": infrahub_address, "token": TEST_TOKEN, **options},
         },
         logging={"enabled": False},
