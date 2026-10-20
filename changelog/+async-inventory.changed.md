@@ -1,0 +1,1 @@
+`InfrahubInventory` now fetches the host node schema when it loads the inventory instead of when it is created, so mapping errors are raised by `load` instead of the constructor. A synchronous task raises `TypeError` on a host loaded by `InfrahubAsyncInventory`, and an asynchronous task raises `TypeError` on a host that holds an `InfrahubNodeSync`.
