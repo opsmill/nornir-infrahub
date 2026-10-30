@@ -553,7 +553,7 @@ wheels = [
 
 [[package]]
 name = "infrahub-testcontainers"
-version = "1.11.8"
+version = "1.11.10"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
@@ -563,9 +563,9 @@ dependencies = [
     { name = "pytest" },
     { name = "testcontainers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/71/ad/285d2aa43ca0b04efc01f5f492accf201e18ea86c3a6a1a36c6b4893c633/infrahub_testcontainers-1.11.8.tar.gz", hash = "sha256:c04218d42dbea28de56e47f972e18f50c50cc62db1894e68f3ed3913d6cbefbd", size = 20675, upload-time = "2026-10-19T13:49:06.198Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/0d/b3/1113b21fdea64fe101c7c59b87c6fb61bfdab20b5ce459568926262db040/infrahub_testcontainers-1.11.10.tar.gz", hash = "sha256:836a00d4a85008f53200fb2693c447858dc33278465291a036fc24bbc57d0653", size = 20673, upload-time = "2026-10-30T13:18:05.002Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/73/5d/0e2d5b2eca0a6f8c4542b75c34e1925e36a305742e981989fb4441727453/infrahub_testcontainers-1.11.8-py3-none-any.whl", hash = "sha256:c2ed3ddb52ee29dcb646d82aa7ff54ef0dba7f0f7f37cdf270ac928c27dd13c7", size = 27059, upload-time = "2026-10-19T13:49:07.332Z" },
+    { url = "https://files.pythonhosted.org/packages/77/ab/4c80d8b16cf0101e758eb52c26c57dc03501cd71a41c9b24b94584d42cf8/infrahub_testcontainers-1.11.10-py3-none-any.whl", hash = "sha256:ac0f86d8cd81bc60bd420cba64a15b655b111ea504a6a6dce943c238bb596ece", size = 27063, upload-time = "2026-10-30T13:18:03.724Z" },
 ]
 
 [[package]]
@@ -847,7 +847,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "docstring-parser", specifier = ">=0.17,<0.19" },
-    { name = "infrahub-testcontainers", specifier = ">=1.11.8,<2" },
+    { name = "infrahub-testcontainers", specifier = ">=1.11.10,<2" },
     { name = "invoke", specifier = ">=2.2.0,<4" },
     { name = "jinja2", specifier = ">=3.1.6,<4" },
     { name = "pre-commit", specifier = ">=4.0.0,<5" },
@@ -856,7 +856,7 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1.3.0,<2" },
     { name = "pyyaml", specifier = ">=6,<7" },
     { name = "rich", specifier = ">=12,<16" },
-    { name = "ruff", specifier = ">=0.14.10,<0.17" },
+    { name = "ruff", specifier = ">=0.14.10,<0.18" },
     { name = "rumdl", specifier = ">=0.1.68,<1" },
     { name = "rumdl", specifier = ">=0.2.27" },
     { name = "towncrier", specifier = ">=25.8.0" },
