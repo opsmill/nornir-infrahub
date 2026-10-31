@@ -82,11 +82,18 @@ The inventory plugin is registered through `pyproject.toml`:
 ```toml
 [project.entry-points."nornir.plugins.inventory"]
 InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
+
+[project.entry-points."nornir.plugins.capability_inventory"]
+InfrahubAsyncInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 ```
 
-This lets Nornir discover it by name (`"plugin": "InfrahubInventory"`), though it can also be registered
-explicitly via `InventoryPluginRegister.register(...)`. The task plugins are plain callables imported from
-`nornir_infrahub.plugins.tasks` and passed to `nr.run(task=...)`.
+The same class is registered under two names. `InfrahubInventory`, in the legacy group, works with every
+Nornir 3 release; `AInitNornir` loads it with `load` in a worker thread. `InfrahubAsyncInventory`, in the
+capability-aware group, declares the `sync` and `asyncio` capabilities: `InitNornir` calls `load` and
+`await AInitNornir(...)` calls `aload`, so the hosts hold an async `InfrahubNode`. The two names must stay
+different: Nornir raises `InventoryPluginAmbiguousError` when one name is in both registries. The task plugins are plain callables
+imported from `nornir_infrahub.plugins.tasks`; the synchronous ones run with `nr.run(task=...)` and the
+`a`-prefixed ones with `await nr.arun(task=...)`.
 
 ## Data flow
 
