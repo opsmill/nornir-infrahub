@@ -533,22 +533,27 @@ wheels = [
 
 [[package]]
 name = "infrahub-sdk"
-version = "1.20.1"
+version = "1.24.0b0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "anyio" },
     { name = "dulwich" },
     { name = "graphql-core" },
     { name = "httpx" },
+    { name = "jinja2" },
     { name = "netutils" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pyyaml" },
+    { name = "rich" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
+    { name = "typing-extensions" },
     { name = "ujson" },
     { name = "whenever" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d9/c9/6be3dce3184422f1baa222035998bc9552ed30cdf9a73694c7387db2d6f3/infrahub_sdk-1.20.1.tar.gz", hash = "sha256:5b7134814d8a700bcae9069aeabc4cf0b18d4f7234dd5867c665b26620393d83", size = 1025138, upload-time = "2026-05-20T13:45:30.069Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cf/66/f66bfcc48737d9adcb670b6345a65842167eb6f062771d4c85ec0900c386/infrahub_sdk-1.24.0b0.tar.gz", hash = "sha256:e974416d3fc956c35641d78d0470a4a3f12bb9cc3baeeadddbfbcba561972c81", size = 1804943, upload-time = "2026-11-02T10:42:53.554Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1b/4f/0533d93f6805b82bb44e19e76855f6a8e5b4c8810c95d770dfc5abaf10a0/infrahub_sdk-1.20.1-py3-none-any.whl", hash = "sha256:82439aff95408d31dcd00661833804907d952dd7ae7b2cae3be8ed35c7bd85aa", size = 246235, upload-time = "2026-05-20T13:45:28.412Z" },
+    { url = "https://files.pythonhosted.org/packages/78/28/4624badf0d481c5f1115cef18fe00ae6bc558ba743c5b3f763d24d3bae81/infrahub_sdk-1.24.0b0-py3-none-any.whl", hash = "sha256:e47534e4f9d571c6d367c46c487ff37f80d12f92621a731e08e8c7f76f254784", size = 360713, upload-time = "2026-11-02T10:42:51.924Z" },
 ]
 
 [[package]]
@@ -836,7 +841,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "infrahub-sdk", specifier = ">=1.20.1,<2" },
+    { name = "infrahub-sdk", specifier = ">=1.24.0b0,<2" },
     { name = "nornir", specifier = ">=3.5.0,<4" },
     { name = "nornir-utils", specifier = ">=0.2.0,<0.4" },
     { name = "pydantic", specifier = ">=2.0.0,<3" },
