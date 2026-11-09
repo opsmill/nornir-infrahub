@@ -1,0 +1,21 @@
+pyproject.toml
+  s_2f2a1f4a40bfa5::t_9406a613737491 51
+uv.lock
+  s_2f2a1f4a40bfa5::t_1ac8a75b3434f4 556,566,568,850
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a51309bdb0ec8e63756998ee786f6c1764a35796",
+  "prompts": {},
+  "sessions": {
+    "s_2f2a1f4a40bfa5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ab92de7f-ee10-455a-8ddc-a14157c93e57",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Benoit Kohler <benoit@opsmill.com>"
+    }
+  }
+}
