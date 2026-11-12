@@ -395,6 +395,7 @@ def test_infrahub_inventory_branch_used_in_get_resources():
 
 
 def _patched_inventory(relationship_names, **kwargs):
+    """Build and load an inventory whose clients return a schema with ``relationship_names``."""
     from unittest.mock import Mock, patch
 
     with patch("nornir_infrahub.plugins.inventory.infrahub.InfrahubClientSync") as mock_client_class:
@@ -403,12 +404,43 @@ def _patched_inventory(relationship_names, **kwargs):
         mock_schema.relationships = []
         mock_schema.relationship_names = list(relationship_names)
         mock_client.schema.get.return_value = mock_schema
+        mock_client.filters.return_value = []
         mock_client_class.return_value = mock_client
-        return InfrahubInventory(**kwargs)
+        inventory = InfrahubInventory(**kwargs)
+    inventory.load()
+    return inventory
 
 
-def test_mapping_relations_merged_into_include():
-    inventory = _patched_inventory(
+async def _apatched_inventory(relationship_names, **kwargs):
+    """Asynchronous counterpart of ``_patched_inventory``, loaded with ``aload``."""
+    from unittest.mock import AsyncMock, Mock, patch
+
+    with patch("nornir_infrahub.plugins.inventory.infrahub.InfrahubClient") as mock_client_class:
+        mock_client = Mock()
+        mock_schema = Mock()
+        mock_schema.relationship_names = list(relationship_names)
+        mock_client.schema.get = AsyncMock(return_value=mock_schema)
+        mock_client.filters = AsyncMock(return_value=[])
+        mock_client_class.return_value = mock_client
+        inventory = InfrahubInventory(**kwargs)
+    await inventory.aload()
+    return inventory
+
+
+@pytest.fixture(params=["load", "aload"])
+def patched_inventory(request):
+    """Return a coroutine that builds an inventory and loads it with ``load`` or ``aload``."""
+
+    async def build(relationship_names, **kwargs):
+        if request.param == "load":
+            return _patched_inventory(relationship_names, **kwargs)
+        return await _apatched_inventory(relationship_names, **kwargs)
+
+    return build
+
+
+async def test_mapping_relations_merged_into_include(patched_inventory):
+    inventory = await patched_inventory(
         relationship_names=["primary_address", "site", "platform"],
         host_node={"kind": "InfraDevice", "include": ["interfaces"]},
         schema_mappings=[
@@ -426,8 +458,8 @@ def test_mapping_relations_merged_into_include():
     }
 
 
-def test_single_segment_mapping_does_not_add_include():
-    inventory = _patched_inventory(
+async def test_single_segment_mapping_does_not_add_include(patched_inventory):
+    inventory = await patched_inventory(
         relationship_names=[],
         host_node={"kind": "InfraDevice"},
         schema_mappings=[{"name": "hostname", "mapping": "name"}],
@@ -435,18 +467,18 @@ def test_single_segment_mapping_does_not_add_include():
     assert set(inventory.host_node.include) == {"member_of_groups"}
 
 
-def test_multi_hop_mapping_rejected():
+async def test_multi_hop_mapping_rejected(patched_inventory):
     with pytest.raises(ValueError, match="more than one relation hop"):
-        _patched_inventory(
+        await patched_inventory(
             relationship_names=["primary_address"],
             host_node={"kind": "InfraDevice"},
             schema_mappings=[{"name": "prefix", "mapping": "primary_address.ip_prefix.prefix"}],
         )
 
 
-def test_mapping_references_unknown_relationship():
+async def test_mapping_references_unknown_relationship(patched_inventory):
     with pytest.raises(ValueError, match="not a relationship"):
-        _patched_inventory(
+        await patched_inventory(
             relationship_names=["site"],
             host_node={"kind": "InfraDevice"},
             schema_mappings=[{"name": "hostname", "mapping": "primary_address.address"}],
