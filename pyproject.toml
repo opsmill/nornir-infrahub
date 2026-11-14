@@ -134,6 +134,7 @@ min-similarity-lines = 20
 
 [tool.ruff]
 line-length = 120
+extend-exclude = [".specify"]  # vendored spec-kit scripts
 
 [tool.ruff.format]
 quote-style = "double"
@@ -196,6 +197,7 @@ exclude = [
     ".claude",               # symlink views of .agents
     ".specify/extensions",   # vendored spec-kit extensions
     ".specify/templates",    # vendored spec-kit templates
+    ".specify/presets",      # vendored spec-kit presets
 ]
 
 [tool.rumdl.per-file-ignores]
