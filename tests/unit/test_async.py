@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from importlib import metadata
 from typing import TYPE_CHECKING, Any
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
@@ -160,7 +161,7 @@ async def test_ainitnornir_loads_with_aload_and_runs_async_tasks(tmp_path: Path,
     with patch(f"{INVENTORY_MODULE}.InfrahubClient", return_value=_async_client(host_schema, ["edge1"])):
         nr = await AInitNornir(
             runner={"plugin": "asyncio"},
-            inventory={"plugin": "InfrahubAsyncInventory", "options": _inventory_options(tmp_path)},
+            inventory={"plugin": "InfrahubInventory", "options": _inventory_options(tmp_path)},
             logging={"enabled": False},
         )
 
@@ -171,14 +172,11 @@ async def test_ainitnornir_loads_with_aload_and_runs_async_tasks(tmp_path: Path,
     assert result["edge1"].result == "InfrahubNode"
 
 
-async def test_ainitnornir_loads_the_legacy_name_with_load(tmp_path: Path, host_schema: NodeSchemaAPI):
-    with patch(f"{INVENTORY_MODULE}.InfrahubClientSync", return_value=_sync_client(host_schema, ["edge1"])):
-        nr = await AInitNornir(
-            inventory={"plugin": "InfrahubInventory", "options": _inventory_options(tmp_path)},
-            logging={"enabled": False},
-        )
+@pytest.mark.parametrize("group", ["nornir.plugins.inventory", "nornir.plugins.capability_inventory"])
+def test_inventory_is_registered_under_one_name_in_both_groups(group: str):
+    entry_points = {entry_point.name: entry_point for entry_point in metadata.entry_points(group=group)}
 
-    assert isinstance(nr.inventory.hosts["edge1"].data["InfrahubNode"], InfrahubNodeSync)
+    assert entry_points["InfrahubInventory"].load() is InfrahubInventory
 
 
 def test_initnornir_loads_with_load(tmp_path: Path, host_schema: NodeSchemaAPI):
@@ -269,7 +267,7 @@ async def test_async_task_rejects_a_host_loaded_with_initnornir(host_schema: Nod
 
 def test_sync_task_rejects_a_host_loaded_with_ainitnornir(host_schema: NodeSchemaAPI):
     node = InfrahubNode(client=InfrahubClient(address="http://mock"), schema=host_schema, data=_node_data("r"))
-    with pytest.raises(TypeError, match="loaded by InfrahubAsyncInventory"):
+    with pytest.raises(TypeError, match="loaded with AInitNornir"):
         get_artifact(_async_task(node), artifact="startup-config")
 
 

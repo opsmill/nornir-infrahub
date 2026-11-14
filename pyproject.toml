@@ -33,7 +33,7 @@ Documentation = "https://docs.infrahub.app/"
 InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 
 [project.entry-points."nornir.plugins.capability_inventory"]
-InfrahubAsyncInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
+InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 
 [dependency-groups]
 dev = [
@@ -59,11 +59,11 @@ dev = [
 [tool.uv]
 package = true
 
-# AInitNornir, Nornir.arun and the capability-aware inventory registry are only on this
-# nornir branch. Remove this source once they are in a nornir release, and raise the
+# AInitNornir, Nornir.arun and the capability-aware inventory registry are on the nornir
+# develop branch and not yet in a release. Remove this source once they are in a nornir release, and raise the
 # nornir lower bound to that release.
 [tool.uv.sources]
-nornir = { git = "https://github.com/nornir-automation/nornir.git", branch = "dga/feat-async-inventory-o5wf5" }
+nornir = { git = "https://github.com/nornir-automation/nornir.git", branch = "develop" }
 
 [tool.coverage.run]
 branch = true

@@ -790,8 +790,8 @@ wheels = [
 
 [[package]]
 name = "nornir"
-version = "3.6.0"
-source = { git = "https://github.com/nornir-automation/nornir.git?branch=dga%2Ffeat-async-inventory-o5wf5#81327839c3991c43fe07515a9a88dc8c17e86e39" }
+version = "3.6.1"
+source = { git = "https://github.com/nornir-automation/nornir.git?branch=develop#6229e535e951aebe036cfc62fbfc511f5b2fac9e" }
 dependencies = [
     { name = "ruamel-yaml" },
 ]
@@ -832,7 +832,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "infrahub-sdk", specifier = ">=1.20.1,<2" },
-    { name = "nornir", git = "https://github.com/nornir-automation/nornir.git?branch=dga%2Ffeat-async-inventory-o5wf5" },
+    { name = "nornir", git = "https://github.com/nornir-automation/nornir.git?branch=develop" },
     { name = "nornir-utils", specifier = ">=0.2.0,<0.4" },
     { name = "pydantic", specifier = ">=2.0.0,<3" },
     { name = "python-slugify", specifier = ">=8.0.4,<9" },

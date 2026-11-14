@@ -12,31 +12,31 @@ if TYPE_CHECKING:
 
 
 def get_node(task: Task) -> Any:
-    """Return the host's `InfrahubNodeSync`, loaded by `InfrahubInventory`.
+    """Return the host's `InfrahubNodeSync`, loaded by `InfrahubInventory` under `InitNornir`.
 
     Raises:
-        TypeError: The host holds an asynchronous `InfrahubNode`, loaded by `InfrahubAsyncInventory`.
+        TypeError: The host holds an asynchronous `InfrahubNode`, loaded under `AInitNornir`.
     """
     node = task.host.data["InfrahubNode"]
     if isinstance(node, InfrahubNode):
         raise TypeError(
-            f"Host '{task.host.name}' was loaded by InfrahubAsyncInventory and holds an asynchronous InfrahubNode; "
+            f"Host '{task.host.name}' was loaded with AInitNornir and holds an asynchronous InfrahubNode; "
             "run the asynchronous variant of this task (prefixed with 'a') with Nornir.arun"
         )
     return node
 
 
 def get_async_node(task: Task) -> Any:
-    """Return the host's asynchronous `InfrahubNode`, loaded by `InfrahubAsyncInventory`.
+    """Return the host's asynchronous `InfrahubNode`, loaded by `InfrahubInventory` under `AInitNornir`.
 
     Raises:
-        TypeError: The host holds an `InfrahubNodeSync`, loaded by `InfrahubInventory`.
+        TypeError: The host holds an `InfrahubNodeSync`, loaded under `InitNornir`.
     """
     node = task.host.data["InfrahubNode"]
     if isinstance(node, InfrahubNodeSync):
         raise TypeError(
             f"Host '{task.host.name}' holds a synchronous InfrahubNodeSync; "
-            "load the inventory with the InfrahubAsyncInventory plugin and AInitNornir to run asynchronous tasks"
+            "load the inventory with AInitNornir to run asynchronous tasks"
         )
     return node
 

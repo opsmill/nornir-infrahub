@@ -95,10 +95,9 @@ hypothetical future use.
 - **Async**: The Infrahub SDK is async-first. Inventory loading and
   SDK interactions use `async`/`await`. Tests use `pytest-asyncio`.
 - **License**: Apache-2.0. All contributions MUST be compatible.
-- **Entry point**: Nornir discovers the plugin via the
-  `nornir.plugins.inventory` entry point (`InfrahubInventory`) and, for
-  `AInitNornir`, the `nornir.plugins.capability_inventory` entry point
-  (`InfrahubAsyncInventory`) in `pyproject.toml`.
+- **Entry point**: Nornir discovers the plugin as `InfrahubInventory` in both
+  the `nornir.plugins.inventory` and the `nornir.plugins.capability_inventory`
+  entry points in `pyproject.toml`.
 
 ## Development Workflow
 

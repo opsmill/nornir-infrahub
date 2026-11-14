@@ -82,13 +82,13 @@ The inventory plugin expects:
 InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 
 [project.entry-points."nornir.plugins.capability_inventory"]
-InfrahubAsyncInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
+InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 ```
 
 ### Important notes
 
 - All task plugins expect the host to have an `InfrahubNode` in `host.data["InfrahubNode"]`
-- The inventory loads with `load` under `InitNornir` (hosts hold an `InfrahubNodeSync`, for the synchronous tasks) and, when selected as `InfrahubAsyncInventory`, with `aload` under `await AInitNornir(...)` (hosts hold an async `InfrahubNode`, for the `a`-prefixed tasks run with `Nornir.arun` and the `asyncio` runner). `AInitNornir` and `Nornir.arun` come from the nornir branch set in `[tool.uv.sources]`
+- The inventory loads with `load` under `InitNornir` (hosts hold an `InfrahubNodeSync`, for the synchronous tasks) and with `aload` under `await AInitNornir(...)` (hosts hold an async `InfrahubNode`, for the `a`-prefixed tasks run with `Nornir.arun` and the `asyncio` runner). `AInitNornir` and `Nornir.arun` come from the nornir `develop` branch set in `[tool.uv.sources]`
 - The inventory plugin automatically includes `member_of_groups` relation for group membership
 - All Infrahub access goes through `infrahub-sdk` — there is no raw `httpx`/`requests` usage in the package (artifact tasks were migrated to SDK-provided functions; see `dev/knowledge/infrahub-sdk-integration.md`)
 - Error handling uses `RuntimeError` for mapping resolution failures (TODO items exist for improvement)
@@ -113,7 +113,7 @@ InfrahubAsyncInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInv
 
 ### Ask First
 
-- Changing the public plugin API or the entry points: `InfrahubInventory` in `nornir.plugins.inventory`, `InfrahubAsyncInventory` in `nornir.plugins.capability_inventory`.
+- Changing the public plugin API or the entry points: `InfrahubInventory` in `nornir.plugins.inventory` and `nornir.plugins.capability_inventory`.
 - Adding, removing, or bumping dependencies in `pyproject.toml` — new deps require justification.
 - Changes that alter inventory mapping semantics (`host_node`, `schema_mappings`, `group_mappings`, defaults/static-group YAML).
 - Upgrading `infrahub-sdk` in a way that changes query behavior or return types — validate against inventory and task functionality first (Constitution §I).
