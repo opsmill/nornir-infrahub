@@ -32,6 +32,42 @@ loads it with the asynchronous client; `host.data["InfrahubNode"]` then holds an
 
 ### Examples
 
+#### Basic usage of `InfrahubInventory` with Nornir
+
+```python
+from nornir import InitNornir
+
+def main():
+    # Initialize Nornir with InfrahubInventory as the inventory plugin.
+    # The plugin is registered through the package's entry point.
+    nr = InitNornir(
+        inventory={
+            "plugin": "InfrahubInventory",
+            "options": {
+                "address": "http://localhost:8000",  # Infrahub API URL
+                "token": "06438eb2-8019-4776-878c-0941b1f1d1ec",  # Infrahub API token
+                "host_node": {"kind": "InfraDevice"},  # Infrahub Node kind to map to Nornir Hosts
+                "schema_mappings": [
+                    {"name": "hostname", "mapping": "primary_address.address"},
+                    {"name": "platform", "mapping": "platform.nornir_platform"},
+                ],  # Mapping Nornir Host properties to Infrahub Node attributes
+                "group_mappings": ["site.name"],  # Create Nornir groups from Infrahub Node attributes
+                "group_file": "dummy.yml",  # Path to the group file
+            },
+        }
+    )
+
+    # Print Nornir inventory host and group names
+    print(nr.inventory.hosts.keys())
+    print(nr.inventory.groups.keys())
+
+    return 0
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+
 #### Load the inventory from a running event loop with `AInitNornir`
 
 ```python
@@ -66,14 +102,6 @@ if __name__ == "__main__":
 ## `get_capabilities`
 
 Return the loading modes the plugin supports: `load` under `InitNornir`, `aload` under `AInitNornir`.
-
-### Examples
-
-No example provided.
-
-## `_include_mapping_relations`
-
-Validate the mappings against the host node schema and fetch the relations they use.
 
 ### Examples
 

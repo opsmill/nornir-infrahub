@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from infrahub_sdk.node import InfrahubNode, InfrahubNodeSync
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from nornir.core.task import Task
 
 
-def get_node(task: Task) -> Any:
+def get_node(task: Task) -> InfrahubNodeSync:
     """Return the host's `InfrahubNodeSync`, loaded by `InfrahubInventory` under `InitNornir`.
 
     Raises:
@@ -26,7 +26,7 @@ def get_node(task: Task) -> Any:
     return node
 
 
-def get_async_node(task: Task) -> Any:
+def get_async_node(task: Task) -> InfrahubNode:
     """Return the host's asynchronous `InfrahubNode`, loaded by `InfrahubInventory` under `AInitNornir`.
 
     Raises:

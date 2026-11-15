@@ -1,14 +1,11 @@
 <!--
 Sync Impact Report
 ===================
-Version change: 1.0.0 → 1.1.0 (Python support range widened to <3.15)
+Version change: 1.1.0 → 1.1.1 (entry point wording)
 Modified principles:
-  - Technology Constraints — Python range >=3.10,<3.14 → >=3.10,<3.15
-Added sections:
-  - Core Principles (5 principles)
-  - Technology Constraints
-  - Development Workflow
-  - Governance
+  - Technology Constraints — the entry point registers `InfrahubInventory` in both
+    `nornir.plugins.inventory` and `nornir.plugins.capability_inventory`
+Added sections: N/A
 Removed sections: N/A
 Templates requiring updates:
   - .specify/templates/plan-template.md — ✅ compatible (no changes needed)
@@ -138,4 +135,4 @@ and ad-hoc decisions.
 adherence to these principles. Violations MUST be flagged and
 resolved before merge.
 
-**Version**: 1.1.0 | **Ratified**: 2026-04-10 | **Last Amended**: 2026-07-28
+**Version**: 1.1.1 | **Ratified**: 2026-04-10 | **Last Amended**: 2026-11-15

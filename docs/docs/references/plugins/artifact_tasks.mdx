@@ -24,6 +24,7 @@ This function regenerates the named artifact for the host's InfrahubNode through
 
 | Exception | Description |
 | --------- | ----------- |
+| `TypeError` | If the host holds an asynchronous `InfrahubNode`, loaded with `AInitNornir`. |
 | `Exception` | Propagates any error raised by the Infrahub SDK if the artifact cannot be generated. |
 
 ### Examples
@@ -75,6 +76,7 @@ Asynchronous variant of `regenerate_host_artifact`, for an inventory loaded with
 
 | Exception | Description |
 | --------- | ----------- |
+| `TypeError` | If the host holds an `InfrahubNodeSync`, loaded with `InitNornir`. |
 | `Exception` | Propagates any error raised by the Infrahub SDK if the artifact cannot be generated. |
 
 ### Examples
@@ -82,13 +84,21 @@ Asynchronous variant of `regenerate_host_artifact`, for an inventory loaded with
 #### Regenerate artifact for a given device from a running event loop
 
 ```python
+import asyncio
+
 from nornir import AInitNornir
 from nornir_infrahub.plugins.tasks import aregenerate_host_artifact
+from nornir_utils.plugins.functions import print_result
 
 
 async def main():
     nr = await AInitNornir(runner={"plugin": "asyncio"}, inventory=...)
     result = await nr.filter(platform="eos").arun(task=aregenerate_host_artifact, artifact="startup-config")
+    print_result(result)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 
@@ -115,6 +125,7 @@ its generation through the Infrahub SDK.
 
 | Exception | Description |
 | --------- | ----------- |
+| `TypeError` | If the host holds an asynchronous `InfrahubNode`, loaded with `AInitNornir`. |
 | `Exception` | Propagates any error raised by the Infrahub SDK if the artifact cannot be generated. |
 
 ### Examples
@@ -166,6 +177,7 @@ Asynchronous variant of `generate_artifacts`, for an inventory loaded with
 
 | Exception | Description |
 | --------- | ----------- |
+| `TypeError` | If the host holds an `InfrahubNodeSync`, loaded with `InitNornir`. |
 | `Exception` | Propagates any error raised by the Infrahub SDK if the artifact cannot be generated. |
 
 ### Examples
@@ -173,8 +185,11 @@ Asynchronous variant of `generate_artifacts`, for an inventory loaded with
 #### Example generating artifacts from a running event loop
 
 ```python
+import asyncio
+
 from nornir import AInitNornir
 from nornir_infrahub.plugins.tasks import agenerate_artifacts
+from nornir_utils.plugins.functions import print_result
 
 
 async def main():
@@ -184,6 +199,11 @@ async def main():
     # so it only needs to run on one host
     run_once = nr.filter(name="jfk1-edge1")
     result = await run_once.arun(task=agenerate_artifacts, artifact="startup-config")
+    print_result(result)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 
@@ -211,6 +231,7 @@ depending on the artifact's content type.
 
 | Exception | Description |
 | --------- | ----------- |
+| `TypeError` | If the host holds an asynchronous `InfrahubNode`, loaded with `AInitNornir`. |
 | `RuntimeError` | If neither or both of `artifact` and `artifact_id` are provided. |
 | `Exception` | Propagates any error raised by the Infrahub SDK if the artifact cannot be retrieved. |
 
@@ -263,6 +284,7 @@ and run with `Nornir.arun`.
 
 | Exception | Description |
 | --------- | ----------- |
+| `TypeError` | If the host holds an `InfrahubNodeSync`, loaded with `InitNornir`. |
 | `RuntimeError` | If neither or both of `artifact` and `artifact_id` are provided. |
 | `Exception` | Propagates any error raised by the Infrahub SDK if the artifact cannot be retrieved. |
 
@@ -271,6 +293,8 @@ and run with `Nornir.arun`.
 #### Example getting artifacts from Infrahub from a running event loop
 
 ```python
+import asyncio
+
 from nornir import AInitNornir
 from nornir_infrahub.plugins.tasks import aget_artifact
 from nornir_utils.plugins.functions import print_result
@@ -280,4 +304,8 @@ async def main():
     nr = await AInitNornir(runner={"plugin": "asyncio"}, inventory=...)
     result = await nr.filter(platform="eos").arun(task=aget_artifact, artifact="startup-config")
     print_result(result)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```

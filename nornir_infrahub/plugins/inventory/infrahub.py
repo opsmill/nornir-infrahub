@@ -178,7 +178,7 @@ class InfrahubInventory:
             raise SystemExit(main())
         ```
 
-    Example:
+    Examples:
         Load the inventory from a running event loop with `AInitNornir`
 
         ```python

@@ -23,6 +23,7 @@ def regenerate_host_artifact(task: Task, artifact: str) -> Result:
         Result: An object representing the outcome of the operation, indicating success or failure.
 
     Raises:
+        TypeError: If the host holds an asynchronous `InfrahubNode`, loaded with `AInitNornir`.
         Exception: Propagates any error raised by the Infrahub SDK if the artifact cannot be generated.
 
     Example:
@@ -71,19 +72,28 @@ async def aregenerate_host_artifact(task: Task, artifact: str) -> Result:
         Result: An object representing the outcome of the operation, indicating success or failure.
 
     Raises:
+        TypeError: If the host holds an `InfrahubNodeSync`, loaded with `InitNornir`.
         Exception: Propagates any error raised by the Infrahub SDK if the artifact cannot be generated.
 
     Example:
         Regenerate artifact for a given device from a running event loop
 
         ```python
+        import asyncio
+
         from nornir import AInitNornir
         from nornir_infrahub.plugins.tasks import aregenerate_host_artifact
+        from nornir_utils.plugins.functions import print_result
 
 
         async def main():
             nr = await AInitNornir(runner={"plugin": "asyncio"}, inventory=...)
             result = await nr.filter(platform="eos").arun(task=aregenerate_host_artifact, artifact="startup-config")
+            print_result(result)
+
+
+        if __name__ == "__main__":
+            asyncio.run(main())
         ```
     """
     node = get_async_node(task)
@@ -108,6 +118,7 @@ def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result: 
         Result: An object representing the outcome of the operation, indicating success or failure.
 
     Raises:
+        TypeError: If the host holds an asynchronous `InfrahubNode`, loaded with `AInitNornir`.
         Exception: Propagates any error raised by the Infrahub SDK if the artifact cannot be generated.
 
     Example:
@@ -157,14 +168,18 @@ async def agenerate_artifacts(task: Task, artifact: str, timeout: int = 10) -> R
         Result: An object representing the outcome of the operation, indicating success or failure.
 
     Raises:
+        TypeError: If the host holds an `InfrahubNodeSync`, loaded with `InitNornir`.
         Exception: Propagates any error raised by the Infrahub SDK if the artifact cannot be generated.
 
     Example:
         Example generating artifacts from a running event loop
 
         ```python
+        import asyncio
+
         from nornir import AInitNornir
         from nornir_infrahub.plugins.tasks import agenerate_artifacts
+        from nornir_utils.plugins.functions import print_result
 
 
         async def main():
@@ -174,6 +189,11 @@ async def agenerate_artifacts(task: Task, artifact: str, timeout: int = 10) -> R
             # so it only needs to run on one host
             run_once = nr.filter(name="jfk1-edge1")
             result = await run_once.arun(task=agenerate_artifacts, artifact="startup-config")
+            print_result(result)
+
+
+        if __name__ == "__main__":
+            asyncio.run(main())
         ```
     """
     node = get_async_node(task)
@@ -201,6 +221,7 @@ def get_artifact(task: Task, artifact: Optional[str] = None, artifact_id: Option
                 the success status of the operation.
 
     Raises:
+        TypeError: If the host holds an asynchronous `InfrahubNode`, loaded with `AInitNornir`.
         RuntimeError: If neither or both of `artifact` and `artifact_id` are provided.
         Exception: Propagates any error raised by the Infrahub SDK if the artifact cannot be retrieved.
 
@@ -260,6 +281,7 @@ async def aget_artifact(task: Task, artifact: Optional[str] = None, artifact_id:
                 the success status of the operation.
 
     Raises:
+        TypeError: If the host holds an `InfrahubNodeSync`, loaded with `InitNornir`.
         RuntimeError: If neither or both of `artifact` and `artifact_id` are provided.
         Exception: Propagates any error raised by the Infrahub SDK if the artifact cannot be retrieved.
 
@@ -267,6 +289,8 @@ async def aget_artifact(task: Task, artifact: Optional[str] = None, artifact_id:
         Example getting artifacts from Infrahub from a running event loop
 
         ```python
+        import asyncio
+
         from nornir import AInitNornir
         from nornir_infrahub.plugins.tasks import aget_artifact
         from nornir_utils.plugins.functions import print_result
@@ -276,6 +300,10 @@ async def aget_artifact(task: Task, artifact: Optional[str] = None, artifact_id:
             nr = await AInitNornir(runner={"plugin": "asyncio"}, inventory=...)
             result = await nr.filter(platform="eos").arun(task=aget_artifact, artifact="startup-config")
             print_result(result)
+
+
+        if __name__ == "__main__":
+            asyncio.run(main())
         ```
     """
     _check_artifact_args(artifact, artifact_id, "aget_artifact")
