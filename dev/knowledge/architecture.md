@@ -87,9 +87,9 @@ InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventor
 InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 ```
 
-The same class is registered as `InfrahubInventory` in both groups. The legacy group keeps the plugin
-working with Nornir releases that have no capability-aware registry. Nornir releases with that registry
-treat a class registered under the same name in both groups as capability-aware. The plugin declares the
+The same class is registered as `InfrahubInventory` in both groups. Nornir treats a class registered
+under the same name in both groups as capability-aware. The legacy group entry keeps the plugin available
+to code that looks it up in `InventoryPluginRegister`. The plugin declares the
 `sync` and `asyncio` capabilities: `InitNornir` calls `load`, so the hosts hold an `InfrahubNodeSync`, and
 `await AInitNornir(...)` calls `aload`, so the hosts hold an async `InfrahubNode`. The task plugins are plain callables
 imported from `nornir_infrahub.plugins.tasks`; the synchronous ones run with `nr.run(task=...)` and the
@@ -136,7 +136,7 @@ imported from `nornir_infrahub.plugins.tasks`; the synchronous ones run with `nr
 ## Key dependencies
 
 - `infrahub-sdk` (>=1.20.1,<2) — API client, node model, object store.
-- `nornir` (>=3.5.0,<4) + `nornir-utils` — automation framework and result printing.
+- `nornir` (>=3.7.0a1,<4) + `nornir-utils` — automation framework and result printing.
 - `pydantic` (v2) — `HostNode` model and `SchemaMappingNode` validation.
 - `ruamel.yaml` — defaults/group file parsing.
 - `python-slugify` — group-name slugification.

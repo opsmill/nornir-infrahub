@@ -18,7 +18,7 @@ classifiers = [
 dependencies = [
     "infrahub-sdk>=1.20.1,<2",
     "ruamel-yaml>=0.18.17,<0.20",
-    "nornir>=3.5.0,<4",
+    "nornir>=3.7.0a1,<4",
     "nornir-utils>=0.2.0,<0.4",
     "python-slugify>=8.0.4,<9",
     "pydantic>=2.0.0,<3",
@@ -58,12 +58,6 @@ dev = [
 
 [tool.uv]
 package = true
-
-# AInitNornir, Nornir.arun and the capability-aware inventory registry are on the nornir
-# develop branch and not yet in a release. Remove this source once they are in a nornir release, and raise the
-# nornir lower bound to that release.
-[tool.uv.sources]
-nornir = { git = "https://github.com/nornir-automation/nornir.git", branch = "develop" }
 
 [tool.coverage.run]
 branch = true
