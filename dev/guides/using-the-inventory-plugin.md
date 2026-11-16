@@ -9,9 +9,12 @@ The plugin is registered as a Nornir entry point in `pyproject.toml`:
 ```toml
 [project.entry-points."nornir.plugins.inventory"]
 InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
+
+[project.entry-points."nornir.plugins.capability_inventory"]
+InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 ```
 
-Because it is an entry point, `InitNornir` resolves `InfrahubInventory` by name once `nornir-infrahub` is installed — no manual registration is needed, whether you use a `config.yaml` or initialize Nornir purely in Python. (Only register it explicitly with `InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)` if the plugin is not discoverable as an installed entry point.)
+Because it is an entry point, `InitNornir` resolves `InfrahubInventory` by name once `nornir-infrahub` is installed — no manual registration is needed, whether you use a `config.yaml` or initialize Nornir purely in Python. `InitNornir` loads the inventory with the synchronous client, and the hosts hold an `InfrahubNodeSync` for the synchronous tasks. `await AInitNornir(...)` loads it with the asynchronous client, and the hosts hold an async `InfrahubNode` for the `a`-prefixed tasks. (Only register the plugin explicitly, with `InventoryPluginRegister` or `CapabilityInventoryPluginRegister`, if it is not discoverable as an installed entry point.)
 
 ## Configure it in `config.yaml`
 
