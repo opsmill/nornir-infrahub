@@ -37,8 +37,8 @@ def host_schema() -> NodeSchemaAPI:
         name="Device",
         namespace="Infra",
         attributes=[
-            {"name": "name", "kind": "String"},
-            {"name": "description", "kind": "String", "optional": True},
+            {"name": "name", "kind": "Text"},
+            {"name": "description", "kind": "Text", "optional": True},
         ],
         relationships=[
             {"name": "member_of_groups", "peer": "CoreGroup", "optional": True, "cardinality": "many", "kind": "Group"}
