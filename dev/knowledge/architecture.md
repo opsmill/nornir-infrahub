@@ -7,14 +7,13 @@ with [Infrahub](https://github.com/opsmill/infrahub) by OpsMill. It has two halv
 2. a set of **task plugins** for managing Infrahub artifacts (device configs, compliance reports, and
    other generated documents).
 
-Both halves are built on top of `infrahub-sdk`: `InfrahubClientSync` and `InfrahubNodeSync` under
-`InitNornir`, `InfrahubClient` and `InfrahubNode` under `AInitNornir`. The contract between them is a single
-piece of host data: `host.data["InfrahubNode"]`.
+Both halves are built on top of `infrahub-sdk` (`InfrahubClientSync` / `InfrahubNodeSync`) and the
+contract between them is a single piece of host data: `host.data["InfrahubNode"]`.
 
 ## The inventory plugin
 
 `InfrahubInventory` (`nornir_infrahub/plugins/inventory/infrahub.py`) connects to the Infrahub API with
-`InfrahubClientSync` in `load()` or `InfrahubClient` in `aload()`, and maps nodes to Nornir hosts. It is configured with:
+`InfrahubClientSync` and maps nodes to Nornir hosts. It is configured with:
 
 - **`host_node`** — a dict selecting the Infrahub node kind to map to hosts, plus optional
   `include` / `exclude` / `filters` (modelled by the `HostNode` pydantic model). A `model_validator`
@@ -28,21 +27,19 @@ piece of host data: `host.data["InfrahubNode"]`.
 - Optional **`defaults_file`** (`defaults.yaml`) and **`group_file`** (`group.yaml`) YAML files loaded
   with `ruamel.yaml` to seed Nornir defaults and statically-defined groups.
 
-The constructor creates both clients and makes no network calls. At the start of `load()` or `aload()`,
-the inventory fetches the host node's schema, validates every mapping, and rejects
+At construction time the inventory fetches the host node's schema, validates every mapping, and rejects
 paths spanning more than one relation hop (`MAX_RELATIONSHIP_HOPS = 2`, i.e. at most one `.`). Any
 relation referenced by a mapping is added to `host_node.include` so the SDK pre-fetches it.
 
-`load()` and `aload()` then do the same work, with the synchronous and the asynchronous client:
+`load()` does the work:
 
-- Fetch nodes via `get_resources()` or `aget_resources()`, which call `client.filters(kind=..., populate_store=True, ...)`.
-  `aload()` reads the defaults and group YAML files in a worker thread.
-- For each node, resolve the host name and each `schema_mapping` through `resolve_node_mapping()`,
+- Fetches nodes via `get_resources()`, which calls `client.filters(kind=..., populate_store=True, ...)`.
+- For each node, resolves the host name and each `schema_mapping` through `resolve_node_mapping()`,
   walking relations (cardinality `many` is unsupported) and reading attribute values. The special-case
   `value_mapper` converts `IPHost` attributes to a bare IP string.
-- Store the originating node on the host as **`host.data["InfrahubNode"]`** — the contract the task
+- Stores the originating node on the host as **`host.data["InfrahubNode"]`** — the contract the task
   plugins depend on.
-- Build groups from two sources: the node's `member_of_groups` peers of type `CoreStandardGroup`, and
+- Builds groups from two sources: the node's `member_of_groups` peers of type `CoreStandardGroup`, and
   each `group_mapping` (slugified and prefixed, e.g. `site__jfk1`). Groups are created on demand and
   attached as `ParentGroups`.
 
@@ -51,8 +48,8 @@ relation referenced by a mapping is added to `host_node.include` so the SDK pre-
 `resolve_node_mapping()` raises `RuntimeError` when a mapping path cannot be resolved (unknown
 attribute/relation, or a `many`-cardinality relation). The `name` mapping wraps that into a clearer
 `RuntimeError`; per-property `schema_mapping` and `group_mapping` failures are currently swallowed and the
-property/group is skipped (two `TODO`s mark these as open decisions). Mapping validation at the start of `load()` or
-`aload()` raises plain `ValueError` for malformed mapping paths.
+property/group is skipped (two `TODO`s mark these as open decisions). Construction-time validation raises
+plain `ValueError` for malformed mapping paths.
 
 ## The task plugins
 
@@ -78,12 +75,6 @@ Alongside the three artifact tasks, `nornir_infrahub/plugins/tasks/file_object.p
 in the object store (both checksum-driven and idempotent). Unlike the artifact tasks, these catch SDK
 errors and return a failed `Result` (`Result(failed=True, ...)`) rather than letting them raise.
 
-Each task has an asynchronous variant with an `a` prefix (`aget_artifact`, `agenerate_artifacts`,
-`aregenerate_host_artifact`, `aupload_file_object`, `adownload_file_object`) that takes the same arguments
-and returns the same `Result`. The synchronous tasks read the host's `InfrahubNodeSync` through
-`get_node()`, and the asynchronous ones read its `InfrahubNode` through `get_async_node()`
-(`nornir_infrahub/utils.py`). Each helper raises `TypeError` when the host holds the other node type.
-
 ## Entry-point registration
 
 The inventory plugin is registered through `pyproject.toml`:
@@ -91,31 +82,24 @@ The inventory plugin is registered through `pyproject.toml`:
 ```toml
 [project.entry-points."nornir.plugins.inventory"]
 InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
-
-[project.entry-points."nornir.plugins.capability_inventory"]
-InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 ```
 
-The same class is registered as `InfrahubInventory` in both groups. Nornir treats a class registered
-under the same name in both groups as capability-aware. The legacy group entry keeps the plugin available
-to code that looks it up in `InventoryPluginRegister`. The plugin declares the
-`sync` and `asyncio` capabilities: `InitNornir` calls `load`, so the hosts hold an `InfrahubNodeSync`, and
-`await AInitNornir(...)` calls `aload`, so the hosts hold an async `InfrahubNode`. The task plugins are plain callables
-imported from `nornir_infrahub.plugins.tasks`; the synchronous ones run with `nr.run(task=...)` and the
-`a`-prefixed ones with `await nr.arun(task=...)`.
+This lets Nornir discover it by name (`"plugin": "InfrahubInventory"`), though it can also be registered
+explicitly via `InventoryPluginRegister.register(...)`. The task plugins are plain callables imported from
+`nornir_infrahub.plugins.tasks` and passed to `nr.run(task=...)`.
 
 ## Data flow
 
 ```text
                      +----------------------+
                      |    Infrahub API      |
-                     | (sync / async client)|
+                     |  (InfrahubClientSync)|
                      +----------+-----------+
                                 | filters(kind=host_node.kind, populate_store=True)
                                 v
                      +----------------------+      defaults.yaml / group.yaml
                      |   InfrahubInventory  |<---- (ruamel.yaml)
-                     |  .load() / .aload()  |
+                     |   .load()            |
                      +----------+-----------+
        schema_mappings -> host props        group_mappings + member_of_groups -> groups
                                 |
@@ -125,7 +109,7 @@ imported from `nornir_infrahub.plugins.tasks`; the synchronous ones run with `nr
         |   hosts[name].data["InfrahubNode"] = node      |
         |   hosts[name].groups = ParentGroups([...])     |
         +-----------------------+------------------------+
-                                | nr.run(task=...) / await nr.arun(task=...)
+                                | nr.run(task=...)
                                 v
         +-----------------------+------------------------+
         | Task plugins (artifact.py, file_object.py)     |
@@ -145,7 +129,7 @@ imported from `nornir_infrahub.plugins.tasks`; the synchronous ones run with `nr
 ## Key dependencies
 
 - `infrahub-sdk` (>=1.20.1,<2) — API client, node model, object store.
-- `nornir` (>=3.7.0a1,<4) + `nornir-utils` — automation framework and result printing.
+- `nornir` (>=3.5.0,<4) + `nornir-utils` — automation framework and result printing.
 - `pydantic` (v2) — `HostNode` model and `SchemaMappingNode` validation.
 - `ruamel.yaml` — defaults/group file parsing.
 - `python-slugify` — group-name slugification.

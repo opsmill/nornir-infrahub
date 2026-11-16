@@ -165,8 +165,7 @@ def extract_docstrings(file_path):
     for node in ast.walk(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             docstring = ast.get_docstring(node)
-            # Private helpers are not part of the plugin reference.
-            if docstring and not node.name.startswith("_"):
+            if docstring:
                 docstrings[node.name] = parse(docstring)
 
     return docstrings
