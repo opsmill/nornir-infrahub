@@ -12,6 +12,12 @@ This plugin fetches inventory data from Infrahub, maps it to Nornir Hosts,
 and supports the creation of Nornir groups based on attributes or relations
 from Infrahub Nodes.
 
+`InitNornir` loads the inventory synchronously; `host.data["InfrahubNode"]` then holds an
+`InfrahubNodeSync` for the synchronous tasks (`get_artifact`, ...). `await AInitNornir(...)`
+loads it with the asynchronous client; `host.data["InfrahubNode"]` then holds an
+`InfrahubNode` for the asynchronous tasks (`aget_artifact`, ...), which run with
+`Nornir.arun` and the `asyncio` runner.
+
 ### Parameters
 
 | Parameter | Type | Required | Default | Description |
@@ -30,14 +36,10 @@ from Infrahub Nodes.
 
 ```python
 from nornir import InitNornir
-from nornir.core.plugins.inventory import InventoryPluginRegister
-from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
 
 def main():
-    # Register the custom InfrahubInventory plugin
-    InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)
-
-    # Initialize Nornir with InfrahubInventory as the inventory plugin
+    # Initialize Nornir with InfrahubInventory as the inventory plugin.
+    # The plugin is registered through the package's entry point.
     nr = InitNornir(
         inventory={
             "plugin": "InfrahubInventory",
@@ -64,3 +66,59 @@ def main():
 if __name__ == "__main__":
     raise SystemExit(main())
 ```
+
+
+#### Load the inventory from a running event loop with `AInitNornir`
+
+```python
+import asyncio
+
+from nornir import AInitNornir
+from nornir_infrahub.plugins.tasks import aget_artifact
+from nornir_utils.plugins.functions import print_result
+
+
+async def main():
+    nr = await AInitNornir(
+        runner={"plugin": "asyncio", "options": {"num_workers": 20}},
+        inventory={
+            "plugin": "InfrahubInventory",
+            "options": {
+                "address": "http://localhost:8000",
+                "token": "06438eb2-8019-4776-878c-0941b1f1d1ec",
+                "host_node": {"kind": "InfraDevice"},
+                "schema_mappings": [{"name": "hostname", "mapping": "primary_address.address"}],
+            },
+        },
+    )
+    print_result(await nr.arun(task=aget_artifact, artifact="startup-config"))
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+
+## `get_capabilities`
+
+Return the loading modes the plugin supports: `load` under `InitNornir`, `aload` under `AInitNornir`.
+
+### Examples
+
+No example provided.
+
+## `load`
+
+Load the inventory with the synchronous client; hosts hold an `InfrahubNodeSync`.
+
+### Examples
+
+No example provided.
+
+## `aload`
+
+Load the inventory with the asynchronous client; hosts hold an `InfrahubNode`.
+
+### Examples
+
+No example provided.

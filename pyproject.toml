@@ -32,6 +32,9 @@ Documentation = "https://docs.infrahub.app/"
 [project.entry-points."nornir.plugins.inventory"]
 InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
 
+[project.entry-points."nornir.plugins.capability_inventory"]
+InfrahubInventory = "nornir_infrahub.plugins.inventory.infrahub:InfrahubInventory"
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.0",
