@@ -24,9 +24,9 @@ async def location_schema() -> NodeSchemaAPI:
         "namespace": "Builtin",
         "default_filter": "name__value",
         "attributes": [
-            {"name": "name", "kind": "String", "unique": True},
-            {"name": "description", "kind": "String", "optional": True},
-            {"name": "type", "kind": "String"},
+            {"name": "name", "kind": "Text", "unique": True},
+            {"name": "description", "kind": "Text", "optional": True},
+            {"name": "type", "kind": "Text"},
         ],
         "relationships": [
             {"name": "tags", "peer": "BuiltinTag", "optional": True, "cardinality": "many"},
@@ -44,9 +44,9 @@ async def device_schema() -> NodeSchemaAPI:
         "namespace": "Infra",
         "default_filter": "name__value",
         "attributes": [
-            {"name": "name", "kind": "String", "unique": True},
-            {"name": "description", "kind": "String", "optional": True},
-            {"name": "type", "kind": "String"},
+            {"name": "name", "kind": "Text", "unique": True},
+            {"name": "description", "kind": "Text", "optional": True},
+            {"name": "type", "kind": "Text"},
         ],
         "relationships": [
             {"name": "site", "peer": "BuiltinLocation", "cardinality": "one"},
