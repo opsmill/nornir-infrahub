@@ -1,14 +1,13 @@
 """Inventory plugin"""
 
-import asyncio
 import ipaddress
 import logging
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 import ruamel.yaml
-from infrahub_sdk import Config, InfrahubClient, InfrahubClientSync
-from infrahub_sdk.node import InfrahubNode, InfrahubNodeSync
+from infrahub_sdk import Config, InfrahubClientSync
+from infrahub_sdk.node import InfrahubNodeSync
 from nornir.core.inventory import (
     ConnectionOptions,
     Defaults,
@@ -25,7 +24,6 @@ from pydantic.dataclasses import dataclass
 from slugify import slugify
 
 MAX_RELATIONSHIP_HOPS: int = 2
-InventoryCapability = Literal["sync", "asyncio"]
 logger = logging.getLogger(__name__)
 
 
@@ -33,7 +31,7 @@ def ip_interface_to_ip_string(ip_interface: Union[ipaddress.IPv4Interface, ipadd
     return str(ip_interface.ip)
 
 
-def resolve_node_mapping(node: Union[InfrahubNode, InfrahubNodeSync], attrs: List[str]) -> Any:
+def resolve_node_mapping(node: InfrahubNodeSync, attrs: List[str]) -> Any:
     for attr in attrs:
         if attr in node._schema.relationship_names:
             relation = getattr(node, attr)
@@ -127,12 +125,6 @@ class InfrahubInventory:
     and supports the creation of Nornir groups based on attributes or relations
     from Infrahub Nodes.
 
-    `InitNornir` loads the inventory synchronously; `host.data["InfrahubNode"]` then holds an
-    `InfrahubNodeSync` for the synchronous tasks (`get_artifact`, ...). `await AInitNornir(...)`
-    loads it with the asynchronous client; `host.data["InfrahubNode"]` then holds an
-    `InfrahubNode` for the asynchronous tasks (`aget_artifact`, ...), which run with
-    `Nornir.arun` and the `asyncio` runner.
-
     Args:
         address (str, optional): The Infrahub URL to connect to. Defaults to "http://localhost:8000".
         branch (str, optional): The Infrahub branch to use. Defaults to "main".
@@ -147,10 +139,14 @@ class InfrahubInventory:
 
         ```python
         from nornir import InitNornir
+        from nornir.core.plugins.inventory import InventoryPluginRegister
+        from nornir_infrahub.plugins.inventory.infrahub import InfrahubInventory
 
         def main():
-            # Initialize Nornir with InfrahubInventory as the inventory plugin.
-            # The plugin is registered through the package's entry point.
+            # Register the custom InfrahubInventory plugin
+            InventoryPluginRegister.register("InfrahubInventory", InfrahubInventory)
+
+            # Initialize Nornir with InfrahubInventory as the inventory plugin
             nr = InitNornir(
                 inventory={
                     "plugin": "InfrahubInventory",
@@ -178,37 +174,6 @@ class InfrahubInventory:
             raise SystemExit(main())
         ```
 
-    Examples:
-        Load the inventory from a running event loop with `AInitNornir`
-
-        ```python
-        import asyncio
-
-        from nornir import AInitNornir
-        from nornir_infrahub.plugins.tasks import aget_artifact
-        from nornir_utils.plugins.functions import print_result
-
-
-        async def main():
-            nr = await AInitNornir(
-                runner={"plugin": "asyncio", "options": {"num_workers": 20}},
-                inventory={
-                    "plugin": "InfrahubInventory",
-                    "options": {
-                        "address": "http://localhost:8000",
-                        "token": "06438eb2-8019-4776-878c-0941b1f1d1ec",
-                        "host_node": {"kind": "InfraDevice"},
-                        "schema_mappings": [{"name": "hostname", "mapping": "primary_address.address"}],
-                    },
-                },
-            )
-            print_result(await nr.arun(task=aget_artifact, artifact="startup-config"))
-
-
-        if __name__ == "__main__":
-            asyncio.run(main())
-        ```
-
     """  # noqa E501
 
     def __init__(  # noqa: PLR0913
@@ -230,10 +195,7 @@ class InfrahubInventory:
         self.defaults_file = Path(defaults_file).expanduser()
         self.group_file = Path(group_file).expanduser()
 
-        # Creating the clients performs no I/O. The schema is fetched by load or aload.
-        config = Config(api_token=token, default_branch=branch)
-        self.client = InfrahubClientSync(config=config, address=self.address)
-        self.async_client = InfrahubClient(config=config, address=self.address)
+        self.client = InfrahubClientSync(config=Config(api_token=token, default_branch=branch), address=self.address)
 
         schema_mappings = schema_mappings or []
         self.schema_mappings = [SchemaMappingNode(**mapping) for mapping in schema_mappings]
@@ -241,13 +203,7 @@ class InfrahubInventory:
         group_mappings = group_mappings or []
         self.group_mappings = group_mappings
 
-    def get_capabilities(self) -> frozenset[InventoryCapability]:
-        """Return the loading modes the plugin supports: `load` under `InitNornir`, `aload` under `AInitNornir`."""
-        capabilities: set[InventoryCapability] = {"sync", "asyncio"}
-        return frozenset(capabilities)
-
-    def _include_mapping_relations(self, host_node_schema: Any) -> None:
-        """Validate the mappings against the host node schema and fetch the relations they use."""
+        host_node_schema = self.client.schema.get(kind=self.host_node.kind)
         host_rel_names = set(host_node_schema.relationship_names)
 
         mapping_relations: set[str] = set()
@@ -274,24 +230,12 @@ class InfrahubInventory:
         for gm in self.group_mappings:
             yield "group_mapping", gm
 
-    def load(self) -> Inventory:
-        """Load the inventory with the synchronous client; hosts hold an `InfrahubNodeSync`."""
-        self._include_mapping_relations(self.client.schema.get(kind=self.host_node.kind))
-        defaults, groups = self._load_files()
-        host_nodes = self.get_resources(**dict(self.host_node))
-        return self._build_inventory(host_nodes, defaults, groups)
-
-    async def aload(self) -> Inventory:
-        """Load the inventory with the asynchronous client; hosts hold an `InfrahubNode`."""
-        self._include_mapping_relations(await self.async_client.schema.get(kind=self.host_node.kind))
-        defaults, groups = await asyncio.to_thread(self._load_files)
-        host_nodes = await self.aget_resources(**dict(self.host_node))
-        return self._build_inventory(host_nodes, defaults, groups)
-
-    def _load_files(self) -> Tuple[Defaults, Groups]:
+    def load(self) -> Inventory:  # noqa: PLR0912
         yml = ruamel.yaml.YAML(typ="safe")
 
+        hosts = Hosts()
         groups = Groups()
+        defaults = Defaults()
 
         defaults_dict: Dict[str, Any] = {}
         groups_dict: Dict[str, Any] = {}
@@ -312,11 +256,9 @@ class InfrahubInventory:
         for g in groups.values():
             g.groups = ParentGroups([groups[g.name] for g in g.groups])
 
-        return defaults, groups
-
-    def _build_inventory(self, host_nodes: List[Any], defaults: Defaults, groups: Groups) -> Inventory:
-        hosts = Hosts()
         host: Dict[str, Any] = {}
+
+        host_nodes = self.get_resources(**dict(self.host_node))
 
         name_mapping = next((m for m in self.schema_mappings if m.name == "name"), None)
 
@@ -376,7 +318,3 @@ class InfrahubInventory:
 
         resources = self.client.filters(kind=kind, branch=self.branch, populate_store=True, **kwargs, **filters)
         return resources
-
-    async def aget_resources(self, kind: str, **kwargs) -> List[InfrahubNode]:
-        filters = kwargs.pop("filters", {})
-        return await self.async_client.filters(kind=kind, branch=self.branch, populate_store=True, **kwargs, **filters)

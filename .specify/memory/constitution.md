@@ -1,11 +1,14 @@
 <!--
 Sync Impact Report
 ===================
-Version change: 1.1.0 → 1.1.1 (entry point wording)
+Version change: 1.0.0 → 1.1.0 (Python support range widened to <3.15)
 Modified principles:
-  - Technology Constraints — the entry point registers `InfrahubInventory` in both
-    `nornir.plugins.inventory` and `nornir.plugins.capability_inventory`
-Added sections: N/A
+  - Technology Constraints — Python range >=3.10,<3.14 → >=3.10,<3.15
+Added sections:
+  - Core Principles (5 principles)
+  - Technology Constraints
+  - Development Workflow
+  - Governance
 Removed sections: N/A
 Templates requiring updates:
   - .specify/templates/plan-template.md — ✅ compatible (no changes needed)
@@ -92,9 +95,8 @@ hypothetical future use.
 - **Async**: The Infrahub SDK is async-first. Inventory loading and
   SDK interactions use `async`/`await`. Tests use `pytest-asyncio`.
 - **License**: Apache-2.0. All contributions MUST be compatible.
-- **Entry point**: Nornir discovers the plugin as `InfrahubInventory` in both
-  the `nornir.plugins.inventory` and the `nornir.plugins.capability_inventory`
-  entry points in `pyproject.toml`.
+- **Entry point**: Nornir discovers the plugin via the
+  `nornir.plugins.inventory` entry point in `pyproject.toml`.
 
 ## Development Workflow
 
@@ -135,4 +137,4 @@ and ad-hoc decisions.
 adherence to these principles. Violations MUST be flagged and
 resolved before merge.
 
-**Version**: 1.1.1 | **Ratified**: 2026-04-10 | **Last Amended**: 2026-11-15
+**Version**: 1.1.0 | **Ratified**: 2026-04-10 | **Last Amended**: 2026-07-28
