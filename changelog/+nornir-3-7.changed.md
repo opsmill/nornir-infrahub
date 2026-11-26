@@ -1,1 +1,1 @@
-nornir-infrahub now requires Nornir 3.7.0a1 or later, the first Nornir release with `AInitNornir`, `Nornir.arun` and the capability-aware inventory registry.
+nornir-infrahub now requires Nornir 3.7.0b1 or later. Nornir 3.7 adds `AInitNornir`, `Nornir.arun` and the capability-aware inventory registry, and 3.7.0b1 is the first release with typed task results.

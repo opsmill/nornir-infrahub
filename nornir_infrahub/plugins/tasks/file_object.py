@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any
 from infrahub_sdk.exceptions import NodeNotFoundError
 from nornir.core.task import Result, Task
 from nornir_infrahub.utils import get_async_client, get_client
+from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
     from infrahub_sdk import InfrahubClient, InfrahubClientSync
@@ -29,6 +30,31 @@ TEXT_MIME_TYPES: frozenset[str] = frozenset(
         "application/xml",
     }
 )
+
+
+class FileObjectDownload(BaseModel):
+    """File content and metadata that `download_file_object` and `adownload_file_object` return in `Result.result`.
+
+    Attributes:
+        binary (str): The file content, base64-encoded.
+        text (str | None): The file content decoded as UTF-8 for text MIME types, otherwise `None`.
+        file_name (str): The file name stored in Infrahub.
+        file_type (str): The MIME type stored in Infrahub.
+        file_size (int | None): The file size in bytes stored in Infrahub.
+        checksum (str | None): The SHA-1 checksum stored in Infrahub.
+        object_id (str): The id of the CoreFileObject node.
+        save_to (str | None): The local path of the saved file, or `None` when `save_to` was not given.
+    """
+
+    # The content is left out of the printed form, so `print_result` prints the metadata only.
+    binary: str = Field(repr=False)
+    text: str | None = Field(default=None, repr=False)
+    file_name: str
+    file_type: str
+    file_size: int | None = None
+    checksum: str | None = None
+    object_id: str
+    save_to: str | None = None
 
 
 def _check_file_object_schema(schema: Any, kind: str) -> NodeSchemaAPI:
@@ -153,7 +179,9 @@ def _create_data(data: dict[str, Any], upload_name: str, kwargs: dict[str, Any])
     return create_data
 
 
-def _update_result(task: Task, existing_obj: Any, kind: str, upload_name: str, uploaded: bool, saved: bool) -> Result:
+def _update_result(
+    task: Task, existing_obj: Any, kind: str, upload_name: str, uploaded: bool, saved: bool
+) -> Result[str]:
     if uploaded:
         message = f"{kind} '{upload_name}' updated (checksum changed)"
     elif saved:
@@ -169,7 +197,7 @@ def _update_result(task: Task, existing_obj: Any, kind: str, upload_name: str, u
     )
 
 
-def _create_result(task: Task, new_obj: Any, kind: str, upload_name: str) -> Result:
+def _create_result(task: Task, new_obj: Any, kind: str, upload_name: str) -> Result[str]:
     return Result(
         host=task.host,
         failed=False,
@@ -207,14 +235,13 @@ def _write_file(path: Path, content: bytes) -> None:
     path.write_bytes(content)
 
 
-def _download_result(task: Task, obj: Any, content: bytes, changed: bool, resolved_save_to: Path | None) -> Result:
+def _download_result(
+    task: Task, obj: Any, content: bytes, changed: bool, resolved_save_to: Path | None
+) -> Result[FileObjectDownload]:
     file_type = obj.file_type.value
     is_text = file_type in TEXT_MIME_TYPES
 
-    return Result(
-        host=task.host,
-        failed=False,
-        changed=changed,
+    download = FileObjectDownload(
         binary=base64.b64encode(content).decode("ascii"),
         text=content.decode("utf-8", errors="replace") if is_text else None,
         file_name=obj.file_name.value,
@@ -224,6 +251,8 @@ def _download_result(task: Task, obj: Any, content: bytes, changed: bool, resolv
         object_id=str(obj.id),
         save_to=str(resolved_save_to) if resolved_save_to is not None else None,
     )
+    # The fields are also set as attributes of the Result, where they were before `result` held the model.
+    return Result(host=task.host, failed=False, changed=changed, result=download, **download.model_dump())
 
 
 def upload_file_object(
@@ -237,7 +266,7 @@ def upload_file_object(
     hfid: list[str] | None = None,
     branch: str | None = None,
     **kwargs: Any,
-) -> Result:
+) -> Result[str]:
     """
     Uploads a file to an Infrahub CoreFileObject object.
 
@@ -266,7 +295,7 @@ def upload_file_object(
             when updating an existing object.
 
     Returns:
-        Result: A Nornir Result with ``changed`` indicating whether the object was
+        Result[str]: A Nornir Result with ``changed`` indicating whether the object was
             created or updated, ``object_id`` with the UUID, and a descriptive
             ``result`` message.
 
@@ -348,7 +377,7 @@ async def aupload_file_object(
     hfid: list[str] | None = None,
     branch: str | None = None,
     **kwargs: Any,
-) -> Result:
+) -> Result[str]:
     """
     Uploads a file to an Infrahub CoreFileObject object, without blocking the event loop.
 
@@ -372,7 +401,7 @@ async def aupload_file_object(
             on the create path only.
 
     Returns:
-        Result: A Nornir Result with ``changed`` indicating whether the object was
+        Result[str]: A Nornir Result with ``changed`` indicating whether the object was
             created or updated, ``object_id`` with the UUID, and a descriptive
             ``result`` message.
 
@@ -446,7 +475,7 @@ def download_file_object(
     hfid: list[str] | None = None,
     save_to: str | Path | None = None,
     branch: str | None = None,
-) -> Result:
+) -> Result[FileObjectDownload]:
     """
     Downloads file content from an Infrahub CoreFileObject object.
 
@@ -474,10 +503,12 @@ def download_file_object(
         branch (str, optional): Target Infrahub branch. Defaults to the client's default branch.
 
     Returns:
-        Result: A Nornir Result containing ``binary`` (base64 string),
-            ``text`` (UTF-8 string or None), ``file_name``, ``file_type``,
-            ``file_size``, ``checksum``, ``object_id``, ``save_to``, and
-            ``changed`` (True only when a local file was created or overwritten).
+        Result[FileObjectDownload]: A Nornir Result whose ``result`` is a ``FileObjectDownload``
+            with ``binary`` (base64 string), ``text`` (UTF-8 string or None), ``file_name``,
+            ``file_type``, ``file_size``, ``checksum``, ``object_id`` and ``save_to``.
+            The same fields are also attributes of the Result. ``changed`` is True only
+            when a local file was created or overwritten. When the task fails, ``result``
+            holds the error text, so check ``failed`` before reading the fields.
 
     Raises:
         ValueError: If *kind* does not inherit from CoreFileObject.
@@ -535,7 +566,7 @@ async def adownload_file_object(
     hfid: list[str] | None = None,
     save_to: str | Path | None = None,
     branch: str | None = None,
-) -> Result:
+) -> Result[FileObjectDownload]:
     """
     Downloads file content from an Infrahub CoreFileObject object, without blocking the event loop.
 
@@ -553,10 +584,12 @@ async def adownload_file_object(
         branch (str, optional): Target Infrahub branch. Defaults to the client's default branch.
 
     Returns:
-        Result: A Nornir Result containing ``binary`` (base64 string),
-            ``text`` (UTF-8 string or None), ``file_name``, ``file_type``,
-            ``file_size``, ``checksum``, ``object_id``, ``save_to``, and
-            ``changed`` (True only when a local file was created or overwritten).
+        Result[FileObjectDownload]: A Nornir Result whose ``result`` is a ``FileObjectDownload``
+            with ``binary`` (base64 string), ``text`` (UTF-8 string or None), ``file_name``,
+            ``file_type``, ``file_size``, ``checksum``, ``object_id`` and ``save_to``.
+            The same fields are also attributes of the Result. ``changed`` is True only
+            when a local file was created or overwritten. When the task fails, ``result``
+            holds the error text, so check ``failed`` before reading the fields.
 
     Example:
         Download a file from a CoreFileObject object from a running event loop

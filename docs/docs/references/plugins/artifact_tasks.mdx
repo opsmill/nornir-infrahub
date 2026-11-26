@@ -18,7 +18,7 @@ This function regenerates the named artifact for the host's InfrahubNode through
 
 ### Returns
 
-`Result` — An object representing the outcome of the operation, indicating success or failure.
+`Result[None]` — An object representing the outcome of the operation, indicating success or failure.
 
 ### Raises
 
@@ -70,7 +70,7 @@ Asynchronous variant of `regenerate_host_artifact`, for an inventory loaded with
 
 ### Returns
 
-`Result` — An object representing the outcome of the operation, indicating success or failure.
+`Result[None]` — An object representing the outcome of the operation, indicating success or failure.
 
 ### Raises
 
@@ -119,7 +119,7 @@ its generation through the Infrahub SDK.
 
 ### Returns
 
-`Result` — An object representing the outcome of the operation, indicating success or failure.
+`Result[None]` — An object representing the outcome of the operation, indicating success or failure.
 
 ### Raises
 
@@ -171,7 +171,7 @@ Asynchronous variant of `generate_artifacts`, for an inventory loaded with
 
 ### Returns
 
-`Result` — An object representing the outcome of the operation, indicating success or failure.
+`Result[None]` — An object representing the outcome of the operation, indicating success or failure.
 
 ### Raises
 
@@ -225,7 +225,7 @@ depending on the artifact's content type.
 
 ### Returns
 
-`Result` — An object containing the retrieved artifact data, its content type, and the success status of the operation.
+`Result[Any]` — An object containing the retrieved artifact data, its content type, and the success status of the operation.
 
 ### Raises
 
@@ -278,7 +278,7 @@ and run with `Nornir.arun`.
 
 ### Returns
 
-`Result` — An object containing the retrieved artifact data, its content type, and the success status of the operation.
+`Result[Any]` — An object containing the retrieved artifact data, its content type, and the success status of the operation.
 
 ### Raises
 

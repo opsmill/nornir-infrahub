@@ -364,6 +364,8 @@ async def test_adownload_file_object_writes_the_file(tmp_path: Path):
 
     assert result.changed is True
     assert result.text == "content"
+    assert result.result.text == "content"
+    assert result.result.save_to == str(tmp_path / "contract.txt")
     assert base64.b64decode(result.binary) == b"content"
     assert (tmp_path / "contract.txt").read_bytes() == b"content"
 

@@ -6,9 +6,16 @@ from .artifact import (
     get_artifact,
     regenerate_host_artifact,
 )
-from .file_object import adownload_file_object, aupload_file_object, download_file_object, upload_file_object
+from .file_object import (
+    FileObjectDownload,
+    adownload_file_object,
+    aupload_file_object,
+    download_file_object,
+    upload_file_object,
+)
 
 __all__ = (
+    "FileObjectDownload",
     "adownload_file_object",
     "agenerate_artifacts",
     "aget_artifact",
