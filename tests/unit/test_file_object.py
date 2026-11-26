@@ -8,6 +8,7 @@ from unittest.mock import MagicMock
 
 from infrahub_sdk.exceptions import NodeNotFoundError
 from nornir_infrahub.plugins.tasks.file_object import (
+    FileObjectDownload,
     download_file_object,
     upload_file_object,
 )
@@ -444,6 +445,32 @@ class TestDownloadTextMime:
         assert result.file_type == "application/json"
         assert result.file_size == len(content)
         assert result.object_id == "aaaa-bbbb-cccc-dddd"
+
+    def test_download_returns_the_model_in_result(self):
+        task = _make_task()
+        client = _get_client_from_task(task)
+        client.schema.get.return_value = _make_mock_schema()
+
+        content = b"hello"
+        obj = _make_mock_object(file_type="text/plain", file_name="hello.txt", file_size=len(content))
+        obj.download_file.return_value = content
+        client.get.return_value = obj
+
+        result = download_file_object(task=task, kind="NetworkConfig", object_id="aaaa-bbbb-cccc-dddd")
+
+        assert result.result == FileObjectDownload(
+            binary=base64.b64encode(content).decode("ascii"),
+            text="hello",
+            file_name="hello.txt",
+            file_type="text/plain",
+            file_size=len(content),
+            checksum="abc123",
+            object_id="aaaa-bbbb-cccc-dddd",
+            save_to=None,
+        )
+        # The printed form, which `print_result` uses, leaves the content out.
+        assert "hello.txt" in str(result)
+        assert result.result.binary not in str(result)
 
 
 class TestDownloadBinaryMime:

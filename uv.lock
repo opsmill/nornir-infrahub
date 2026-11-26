@@ -795,14 +795,14 @@ wheels = [
 
 [[package]]
 name = "nornir"
-version = "3.7.0a1"
+version = "3.7.0b1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ruamel-yaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f9/fa/c21bce221e979d28502c3a932c453d83967b604ba35b6cd117c0997ea8e2/nornir-3.7.0a1.tar.gz", hash = "sha256:4035895ff916dff3dcbbf9395cac8c23f165483760ce18a9641ddf1f28a05df1", size = 61997, upload-time = "2026-11-15T11:58:51.614Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/64/197a734acf9260ed8dfb21e2fd2ee68adda141883d920385b155dc528076/nornir-3.7.0b1.tar.gz", hash = "sha256:bdcafc59421413cee96a130edd06212847c978e379c42754122402760904e9ba", size = 75574, upload-time = "2026-11-26T07:15:52.805Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/e2/7a552c6b07cb9c5af71084f3e70fc71c9c30537b12afc9c8d8f3b3e83839/nornir-3.7.0a1-py3-none-any.whl", hash = "sha256:79ad228b2e74a16ee0a467ceacbb228a2305fe6aa813aecd6aad6cb927f86ce4", size = 66145, upload-time = "2026-11-15T11:58:50.611Z" },
+    { url = "https://files.pythonhosted.org/packages/6f/7c/6f8763d947c38c6d40d24c0774c07b95a560a1f504658f4dd794938b5552/nornir-3.7.0b1-py3-none-any.whl", hash = "sha256:c7d735d51ca297911e43b411e60de37867f18ec72bacbbf1585b0a9a4f2bfee1", size = 79807, upload-time = "2026-11-26T07:15:51.587Z" },
 ]
 
 [[package]]
@@ -841,7 +841,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "infrahub-sdk", specifier = ">=1.20.1,<2" },
-    { name = "nornir", specifier = ">=3.7.0a1,<4" },
+    { name = "nornir", specifier = ">=3.7.0b1,<4" },
     { name = "nornir-utils", specifier = ">=0.2.0,<0.4" },
     { name = "pydantic", specifier = ">=2.0.0,<3" },
     { name = "python-slugify", specifier = ">=8.0.4,<9" },
@@ -998,8 +998,8 @@ name = "pendulum"
 version = "3.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "python-dateutil", marker = "python_full_version < '3.13'" },
-    { name = "tzdata", marker = "python_full_version < '3.13'" },
+    { name = "python-dateutil" },
+    { name = "tzdata" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cb/72/9a51afa0a822b09e286c4cb827ed7b00bc818dac7bd11a5f161e493a217d/pendulum-3.2.0.tar.gz", hash = "sha256:e80feda2d10fa3ff8b1526715f7d33dcb7e08494b3088f2c8a3ac92d4a4331ce", size = 86912, upload-time = "2026-01-30T11:22:24.093Z" }
 wheels = [

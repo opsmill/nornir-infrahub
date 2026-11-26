@@ -37,7 +37,7 @@ def lint_yaml(context: Context):
 def lint_ty(context: Context):
     """Run type checker to check all Python files."""
     print(" - Check code with ty")
-    exec_cmd = "ty check nornir_infrahub"
+    exec_cmd = "ty check nornir_infrahub tests/unit/test_typed_results.py"
     with context.cd(MAIN_DIRECTORY_PATH):
         context.run(exec_cmd)
 

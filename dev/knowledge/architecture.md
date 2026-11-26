@@ -145,7 +145,7 @@ imported from `nornir_infrahub.plugins.tasks`; the synchronous ones run with `nr
 ## Key dependencies
 
 - `infrahub-sdk` (>=1.20.1,<2) — API client, node model, object store.
-- `nornir` (>=3.7.0a1,<4) + `nornir-utils` — automation framework and result printing.
+- `nornir` (>=3.7.0b1,<4) + `nornir-utils` — automation framework and result printing.
 - `pydantic` (v2) — `HostNode` model and `SchemaMappingNode` validation.
 - `ruamel.yaml` — defaults/group file parsing.
 - `python-slugify` — group-name slugification.

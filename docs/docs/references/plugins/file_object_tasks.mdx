@@ -3,6 +3,28 @@ title: CoreFileObject management tasks
 ---
 
 
+## `FileObjectDownload`
+
+File content and metadata that `download_file_object` and `adownload_file_object` return in `Result.result`.
+
+
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `binary` | `str` | Yes |  | The file content, base64-encoded. |
+| `text` | `str \| None` | Yes |  | The file content decoded as UTF-8 for text MIME types, otherwise `None`. |
+| `file_name` | `str` | Yes |  | The file name stored in Infrahub. |
+| `file_type` | `str` | Yes |  | The MIME type stored in Infrahub. |
+| `file_size` | `int \| None` | Yes |  | The file size in bytes stored in Infrahub. |
+| `checksum` | `str \| None` | Yes |  | The SHA-1 checksum stored in Infrahub. |
+| `object_id` | `str` | Yes |  | The id of the CoreFileObject node. |
+| `save_to` | `str \| None` | Yes |  | The local path of the saved file, or `None` when `save_to` was not given. |
+
+### Examples
+
+No example provided.
+
 ## `upload_file_object`
 
 Uploads a file to an Infrahub CoreFileObject object.
@@ -31,7 +53,7 @@ Provide either ``file_path`` (to upload a file from disk) or ``content`` with
 
 ### Returns
 
-`Result` — A Nornir Result with ``changed`` indicating whether the object was created or updated, ``object_id`` with the UUID, and a descriptive ``result`` message.
+`Result[str]` — A Nornir Result with ``changed`` indicating whether the object was created or updated, ``object_id`` with the UUID, and a descriptive ``result`` message.
 
 ### Raises
 
@@ -80,7 +102,7 @@ the same `Result`.
 
 ### Returns
 
-`Result` — A Nornir Result with ``changed`` indicating whether the object was created or updated, ``object_id`` with the UUID, and a descriptive ``result`` message.
+`Result[str]` — A Nornir Result with ``changed`` indicating whether the object was created or updated, ``object_id`` with the UUID, and a descriptive ``result`` message.
 
 ### Examples
 
@@ -128,7 +150,7 @@ infrahub-sdk download API directly.
 
 ### Returns
 
-`Result` — A Nornir Result containing ``binary`` (base64 string), ``text`` (UTF-8 string or None), ``file_name``, ``file_type``, ``file_size``, ``checksum``, ``object_id``, ``save_to``, and ``changed`` (True only when a local file was created or overwritten).
+`Result[FileObjectDownload]` — A Nornir Result whose ``result`` is a ``FileObjectDownload`` with ``binary`` (base64 string), ``text`` (UTF-8 string or None), ``file_name``, ``file_type``, ``file_size``, ``checksum``, ``object_id`` and ``save_to``. The same fields are also attributes of the Result. ``changed`` is True only when a local file was created or overwritten. When the task fails, ``result`` holds the error text, so check ``failed`` before reading the fields.
 
 ### Raises
 
@@ -172,7 +194,7 @@ the same `Result`. Local file reads and writes run in a worker thread.
 
 ### Returns
 
-`Result` — A Nornir Result containing ``binary`` (base64 string), ``text`` (UTF-8 string or None), ``file_name``, ``file_type``, ``file_size``, ``checksum``, ``object_id``, ``save_to``, and ``changed`` (True only when a local file was created or overwritten).
+`Result[FileObjectDownload]` — A Nornir Result whose ``result`` is a ``FileObjectDownload`` with ``binary`` (base64 string), ``text`` (UTF-8 string or None), ``file_name``, ``file_type``, ``file_size``, ``checksum``, ``object_id`` and ``save_to``. The same fields are also attributes of the Result. ``changed`` is True only when a local file was created or overwritten. When the task fails, ``result`` holds the error text, so check ``failed`` before reading the fields.
 
 ### Examples
 

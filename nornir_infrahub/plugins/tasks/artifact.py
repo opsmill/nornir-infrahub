@@ -9,7 +9,7 @@ from nornir.core.task import Result, Task
 from nornir_infrahub.utils import get_async_node, get_node
 
 
-def regenerate_host_artifact(task: Task, artifact: str) -> Result:
+def regenerate_host_artifact(task: Task, artifact: str) -> Result[None]:
     """
     Regenerates a host artifact for a given task.
 
@@ -20,7 +20,7 @@ def regenerate_host_artifact(task: Task, artifact: str) -> Result:
         artifact (str): The name of the artifact to regenerate.
 
     Returns:
-        Result: An object representing the outcome of the operation, indicating success or failure.
+        Result[None]: An object representing the outcome of the operation, indicating success or failure.
 
     Raises:
         TypeError: If the host holds an asynchronous `InfrahubNode`, loaded with `AInitNornir`.
@@ -57,7 +57,7 @@ def regenerate_host_artifact(task: Task, artifact: str) -> Result:
     return Result(host=task.host, failed=False)
 
 
-async def aregenerate_host_artifact(task: Task, artifact: str) -> Result:
+async def aregenerate_host_artifact(task: Task, artifact: str) -> Result[None]:
     """
     Regenerates a host artifact for a given task, without blocking the event loop.
 
@@ -69,7 +69,7 @@ async def aregenerate_host_artifact(task: Task, artifact: str) -> Result:
         artifact (str): The name of the artifact to regenerate.
 
     Returns:
-        Result: An object representing the outcome of the operation, indicating success or failure.
+        Result[None]: An object representing the outcome of the operation, indicating success or failure.
 
     Raises:
         TypeError: If the host holds an `InfrahubNodeSync`, loaded with `InitNornir`.
@@ -102,7 +102,7 @@ async def aregenerate_host_artifact(task: Task, artifact: str) -> Result:
     return Result(host=task.host, failed=False)
 
 
-def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result:  # pylint: disable=unused-argument
+def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result[None]:  # pylint: disable=unused-argument
     """
     Generates an artifact for a given task.
 
@@ -115,7 +115,7 @@ def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result: 
         timeout (int, optional): Retained for compatibility; ignored by the SDK path. Defaults to 10.
 
     Returns:
-        Result: An object representing the outcome of the operation, indicating success or failure.
+        Result[None]: An object representing the outcome of the operation, indicating success or failure.
 
     Raises:
         TypeError: If the host holds an asynchronous `InfrahubNode`, loaded with `AInitNornir`.
@@ -152,7 +152,7 @@ def generate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result: 
     return Result(host=task.host, failed=False)
 
 
-async def agenerate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result:  # pylint: disable=unused-argument
+async def agenerate_artifacts(task: Task, artifact: str, timeout: int = 10) -> Result[None]:  # pylint: disable=unused-argument
     """
     Generates an artifact for a given task, without blocking the event loop.
 
@@ -165,7 +165,7 @@ async def agenerate_artifacts(task: Task, artifact: str, timeout: int = 10) -> R
         timeout (int, optional): Retained for compatibility; ignored by the SDK path. Defaults to 10.
 
     Returns:
-        Result: An object representing the outcome of the operation, indicating success or failure.
+        Result[None]: An object representing the outcome of the operation, indicating success or failure.
 
     Raises:
         TypeError: If the host holds an `InfrahubNodeSync`, loaded with `InitNornir`.
@@ -203,7 +203,7 @@ async def agenerate_artifacts(task: Task, artifact: str, timeout: int = 10) -> R
     return Result(host=task.host, failed=False)
 
 
-def get_artifact(task: Task, artifact: Optional[str] = None, artifact_id: Optional[str] = None) -> Result:
+def get_artifact(task: Task, artifact: Optional[str] = None, artifact_id: Optional[str] = None) -> Result[Any]:
     """
     Retrieves the specified artifact from the Infrahub storage.
 
@@ -217,7 +217,7 @@ def get_artifact(task: Task, artifact: Optional[str] = None, artifact_id: Option
         artifact_id (str, optional): The id of the artifact to retrieve.
 
     Returns:
-        Result: An object containing the retrieved artifact data, its content type, and
+        Result[Any]: An object containing the retrieved artifact data, its content type, and
                 the success status of the operation.
 
     Raises:
@@ -264,7 +264,7 @@ def get_artifact(task: Task, artifact: Optional[str] = None, artifact_id: Option
     return _artifact_result(task, artifact_node, content)
 
 
-async def aget_artifact(task: Task, artifact: Optional[str] = None, artifact_id: Optional[str] = None) -> Result:
+async def aget_artifact(task: Task, artifact: Optional[str] = None, artifact_id: Optional[str] = None) -> Result[Any]:
     """
     Retrieves the specified artifact from the Infrahub storage, without blocking the event loop.
 
@@ -277,7 +277,7 @@ async def aget_artifact(task: Task, artifact: Optional[str] = None, artifact_id:
         artifact_id (str, optional): The id of the artifact to retrieve.
 
     Returns:
-        Result: An object containing the retrieved artifact data, its content type, and
+        Result[Any]: An object containing the retrieved artifact data, its content type, and
                 the success status of the operation.
 
     Raises:
@@ -328,7 +328,7 @@ def _check_artifact_args(artifact: Optional[str], artifact_id: Optional[str], ta
         )
 
 
-def _artifact_result(task: Task, artifact_node: Any, content: str) -> Result:
+def _artifact_result(task: Task, artifact_node: Any, content: str) -> Result[Any]:
     if artifact_node.content_type.value == "application/json":
         data = json.loads(content)
     else:
