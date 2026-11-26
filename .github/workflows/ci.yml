@@ -71,7 +71,7 @@ jobs:
       - name: "Linting: ruff format"
         run: "uv run ruff format --check --diff ."
       - name: "Type check with ty"
-        run: "uv run ty check nornir_infrahub"
+        run: "uv run ty check nornir_infrahub tests/unit/test_typed_results.py"
       - name: "Pylint Tests"
         run: "uv run pylint nornir_infrahub *.py"
 
